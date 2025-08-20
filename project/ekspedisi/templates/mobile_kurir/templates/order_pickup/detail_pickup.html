@@ -1,0 +1,312 @@
+{% extends '../base.html' %}
+{% load static %}
+{% load custom_filter %}
+
+{% block title_name %}
+ <title>Pengiriman | BaliGo Ekspedisi</title>
+{% endblock %}
+
+{% block file_css %}
+<!-- Daterange picker -->
+<link rel="stylesheet" href="{% static 'assets/plugins/daterangepicker/daterangepicker.css' %}">
+<!-- summernote -->
+<link rel="stylesheet" href="{% static 'assets/plugins/summernote/summernote-bs4.css' %}">
+<link rel="stylesheet" href="{% static 'assets/plugins/sweetalert2/sweetalert2.min.css' %}">
+
+<style>
+  #preview,
+  #preview-sampai{
+     width:100%;
+     height: auto;
+     margin:0px auto;
+  }
+</style>
+{% endblock %}
+
+{% block nav_link %}
+  <a class="nav-link breadcrumb_mobile" href="{% url 'kurir_order_pickup' %}">
+    <i class="fas fa-chevron-left"></i>&nbsp;&nbsp;Detail Order
+  </a>
+{% endblock nav_link %}
+
+{% block content %}
+  <div class="callout callout-danger">
+    <h5 class="mb-0">{{ data.id_order }}</h5>
+    <small class="text-muted">*Pastikan data pengiriman sudah benar</small>
+  </div>
+  <hr>
+  <div class="card">
+    <div class="card-header">
+      <div class="row">
+        <div class="form-group col-6">
+          <div class="callout callout-danger">
+            <h5 class="text-center mb-0">PENGIRIM</h5>
+            <div class="text-center">
+              <small class="text-center">*Info Detail Pengirim</small>
+            </div>
+          </div>
+          <div>
+            <h6><strong><i class="fas fa-user"></i>&nbsp;&nbsp;Nama :</strong></h6>
+            <h6>{{ data.id_customer.first_name }}</h6>
+          </div>
+          <div>
+            <h6><strong><i class="fas fa-phone-alt"></i>&nbsp;&nbsp;No Telp :</strong></h6>
+            <h6>{{ data.id_customer.no_telp }}</h6>
+          </div>
+          <div>
+            <h6><strong><i class="fas fa-envelope"></i>&nbsp;&nbsp;Email :</strong></h6>
+            <h6>{{ data.id_customer.email }}</h6>
+          </div>
+          <div>
+            <h6><strong><i class="fas fa-map-marker-alt"></i>&nbsp;&nbsp;Alamat :</strong></h6>
+            <h6>
+              {% if data.alamat_pengirim_alt %}
+                {{ data.alamat_pengirim_alt }}
+              {% else %}
+                {{ data.id_customer.alamat }}
+              {% endif %}
+            </h6>
+          </div>
+          <div class="callout callout-danger">
+            <h5 class="text-center mb-0">Lokasi</h5>
+            <div class="text-center">
+              <small class="text-center">*Lokasi Pengirim</small>
+            </div>
+          </div>
+          <div>
+            <h6><strong>Provinsi :</strong></h6>
+            <h6>{{ data.provinsi_pengirim }}</h6>
+          </div>
+          <div>
+            <h6><strong>Kabupaten :</strong></h6>
+            <h6>{{ data.kota_pengirim }}</h6>
+          </div>
+          <div>
+            <h6><strong>Kecamatan :</strong></h6>
+            <h6>{{ data.kecamatan_pengirim }}</h6>
+          </div>
+          <div>
+            <h6><strong>Kode POS :</strong></h6>
+            <h6>{{ data.kode_pos_pengirim }}</h6>
+          </div>
+        </div>
+        <div class="form-group col-6">
+          <div class="callout callout-danger">
+            <h5 class="text-center mb-0">PENERIMA</h5>
+            <div class="text-center">
+              <small class="text-center">*Info Detail Penerima</small>
+            </div>
+          </div>
+          <div>
+            <h6><strong><i class="fas fa-user"></i>&nbsp;&nbsp;Nama :</strong></h6>
+            <h6>{{ data.nama_penerima }}</h6>
+          </div>
+          <div>
+            <h6><strong><i class="fas fa-phone-alt"></i>&nbsp;&nbsp;No Telp :</strong></h6>
+            <h6>{{ data.no_tlp_penerima }}</h6>
+          </div>
+          <div>
+            <h6><strong><i class="fas fa-envelope"></i>&nbsp;&nbsp;Email :</strong></h6>
+            <h6>{{ data.email_penerima }}</h6>
+          </div>
+          <div>
+            <h6><strong><i class="fas fa-map-marker-alt"></i>&nbsp;&nbsp;Alamat :</strong></h6>
+            <h6>{{ data.alamat_penerima }}</h6>
+          </div>
+          <div>
+            <div class="callout callout-danger">
+            <h5 class="text-center mb-0">Lokasi</h5>
+            <div class="text-center">
+              <small class="text-center">*Lokasi Penerima</small>
+            </div>
+          </div>
+            <h6><strong>Provinsi :</strong></h6>
+            <h6>{{ data.provinsi_penerima }}</h6>
+          </div>
+          <div>
+            <h6><strong>Kabupaten :</strong></h6>
+            <h6>{{ data.kota_penerima }}</h6>
+          </div>
+          <div>
+            <h6><strong>Kecamatan :</strong></h6>
+            <h6>{{ data.kecamatan_penerima }}</h6>
+          </div>
+          <div>
+            <h6><strong>Kode POS :</strong></h6>
+            <h6>{{ data.kode_pos_penerima }}</h6>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <div class="form-group">
+            <div class="callout callout-danger">
+              <h5 class="text-center mb-0">Status Order Pickup</h5>
+              <div class="text-center">
+                <small class="text-center">*Ubah status disini</small>
+              </div>
+            </div>
+            {% if data.status == 'done' %}
+              <button class="btn btn-success btn-block" readonly>Order Telah Berhasil</button>
+            {% elif data.status == 'cancel' %}
+              <button class="btn btn-danger btn-block" readonly>Order telah Dibatalkan</button>
+            {% else %}
+            <form id="ubah_status" method="POST">
+              {% csrf_token %}
+              <div class="form-group">
+                <input type="hidden" name="id_order" value="{{ data.id_order }}">
+                <input type="hidden" name="id_kurir" value="{{ request.user.id }}">
+                <select class="form-control" required="" id="select-status" name="status_order">
+                  <option value="done" default selected>Done</option>
+                  <option value="cancel">Cancel Order</option>
+                </select>
+              </div>
+              <button type="submit" disabled class="btn btn-block btn-primary btn-status-order">Update Status</button>
+              <br>
+            </form>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
+
+{% block file_js %}
+<!-- ChartJS -->
+<script src="{% static 'custom_js/qr_scan.js' %}"></script>
+<script src="{% static 'assets/plugins/sweetalert2/sweetalert2.min.js' %}"></script>
+<script src="https://js.pusher.com/7.0/pusher.min.js"></script>
+<script type="text/javascript">
+  function setVal(value) {
+    try{
+      $('input[name="status"]').val(value)
+    }catch(message){}
+  }
+
+  $(function(){
+    $('.btn-status-order').prop('disabled', false);
+    $('#ubah_status').submit(function(e){
+      e.preventDefault();
+      var status_value = $('#select-status').val() || 0;
+      if(status_value=='done'){
+        Swal.queue([{
+          title: 'Upload data',
+          text: 'Apakah anda yakin ingin mengupload data ?',
+          showLoaderOnConfirm: true,
+          confirmButtonText: 'Ya, Lanjutkan', 
+          showCancelButton: true,
+          allowOutsideClick: false,
+          preConfirm: () => {
+            var form = $('#ubah_status')[0];
+            var formData = new FormData(form);
+            $.ajax({
+              url: '/mobile_kurir/kurir_update_order',
+              type: 'POST',
+              data: formData,
+              contentType: false,
+              processData: false,
+            }).done((result) => {
+              Swal.fire({
+                title:result.title, 
+                text:result.msg, 
+                icon:result.type,
+                allowOutsideClick: false,
+              }).then((result)=> {
+                if(result.value) {
+                  location.href = '/mobile_kurir/kurir_order_pickup'
+                }
+              })
+            }).fail(error => {
+              console.log('FAIL', error.responseJSON)
+              if(error.status==401 || error.status==500){
+                return Swal.fire('Error',error.statusText, 'error')
+                .then((result)=> {
+                  if(result.value) {
+                    location.href = '/mobile_kurir/kurir_order_pickup'
+                  }
+                });
+              }
+              Swal.fire(error.responseJSON.title, error.responseJSON.msg, error.responseJSON.type)
+              .then((result)=> {
+                if(result.value) {
+                  location.href = '/mobile_kurir/kurir_order_pickup'
+                }
+              });
+            })
+          }
+        }]);
+      }
+      else {
+        Swal.fire({
+          title: 'Alasan Cancel Order',
+          text: 'Masukkan alasan cancel order dibawah',
+          input: 'text',
+          inputAttributes: {
+            autocapitalize: 'off',
+            name: 'keterangan_cancel',
+          },
+          showCancelButton: true,
+          confirmButtonText: 'Lanjutkan',
+          showLoaderOnConfirm: true,
+          preConfirm: (keterangan_cancel) => {
+            var form = $('#ubah_status')[0];
+            var formData = new FormData(form);
+            formData.append('keterangan_cancel', keterangan_cancel);
+            $.ajax({
+              url: '/mobile_kurir/kurir_update_order',
+              type: 'POST',
+              data: formData,
+              contentType: false,
+              processData: false,
+            }).done((result) => {
+              Swal.fire({
+                title:result.title, 
+                text:result.msg, 
+                icon:result.type,
+                allowOutsideClick: false,
+              }).then((result)=> {
+                if(result.value) {
+                  location.href = '/mobile_kurir/kurir_order_pickup'
+                }
+              })
+            }).fail(error => {
+              console.log('FAIL', error.responseJSON)
+              if(error.status==401 || error.status==500){
+                return Swal.fire('Error',error.statusText, 'error')
+                .then((result)=> {
+                  if(result.value) {
+                    location.href = '/mobile_kurir/kurir_order_pickup'
+                  }
+                })
+              }
+              Swal.fire(error.responseJSON.title, error.responseJSON.msg, error.responseJSON.type)
+              .then((result)=> {
+                if(result.value) {
+                  location.href = '/mobile_kurir/kurir_order_pickup'
+                }
+              });
+            })
+          },
+          allowOutsideClick: false
+        })
+      }
+      return false;
+    });
+
+    $('#modal-scanner').on('hide.bs.modal', function(){
+      try {
+        scanner.stop()
+        .then(function(){
+          document.getElementById('#scanner-body').innerHTML = "<video id='preview'></video>";
+        })
+      } catch(message) {
+        console.log(message)
+      };
+    });
+
+    
+  });
+</script>
+{% endblock file_js %}

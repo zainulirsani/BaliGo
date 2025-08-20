@@ -1,0 +1,129 @@
+{% extends '../base.html' %}
+{% load static %}
+{% block title_name %}
+<title>Reset | BaliGo Ekspedisi</title>
+{% endblock %}
+{% block file_css %}
+<link href="{% static 'frontend/css/about.css' %}" rel="stylesheet">
+<link href="{% static 'frontend/css/register.css' %}" rel="stylesheet">
+{% endblock %}
+{% block slider %}
+{% endblock %}
+{% block content %}
+<section id="about1" class="about about-1 pb-0">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12" id="form_login" style="width: 100%; height: auto;">
+                <div class="contact-panel contact-panel-2" style="background-image: url({% static 'frontend/gif/login.gif'%}); background-size: 230px auto; background-repeat: no-repeat; background-position: left 10px top 10px;; height: auto; background-color: #ffffff; border: 2px;">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <br>
+                            <br>
+                            <h1 style="text-align: right;">Reset Password</h1>
+                            <br>
+                            <form id="formResetV1" method="post" data-url="{% url 'customer_reset_v1' %}">
+                                {% csrf_token %}
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        
+                                    </div>
+                                    <div class="col-md-6">
+                                        <input class="form-control" type="text" name="email" value="{{data.email}}" placeholder="Masukan email Anda" style="">
+                                    </div>
+                                </div>
+                                
+                                <button class="primary-btn float-right" id="send_email" style="transform: translateX(-600px); animation: 1.2s slideIn_x ease-in-out forwards 1s;">Kirim Reset Link</button>
+                            </form>
+                            <br>
+                            <br>
+                            <hr class="new1" width="40%" style="float: right;">
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /.col-lg-6 -->
+        </div><!-- /.row -->
+    </div><!-- /.container -->
+</section><!-- /.About 1 -->
+<br>
+<br>
+<br>
+{% endblock %}
+{% block file_js %}
+<script type="text/javascript">
+$(document).ready(function() {
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function tampilkan_pesan(pesan, type) {
+        Toast.fire({
+            icon: type,
+            title: pesan
+        });
+    }
+
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000
+    });
+
+    // CREATE DATA ACTION
+    $("#send_email").click(function(e) {
+        $("#send_email").prop("disabled", true);
+        e.preventDefault();
+        var serializeData = $("#formResetV1")[0];
+        serializeData = new FormData(serializeData);
+
+        $.ajax({
+            url: $("#formResetV1").data('url'),
+            data: serializeData,
+            type: 'post',
+            cache: false,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                
+                setTimeout(function() {
+                    document.getElementsByClassName('mobile-nav-toggle')[0].style.display = 'none';
+                    tampilkan_pesan(response.msg, response.status);
+                }, 1000);
+                $("#formResetV1")[0].reset();
+                $("#send_email").prop("disabled", false);
+                setTimeout(function() {
+                    document.getElementsByClassName('mobile-nav-toggle')[0].style.display = 'block';
+                }, 4000);
+                
+            },
+            error: function(xhr, status, error) {
+                // $('#modal_pengemasan').modal('hide');
+                
+                setTimeout(function() {
+                    document.getElementsByClassName('mobile-nav-toggle')[0].style.display = 'none';
+                    var error_response = xhr.responseJSON;
+                    tampilkan_pesan(error_response.msg, error_response.status);
+                }, 1000)
+                $("#send_email").prop("disabled", false);
+                setTimeout(function() {
+                    document.getElementsByClassName('mobile-nav-toggle')[0].style.display = 'block';
+                }, 4000);
+            },
+        })
+    });
+
+});
+</script>
+{% endblock %}

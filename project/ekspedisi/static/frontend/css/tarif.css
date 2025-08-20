@@ -1,0 +1,310 @@
+/*Animate Gradient*/
+.animate_gradient {
+    background: linear-gradient(-45deg, #70a1ff, #0fbcf9, #2ed573, #eccc68);
+    background-size: 300% 300%;
+    animation: gradient 15s ease infinite;
+}
+
+@keyframes gradient {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/*END Animate Gradient*/
+
+@keyframes slideIn {
+    100% {
+        transform: translateY(0px);
+        opacity: 1;
+    }
+}
+
+@keyframes slideIn_x {
+    100% {
+        transform: translateX(0px);
+        opacity: 1;
+    }
+}
+
+.table td,
+.table th {
+    white-space: nowrap;
+    width: 1%;
+}
+
+.input_field {
+    background: rgba(255, 255, 255, 0.4);
+    border: none;
+    position: relative;
+    outline: none;
+    width: 100%;
+    height: auto;
+    margin: 0 auto;
+    margin-bottom: 20px;
+    border-radius: 25px;
+    /*padding: 10px;*/
+    color: #333;
+    -webkit-box-shadow: 0 2px 10px 1px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 2px 10px 1px rgba(0, 0, 0, 0.5);
+    transform: translateX(-600px);
+    animation: 1.2s slideIn_x ease-in-out forwards 1s;
+}
+
+::-webkit-input-placeholder {
+    color: #666;
+}
+
+:-moz-placeholder {
+    color: #666;
+}
+
+::-moz-placeholder {
+    color: #666;
+}
+
+:-ms-input-placeholder {
+    color: #666;
+}
+
+
+.select2-container * {
+    border-radius: 25px !important;
+}
+
+.select2-container--bootstrap4 .select2-selection--single .select2-selection__rendered {
+    line-height: 2.25rem;
+    box-shadow: 0 2px 10px 1px rgba(0, 0, 0, 0.5);
+}
+
+.select2-container--bootstrap4 .select2-results>.select2-results__options {
+    max-height: 15em;
+    overflow-y: unset;
+}
+
+
+.btn_cek_tarif {
+    background: rgba(101, 215, 60, 0.4);
+    border: none;
+    outline: none;
+    width: 100%;
+    top: 5px;
+    margin-bottom: 20px;
+    border-radius: 25px;
+    padding: 10px;
+    color: #333;
+    -webkit-box-shadow: 0 2px 10px 1px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 2px 10px 1px rgba(0, 0, 0, 0.5);
+}
+
+.btn_cek_tarif:hover {
+    background: rgba(84, 188, 47, 0.4);
+    border: none;
+    outline: none;
+    width: 100%;
+    top: 5px;
+    margin-bottom: 20px;
+    border-radius: 25px;
+    padding: 10px;
+    color: #333;
+    -webkit-box-shadow: 0 2px 10px 1px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 2px 10px 1px rgba(0, 0, 0, 0.5);
+}
+
+.shadow {
+    border-radius: 20px;
+    padding: 1.5em 10px;
+    -webkit-box-shadow: 0px 4px 13px 6px #cccccc80 !important;
+    /* Safari 3-4, iOS 4.0.2 - 4.2, Android 2.3+ */
+    -moz-box-shadow: 0px 4px 13px 6px #cccccc80 !important;
+    /* Firefox 3.5 - 3.6 */
+    box-shadow: 0px 4px 13px 6px #cccccc80 !important;
+    /* Opera 10.5, IE 9, Firefox 4+, Chrome 6+, iOS 5 */
+}
+
+.round {
+    border-radius: 20px 0px 0px 20px;
+    /* top left, top right, bottom right, bottom left */
+}
+
+@media (max-width: 768px) {
+    .round {
+        border-radius: 20px 20px 20px 20px;
+        /* top left, top right, bottom right, bottom left */
+    }
+}
+
+/** SPINNER CREATION **/
+.loader {
+    position: relative;
+    text-align: center;
+    margin: 15px auto 35px auto;
+    z-index: 9999;
+    display: block;
+    width: 80px;
+    height: 80px;
+    border: 10px solid rgba(0, 0, 0, .3);
+    border-radius: 50%;
+    border-top-color: #000;
+    animation: spin 1s ease-in-out infinite;
+    -webkit-animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to {
+        -webkit-transform: rotate(360deg);
+    }
+}
+
+@-webkit-keyframes spin {
+    to {
+        -webkit-transform: rotate(360deg);
+    }
+}
+
+/** MODAL STYLING **/
+.modal-content {
+    border-radius: 0px;
+    box-shadow: 0 0 20px 8px rgba(0, 0, 0, 0.7);
+}
+
+.modal-backdrop.show {
+    opacity: 0.75;
+}
+
+.loader-txt {
+    p {
+        font-size: 13px;
+        color: #666;
+
+        small {
+            font-size: 11.5px;
+            color: #999;
+        }
+    }
+}
+
+
+/*--------------------------------------------------------------
+# Slider
+--------------------------------------------------------------*/
+.btn_slider {
+    border-radius: 2px;
+    padding: 8px 12px;
+    color: #399EF1;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: 0.5s ease;
+}
+
+.card_slider {
+    background: #FFFFFF;
+    max-width: 400px;
+    margin: 0 auto;
+    border-radius: 12px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+    box-sizing: border-box;
+    padding: 48px;
+    /*text-align: center;*/
+}
+
+.products_slider {
+    position: relative;
+    overflow: hidden;
+    transition: 0.5s ease;
+}
+
+.product {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    visibility: hidden;
+    transition: 0.5s ease;
+}
+
+.product.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.thumbnail_slider {
+    margin: 0 0 auto;
+    text-align: center;
+}
+
+.thumbnail_slider img {
+    height: auto;
+    width: 80px;
+}
+
+.title_slider {
+    margin: 0 0 12px;
+    color: #399EF1;
+    font-size: 24px;
+    transition: 0.5s ease;
+    text-align: center;
+}
+
+.description_slider {
+    margin: 0 0 48px;
+    text-align: justify;
+}
+
+.footer_slider {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin: 15px -12px -12px;
+}
+
+[ripple] {
+    z-index: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+[ripple] .ripple {
+    position: absolute;
+    background: #FFFFFF;
+    width: 60px;
+    height: 60px;
+    border-radius: 100%;
+    transform: scale(0);
+    -webkit-animation: ripple 2s;
+    animation: ripple 2s;
+}
+
+@-webkit-keyframes ripple {
+    0% {
+        transform: scale(0);
+        opacity: 0.2;
+    }
+
+    100% {
+        transform: scale(20);
+        opacity: 0;
+    }
+}
+
+@keyframes ripple {
+    0% {
+        transform: scale(0);
+        opacity: 0.2;
+    }
+
+    100% {
+        transform: scale(20);
+        opacity: 0;
+    }
+}

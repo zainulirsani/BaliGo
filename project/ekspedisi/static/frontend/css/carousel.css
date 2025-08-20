@@ -1,0 +1,145 @@
+/*----------------------
+    Carousel
+-----------------------*/
+[data-nav=false] .owl-nav,
+[data-dots=false] .owl-dots {
+  display: none;
+}
+
+.owl-carousel .owl-item img {
+  width: 100%;
+}
+
+.carousel-dots .owl-dots {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.carousel-dots .owl-dots .owl-dot {
+  background-color: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 12px;
+  height: 12px;
+  margin: 0 20px;
+}
+
+.carousel-dots .owl-dots .owl-dot span {
+  display: block;
+  width: 8px;
+  height: 8px;
+  border: 2px solid #a5a5a5;
+  border-radius: 50%;
+  -webkit-transition: all 0.4s ease;
+  -moz-transition: all 0.4s ease;
+  -ms-transition: all 0.4s ease;
+  -o-transition: all 0.4s ease;
+  transition: all 0.4s ease;
+}
+
+.carousel-dots .owl-dots .owl-dot:not(:last-child):after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 20px;
+  width: 12px;
+  height: 2px;
+  display: block;
+  background-color: #eee;
+  -webkit-transform: translateY(-50%);
+  -moz-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  -o-transform: translateY(-50%);
+  transform: translateY(-50%);
+}
+
+.carousel-dots .owl-dots .owl-dot:not(:first-child):before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: -20px;
+  width: 12px;
+  height: 2px;
+  display: block;
+  background-color: #eee;
+  -webkit-transform: translateY(-50%);
+  -moz-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  -o-transform: translateY(-50%);
+  transform: translateY(-50%);
+}
+
+.carousel-dots .owl-dots .owl-dot.active span {
+  border-color: #49b44b;
+  -webkit-transform: scale(1.5);
+  -moz-transform: scale(1.5);
+  -ms-transform: scale(1.5);
+  -o-transform: scale(1.5);
+  transform: scale(1.5);
+}
+
+.carousel-dots .owl-dots .owl-dot.active:before,
+.carousel-dots .owl-dots .owl-dot.active:after {
+  background-color: #49b44b;
+}
+
+.carousel-dots-white .owl-dots .owl-dot.active span,
+.carousel-dots-white .owl-dots .owl-dot span {
+  border-color: #fff;
+}
+
+.carousel-dots-white .owl-dots .owl-dot.active:before,
+.carousel-dots-white .owl-dots .owl-dot.active:after {
+  background-color: #fff;
+}
+
+.carousel-arrows .owl-nav .owl-prev,
+.carousel-arrows .owl-nav .owl-next {
+  position: absolute;
+  top: 50%;
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+  color: #999999;
+  font-size: 0;
+  font-weight: 400;
+  text-align: center;
+  background-color: transparent;
+  cursor: pointer;
+  padding: 0;
+  border-radius: 0;
+  transition: all 0.3s ease;
+  -webkit-transition: all 0.3s ease;
+  -moz-transition: all 0.3s ease;
+  -ms-transition: all 0.3s ease;
+  -o-transition: all 0.3s ease;
+  transform: translateY(-50%);
+}
+
+.carousel-arrows .owl-nav .owl-prev:hover,
+.carousel-arrows .owl-nav .owl-next:hover {
+  color: #49b44b;
+  background-color: transparent;
+}
+
+.carousel-arrows .owl-nav .owl-prev {
+  left: 0;
+}
+
+.carousel-arrows .owl-nav .owl-prev:before {
+  font-family: "icomoon";
+  /*content: "";*/
+  font-size: 50px;
+}
+
+.carousel-arrows .owl-nav .owl-next {
+  right: 0;
+}
+
+.carousel-arrows .owl-nav .owl-next:before {
+  font-family: "icomoon";
+  /*content: "";*/
+  font-size: 50px;
+}

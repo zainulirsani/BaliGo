@@ -1,0 +1,430 @@
+{% extends '../base.html' %}
+{% load static %}
+
+{% block title_name %}
+ <title>Order Pickup | Samitra Ekspedisi</title>
+{% endblock %}
+
+{% block file_css %}
+<!-- DataTables -->
+<link rel="stylesheet" href="{% static 'assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+<link rel="stylesheet" href="{% static 'assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+ <!-- SweetAlert2 -->
+<link rel="stylesheet" href="{% static 'assets/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css' %}">
+<link rel="stylesheet" href="{% static 'assets/plugins/daterangepicker/daterangepicker.css' %}">
+
+<style>
+	#preview{
+	   width:100%;
+	   height: auto;
+	   margin:0px auto;
+	}
+</style>
+{% endblock %}
+
+{% block breadcrumb_mobile %}
+	Order Pickup
+{% endblock breadcrumb_mobile %}
+
+{% block content %}
+<!-- /.modal -->
+<div class="modal fade" id="modal-scanner">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title" id="title_modal"><i class="fas fa-qrcode"></i>&nbsp;&nbsp;Scan Order</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body" id="scanner-body">
+				<video id="preview" style="height: 170px;overflow: hidden;object-fit: cover;"></video>
+			</div>
+			{% comment %}
+			<div class="play-pause-btn-mobile" style="top:15px; right:15px">
+			<button type="button" class="btn btn-default btn-switch-order" data-camera="0">
+				<i class="fas fa-history"></i>
+			</button>
+			</div>
+			{% endcomment %}
+			<div class="modal-footer justify-content-between">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
+			</div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<div class="card mb-4 card-title-sticky">
+	<div class="card-header">
+		<div class="card-tools">
+			<ul class="nav nav-pills ml-auto p-2">
+				<li class="nav-item"><a class="nav-link active" onclick="$('.form-search-order-wrapper').show('fast')" href="#tab_outlet" data-toggle="tab"><i class="nav-icon fas fa-search"></i>&emsp;Pencarian Data</a></li>
+				<li class="nav-item"><a class="nav-link" onclick="$('.form-search-order-wrapper').hide('fast')" href="#tab_gudang" data-toggle="tab"><i class="nav-icon fas fa-history"></i>&emsp;History / Arsip</a></li>
+			</ul>
+		</div>
+	</div>
+	<div class="offset-lg-2 offset-md-2 col-lg-8 col-md-8 form-search-order-wrapper">
+		<form id="form-search-order" class="card-header">
+			<div class="mb-1">
+				<div class="input-group input-group-sm">
+				  <div class="input-group-prepend">
+					<select class="form-control search-mobile" name='search-by'>
+						<option value="id_order">No. Order</option>
+						<option value="id_customer__first_name">Nama Pengirim</option>
+						<option value="id_customer__no_telp">Telp Pengirim</option>
+					</select>
+				  </div>
+				  <!-- /btn-group -->
+				  <input type="text" id="search-data" name='search-value' placeholder="Pencarian Data...." class="form-control">
+				  <button type="submit" class="btn bg-secondary text-white btn-sm barcode-group no-border-radius"><i class="fas fa-search"></i></button>
+			      <a class="btn btn-primary text-white btn-sm barcode-group"><i class="fas fa-qrcode"></i></a>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-6 pr-0">
+					<div class="input-group input-group-sm date" id="orderstart" data-target-input="nearest">
+                        <input type="text" placeholder="Tanggal awal" name="orderstart" class="form-control datetimepicker-input" data-target="#orderstart"/>
+                        <div class="input-group-append" data-target="#orderstart" data-toggle="datetimepicker">
+                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                        </div>
+                    </div>
+        		</div>
+        		<div class="col-6 pl-0">
+        			<div class="input-group input-group-sm date" id="orderend" data-target-input="nearest">
+                        <input type="text" placeholder="Tanggal akhir" name="orderend" class="form-control datetimepicker-input" data-target="#orderend"/>
+                        <div class="input-group-append" data-target="#orderend" data-toggle="datetimepicker">
+                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                        </div>
+                    </div>
+        		</div>
+        	</div>
+		</form>
+	</div>
+</div>
+
+<div class="card">
+	<!-- /.card-header -->
+	<div class="card-body">
+		{% csrf_token %}
+		<!-- ANY MESSAGE GOES HERE -->
+	    {% if messages %}
+	    {% for message in messages %}
+	    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+	      {{ message }}
+	      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+	        <span aria-hidden="true">&times;</span>
+	      </button>
+	    </div>
+	    {% endfor %}
+	    {% endif %}
+	    <!-- END MESSAGE -->
+		
+		<div class="tab-content">
+			<div class="tab-pane active" id="tab_outlet">
+				{% if pencarian %}
+				<div class="mb-3">
+					<h6 class="text-muted"><a href="{% url 'kurir_order_pickup' %}" class="btn btn-danger btn-danger btn-xs"><i class="text-white fas fa-window-close"></i></a>&nbsp;&nbsp;Hasil Pencarian :</h6>
+				</div>
+				{% endif %}
+				{% comment %}
+				<div class="mb-3">
+					<form id="form-search-order">
+						<div class="mb-1">
+							<div class="input-group input-group-sm">
+							  <div class="input-group-prepend">
+								<select class="form-control search-mobile" name='search-by'>
+									<option value="id_order">No. Order</option>
+									<option value="id_customer__first_name">Nama Pengirim</option>
+									<option value="id_customer__no_telp">Telp Pengirim</option>
+								</select>
+							  </div>
+							  <!-- /btn-group -->
+							  <input type="text" id="search-data" name='search-value' placeholder="Pencarian Data...." class="form-control">
+							  <button type="submit" class="btn bg-secondary text-white btn-sm barcode-group no-border-radius"><i class="fas fa-search"></i></button>
+						      <a class="btn btn-primary text-white btn-sm barcode-group"><i class="fas fa-qrcode"></i></a>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-6 pr-0">
+								<div class="input-group input-group-sm date" id="orderstart" data-target-input="nearest">
+			                        <input type="text" placeholder="Tanggal awal" name="orderstart" class="form-control datetimepicker-input" data-target="#orderstart"/>
+			                        <div class="input-group-append" data-target="#orderstart" data-toggle="datetimepicker">
+			                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+			                        </div>
+			                    </div>
+	                		</div>
+	                		<div class="col-6 pl-0">
+	                			<div class="input-group input-group-sm date" id="orderend" data-target-input="nearest">
+			                        <input type="text" placeholder="Tanggal akhir" name="orderend" class="form-control datetimepicker-input" data-target="#orderend"/>
+			                        <div class="input-group-append" data-target="#orderend" data-toggle="datetimepicker">
+			                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+			                        </div>
+			                    </div>
+	                		</div>
+	                	</div>
+					</form>
+				</div>
+				{% endcomment %}
+				{% if order|length %}
+				<!-- ISI DATA TABLE LIST OUTLET/TOKO -->
+					{% for data in order %}
+						<div class="card card-widget widget-user-2 shadow">
+						  {% comment %}
+						  <div class="quick-access-mobile">
+							<div class="btn-group">
+								<button type="button" class="btn btn-default btn-flat" data-toggle="dropdown"><i class="fas fa-ellipsis-h"></i>
+								  <span class="sr-only">Toggle Dropdown</span>
+								  <div class="dropdown-menu" role="menu">
+									<a class="dropdown-item" href="#">Arsip Order</a>
+								  </div>
+								</button>
+							</div>
+						  </div>
+						  {% endcomment %}
+						  <div class="widget-user-header bg-secondary">
+							<!-- /.widget-user-image -->
+							<h3 class="widget-user-username">{{ data.id_order }}</h3>
+							<h5 class="widget-user-desc"><i class="fas fa-user-circle"></i>&nbsp;&nbsp;{{ data.id_customer.first_name }}</h5>
+							<h5 class="widget-user-desc"><i class="fas fa-phone-alt"></i>&nbsp;&nbsp;{{ data.id_customer.no_telp }}</h5>
+						  </div>
+						  <div class="card-footer p-0">
+							<ul class="nav flex-column">
+							  <li class="nav-item">
+								<span class="nav-link text-muted">
+								  <i class="fas fa-map-marker-alt"></i> 
+								  {% if data.alamat_pengirim_alt %}
+								  	{{ data.alamat_pengirim_alt }}
+								  {% else %}
+								  	{{ data.id_customer.alamat }}
+								  {% endif %}
+								</span>
+							  </li>
+							</ul>
+						  </div>
+						  <div>
+							<div class="btn-wrapper">
+								{% url 'kurir_order_detail' data.id as order_detail %}
+								<a href="{{ order_detail }}" class="btn btn-sm btn-block btn-danger text-white"><i class="fas fa-eye"></i>&nbsp;&nbsp;Lihat Detail Order</a>
+							</div>
+						  </div>
+						</div>
+						<hr>
+					{% endfor %}
+				{% else %}
+				 <div class="text-center">TIDAK ADA DATA TERBARU</div>
+				{% endif %}
+			</div>
+			<!-- /.tab-pane -->
+			<div class="tab-pane" id="tab_gudang">
+				<!-- ISI DATA TABLE LIST GUDANG -->
+				 {% if order_berhasil|length %}
+				 <div class="text-center mb-3">
+		            <h5 class="text-muted"><strong>History Order Anda</strong></h5>
+		          </div>
+		          <table id="table-history" class="table table-bordered table-stripped">
+		            <thead>
+		              <tr>
+		                <th>ID Order</th>
+		                <th>ID Pengiriman</th>
+		                <th>Tanggal</th>
+		              </tr>
+		            </thead>
+		            <tbody>
+		              {% for data in order_berhasil %}
+		                <tr class="text-center">
+		                  <td>{{ data.id_order }}</td>
+		                  <td>{{ data.orderpickup_pengiriman__id_pengiriman }}</td>
+		                  <td>{{ data.created_at|date:'d-m-Y H:i:s' }}</td>
+		                </tr>
+		              {% endfor %}
+		            </tbody>
+		          </table>
+				 {% else %}
+				 <div class="text-center">TIDAK ADA DATA</div>
+				 {% endif %}
+			</div>
+			
+		</div>
+
+		
+	</div>
+	<!-- /.card-body -->
+</div>
+{% endblock %}
+
+{% block file_js %}
+<!-- DataTables -->
+<script src="{% static 'assets/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+<!-- SweetAlert2 -->
+<script src="{% static 'assets/plugins/sweetalert2/sweetalert2.min.js' %}"></script>
+<script src="{% static 'custom_js/instascan.min.js' %}"></script>
+<!-- <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script> -->
+<!-- InputMask -->
+<script src="{% static 'assets/plugins/moment/moment.min.js' %}"></script>
+<script src="{% static 'assets/plugins/inputmask/jquery.inputmask.min.js' %}"></script>
+<!-- date-range-picker -->
+<script src="{% static 'assets/plugins/daterangepicker/daterangepicker.js' %}"></script>
+<!-- Tempusdominus Bootstrap 4 -->
+<script src="{% static 'assets/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js' %}"></script>
+<!-- <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/underscore@1.12.0/underscore-min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lodash@4.17.10/lodash.min.js"></script> -->
+<script>
+	$(document).ready(function(){
+		var csrfToken = $("input[name=csrfmiddlewaretoken]").val();
+		var url_edit = '';
+
+		function tampilkan_pesan(pesan, type){
+			Toast.fire({
+			icon: type,
+			title: pesan
+		  });
+		}
+
+		$('#table-history thead th').each( function () {
+	        var title = $(this).text();
+	        $(this).html(`<p style="margin:5px">${title}</p><input type="text" placeholder="Cari Data.."/>` );
+	    });
+
+		$('#table-history').DataTable({
+        	"paging":   false,
+        	"ordering": false,
+        	"info":     false,
+        	initComplete: function () {
+	            // Apply the search
+	            this.api().columns().every( function () {
+	                var that = this;
+	                $( 'input', this.header() ).on( 'keyup change clear', function () {
+	                    if ( that.search() !== this.value ) {
+	                        that
+	                            .search( this.value )
+	                            .draw();
+	                    }
+	                } );
+	            } );
+	        }
+   		 });
+
+		function generate_token(){
+			var now = new Date();
+			timestamp = now.getFullYear().toString(); // 2011
+			timestamp += (now.getMonth < 12 ? '0' : '') + now.getMonth().toString();
+			timestamp += ((now.getDate < 30) ? '0' : '') + now.getDate().toString();
+			timestamp += ((now.getHours < 12) ? '0' : '') + now.getHours().toString();
+			timestamp += ((now.getMinutes < 60) ? '0' : '') + now.getMinutes().toString();
+			timestamp += ((now.getSeconds < 60) ? '0' : '') + now.getSeconds().toString();
+			return timestamp;
+		}
+
+		const Toast = Swal.mixin({
+		  toast: true,
+		  position: 'top-end',
+		  showConfirmButton: false,
+		  timer: 3000
+		});
+
+
+		var scanner = {};
+		$('.barcode-group').on('click', function(){
+			scanner = new Instascan.Scanner({ video: document.getElementById('preview'), scanPeriod: 5, mirror: false });
+			scanner.addListener('scan',function(content){
+				$('#modal-scanner').modal('hide');
+				setTimeout(function(){
+					Swal.queue([{
+			          title: 'Pickup Order Customer',
+			          text: `Apakah anda yakin ingin mengubah status No Order ${content} ?`,
+			          showLoaderOnConfirm: true,
+			          confirmButtonText: 'Ya, Lanjutkan', 
+			          showCancelButton: true,
+			          allowOutsideClick: false,
+			          preConfirm: () => {
+			            $.ajax({
+			              url: '/mobile_kurir/kurir_update_order',
+			              type: 'POST',
+			              data: {status_order:"done", id_kurir: '{{request.user.id}}', id_order: content, 'csrfmiddlewaretoken':csrfToken},
+			              // contentType: false,
+			              // processData: false,
+			            }).done((result) => {
+			              Swal.fire({
+			                title:result.title, 
+			                text:result.msg, 
+			                icon:result.type,
+			                allowOutsideClick: false,
+			              }).then((result)=> {
+			                if(result.value) {
+			                  location.href = '/mobile_kurir/kurir_order_pickup'
+			                }
+			              })
+			            }).fail(error => {
+			              console.log('FAIL', error, error.responseJSON)
+			              if(error.status==401 || error.status==500){
+			                return Swal.fire('Error',error.statusText, 'error');
+			              }
+			              Swal.fire(error.responseJSON.title, error.responseJSON.msg, error.responseJSON.type);
+			            })
+			          }
+			        }]);
+				},500)
+				//window.location.href=content;
+			});
+			Instascan.Camera.getCameras().then(function (cameras){
+				if(cameras.length>0){
+					$('#modal-scanner').modal('show');
+					scanner.start(cameras[0]);
+					$('.btn-switch-order').on('click',function(){
+						console.log(cameras,$(this).data('camera'))
+						if($(this).data('camera')==1){
+							if(Object.keys(cameras).includes("0")){
+								$(this).data('camera', 0);
+								scanner.start(cameras[0]);
+							}else{
+								alert('No Front camera found!');
+							}
+						}else if($(this).data('camera')==0){
+							if(Object.keys(cameras).includes("1")){
+								$(this).data('camera', 1);
+								scanner.start(cameras[1]);
+							}else{
+								alert('No Back camera found!');
+							}
+						}
+					});
+				}else{
+					console.error('No cameras found.');
+					alert('No cameras found.');
+				}
+			}).catch(function(e){
+				// console.error(e);
+				console.log(e);
+				// alert(e);
+			});
+		});
+
+		$('#modal-scanner').on('hide.bs.modal', function(){
+			try {
+				scanner.stop()
+				.then(function(){
+					document.getElementById('#scanner-body').innerHTML = "<video id='preview' style='height: 170px;overflow: hidden;object-fit: cover;'></video>";
+				})
+			} catch(message) {
+				console.log(message)
+			};
+		});
+
+		// var elasticSearch = _.debounce(function(e) {
+		// 	// All the taxing stuff you do
+		// 	console.log('data data')
+		// }, 250);
+
+    	$('#orderstart, #orderend').datetimepicker({
+        	format: 'YYYY-MM-DD'
+    	});
+
+	});
+</script>
+{% endblock %}

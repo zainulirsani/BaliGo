@@ -1,0 +1,411 @@
+{% extends '../base.html' %}
+{% load static %} 
+{% block title_name %}
+<title>Track | BaliGo Ekspedisi</title>
+{% endblock %}
+{% block file_css %}
+<!-- SweetAlert2 -->
+<link rel="stylesheet" href="{% static 'assets/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css' %}">
+<!-- Load Leaflet from CDN -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+<!-- Load Esri Leaflet from CDN -->
+<script src="https://unpkg.com/esri-leaflet@2.5.0/dist/esri-leaflet.js" integrity="sha512-ucw7Grpc+iEQZa711gcjgMBnmd9qju1CICsRaryvX7HJklK0pGl/prxKvtHwpgm5ZHdvAil7YPxI1oWPOWK3UQ==" crossorigin=""></script>
+<!-- Load Esri Leaflet Geocoder from CDN -->
+<link rel="stylesheet" href="https://unpkg.com/esri-leaflet-geocoder@2.3.3/dist/esri-leaflet-geocoder.css" integrity="sha512-IM3Hs+feyi40yZhDH6kV8vQMg4Fh20s9OzInIIAc4nx7aMYMfo+IenRUekoYsHZqGkREUgx0VvlEsgm7nCDW9g==" crossorigin="">
+<script src="https://unpkg.com/esri-leaflet-geocoder@2.3.3/dist/esri-leaflet-geocoder.js" integrity="sha512-HrFUyCEtIpxZloTgEKKMq4RFYhxjJkCiF5sDxuAokklOeZ68U2NPfh4MFtyIVWlsKtVbK5GD2/JzFyAfvT5ejA==" crossorigin=""></script>
+<link href="{% static 'frontend/css/track.css' %}" rel="stylesheet">
+<!-- Font Awesome -->
+<link rel="stylesheet" href="{% static 'assets/plugins/fontawesome-free/css/all.min.css' %}">
+<link href="{% static 'frontend/css/request-quote.css' %}" rel="stylesheet">
+<link href="{% static 'frontend/css/sidebar.css' %}" rel="stylesheet">
+<link href="{% static 'frontend/css/timeline.css' %}" rel="stylesheet">
+{% endblock %}
+{% block slider %}
+{% endblock %}
+{% block content %}
+<div class="container" style="margin-top: 100px;border-top-right-radius: 20px;border-bottom-right-radius: 20px;box-shadow: 2px 2px 13px 1px #bbbbbb">
+    <div class="row">
+        <div class="col-md-8">
+            <form action="" method="post" class="registration-form" id="formPelacakan" data-url="{% url 'customer_track'%}" data-url_live_track="{% url 'customer_live_track'%}">
+                {% csrf_token %}
+                <div class="row">
+                    <img src="{% static 'frontend/gif/courier-truck.gif'%}" style="width: 100%; height: auto;">
+                </div>
+                <div class="row" style="margin-top: 20px;">
+                    <div class="col-md-8">
+                        <input type="text" class="form-control input_resi" id="inputIdPengiriman" name="no_resi" required="" placeholder="Resi Paket, ex: ER-002131532">
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="cek_button" id="cek_button">Lacak Kiriman</button>
+                    </div>
+                </div><!-- /.request__form-body -->
+            </form>
+        </div>
+        <div class="col-md-4 round" style="background-color: #ff2626 !important; background-image: url({% static 'frontend/images/banners/track.webp'%}); background-size: 380px auto; background-repeat: no-repeat; background-position: right bottom;">
+            <div style="padding: 2rem">
+                <h5 class="header_title text-white">Bisa Lacak Kiriman anda!</h5>
+                <p class="body_title text-white" style="text-align: justify; line-height: 1.4">Melihat kemana dan sedang berada dimana paket anda kini mudah dilakukan dengan hanya sekali klik, Hal ini tentunya membuat anda lega dan tidak perlu khawatir tidak tahu sedang berada dimana paket anda :).</p>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <br>
+    <div class="row">
+        <div id="advanced_map" class="gmap" style="display: none;"></div>
+    </div>
+    <div class="row">
+        <!-- The Timeline -->
+        <ul class="timeline" id="hasil_tracking" style="display: none;">
+        </ul>
+    </div>
+    <br>
+    <br>
+</div>
+<!-- Modal Loading -->
+<div class="modal fade" id="loadMe" tabindex="-1" role="dialog" aria-labelledby="loadMeLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <div class="loader"></div>
+                <div clas="loader-txt">
+                    <p>Please Wait. <br><br><small>Loading ...</small></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END Modal Loading -->
+{% endblock %}
+{% block file_js %}
+<!-- SweetAlert2 -->
+<script src="{% static 'assets/plugins/sweetalert2/sweetalert2.min.js' %}"></script>
+<script type="text/javascript">
+$(window).ready(function(){
+    const params = new URLSearchParams(window.location.search)
+    var cek_type = (params.get('type') == 'qrcode');
+    if(cek_type){
+        $id_pengiriman = params.get('resi', false);
+        if($id_pengiriman){
+            try{
+                window.history.pushState({}, document.title, "/" + "track");
+                $('#inputIdPengiriman').val($id_pengiriman);
+                setTimeout(function(){
+                    $('#cek_button').trigger('click');
+                },800)
+            } catch(error) { console.log("Param error", error) }
+        }
+    }
+})
+
+$(document).ready(function() {
+
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        onClose: () => {
+            document.getElementsByClassName('mobile-nav-toggle')[0].style.display = 'block';
+        },
+        onOpen: () => {
+            document.getElementsByClassName('mobile-nav-toggle')[0].style.display = 'none';
+        }
+    });
+
+    function tampilkan_pesan(pesan, type) {
+        Toast.fire({
+            icon: type,
+            title: pesan
+        })
+    }
+
+    function process_str(msg) {
+        var out = msg.replace("_", " ");
+        var splitStr = out.toLowerCase().split(' ');
+        for (var i = 0; i < splitStr.length; i++) {
+            // You do not need to check if i is larger than splitStr length, as your for does that for you
+            // Assign it back to the array
+            splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);
+        }
+        // Directly return the joined string
+        return splitStr.join(' ');
+    }
+
+    function validation(id_input_field) {
+        var inpObj = document.getElementById(id_input_field);
+        if (!inpObj.checkValidity()) {
+            tampilkan_pesan(process_str(inpObj.name) + ' <= ' + inpObj.validationMessage, 'error');
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    var my_token = '{{API_MAPS_VIEW}}';
+
+    //Basic map
+    // DOCUMENTATION https://esri.github.io/esri-leaflet/examples/search-map-service.html
+
+    var mymap = L.map('advanced_map').setView([-8.652415520702286, 115.21718502044679], 13);
+    L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v10/tiles/256/{z}/{x}/{y}?access_token={accessToken}', {
+        maxZoom: 18,
+        id: 'advanced_map',
+        accessToken: my_token
+    }).addTo(mymap);
+
+    var theMarker = {};
+
+    var arcgisOnline = L.esri.Geocoding.arcgisOnlineProvider();
+
+    L.esri.Geocoding.geosearch({
+        providers: [
+            arcgisOnline,
+            L.esri.Geocoding.mapServiceProvider({
+                label: 'States and Counties',
+                url: 'https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer',
+                layers: [2, 3],
+                searchFields: ['NAME', 'STATE_NAME']
+            })
+        ]
+    }).addTo(mymap);
+
+    var data_no_resi;
+    getDevices = async () => {
+        const location = $("#formPelacakan").data('url_live_track');
+        const settings = {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            data: {
+                csrfmiddlewaretoken: getCookie('csrftoken'),
+                no_resi: data_no_resi
+            }
+        };
+        try {
+            const fetchResponse = await fetch(location + '?no_resi=' + data_no_resi, settings);
+            const data = await fetchResponse.json();
+            console.log('masuk pak eko');
+            const data_live = await show_result_live_tracking(data);
+            return data;
+        } catch (e) {
+            return e;
+        }
+    }
+
+    async function show_result_live_tracking(response) {
+        if (response.status_akhir.titik_lokasi) {
+            if (theMarker != undefined) {
+                mymap.removeLayer(theMarker);
+            };
+            var lokasi = response.status_akhir.titik_lokasi;
+            var data_loc = lokasi.split(',');
+            theMarker = L.marker([data_loc[0], data_loc[1]]).addTo(mymap);
+            mymap.setView([data_loc[0], data_loc[1]], 13);
+            setTimeout(function() {
+                mymap.invalidateSize()
+            }, 400);
+            if (response.status_akhir.status_pengiriman) {
+                document.getElementById('id_status').innerHTML = response.status_akhir.status_pengiriman;
+            }
+            return response.status_akhir.status_pengiriman;
+        }
+    }
+
+    let interval;
+
+    function formatDate(date) {
+        var hours = date.getHours();
+        var minutes = date.getMinutes();
+        var seconds = date.getSeconds();
+        var ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12; // the hour '0' should be '12'
+        hours = hours < 10 ? '0'+hours : hours;
+        minutes = minutes < 10 ? '0'+minutes : minutes;
+        seconds = seconds < 10 ? '0'+seconds : seconds;
+        var strTime = hours + ':' + minutes + ':' + seconds + `-${ampm}`;
+        // return (date.getMonth()+1) + "/" + date.getDate() + "/" + date.getFullYear() + "  " + strTime;
+        return date.getFullYear() + "-" + ("0" + (date.getMonth()+1)).slice(-2) + "-" + date.getDate() + " " + strTime;
+    }
+
+    function show_data(response) {
+        // console.log(response);
+
+        var data_timeline = '<li><div class="direction-r"><div class="flag-wrapper"><span class="flag">Paket Diproses</span><span class="time-wrapper"><span class="time">' + formatDate(new Date(response.tgl_pengiriman)) + '</span></span></div><div class="desc">Resi : ' + response.pengiriman.id_pengiriman + '<br>Layanan: ' + response.layanan.nama_layanan + '<br> Estimasi: ' + response.layanan.estimasi_layanan + ' Hari</div></div></li>';
+        var i;
+        var direction = 'direction-r';
+        var deskripsi;
+        
+        for (i = 0; i < response.log_pengiriman.length; i++) {
+            var titik_lokasi = '';
+            if(response.log_pengiriman[i].titik_lokasi){
+                titik_lokasi = response.log_pengiriman[i].titik_lokasi.split(',')
+                titik_lokasi = titik_lokasi.reduce(function(pre, next) {
+                    return '<br>' + parseFloat(pre).toFixed(6).toString() + ', ' + parseFloat(next).toFixed(6).toString();
+                });
+            }
+
+            if (i > 0 && i % 2 == 0) {
+                direction = 'direction-r';
+            } else {
+                direction = 'direction-l';
+            }
+            if (response.log_pengiriman[i].status_pengiriman == 'waiting') {
+                deskripsi = 'Menunggu Kurir, untuk diantar ke gudang';
+            }
+            else if (response.log_pengiriman[i].status_pengiriman == 'arrive_at' && i == 1){
+                deskripsi = 'Paket telah sampai di Outlet Penerimaan, <br> Titik Lokasi: ' + titik_lokasi;
+            }
+            else if (response.log_pengiriman[i].status_pengiriman == 'arrive_at' && i == 2){
+                deskripsi = 'Paket telah sampai di Gudang #1, <br> Titik Lokasi: ' + titik_lokasi;
+            }
+            else if (response.log_pengiriman[i].status_pengiriman == 'done'){
+                deskripsi = 'Paket telah sampai pada penerima.';
+            }
+            else{
+                deskripsi = 'Paket telah dikirim dari Titik Lokasi: ' + titik_lokasi;
+            }
+            
+
+            data_timeline += '<li><div class="' + direction + '"><div class="flag-wrapper"><span class="flag">' + response.log_pengiriman[i].status_pengiriman + '</span><span class="time-wrapper"><span class="time">' + formatDate(new Date(response.log_pengiriman[i].created_at)) + '</span></span></div><div class="desc">' + deskripsi + '</div></div></li>';
+        }
+
+        if (response.status_akhir.status_pengiriman == 'arrive_at') {
+            if (theMarker != undefined) {
+                mymap.removeLayer(theMarker);
+            };
+
+            //Add a marker
+            if (response.status_akhir.titik_lokasi) {
+                var lokasi = response.status_akhir.titik_lokasi;
+                var data_loc = lokasi.split(',');
+                theMarker = L.marker([data_loc[0], data_loc[1]]).addTo(mymap);
+                mymap.setView([data_loc[0], data_loc[1]], 13);
+                setTimeout(function() { mymap.invalidateSize() }, 400);
+            }
+            document.getElementById('advanced_map').style.display = 'block';
+
+            // Live Update 
+            interval = setInterval(function() {
+                getDevices();
+            }, 600000);
+            clearInterval(interval);
+        }
+
+        document.getElementById('hasil_tracking').innerHTML = data_timeline;
+        document.getElementById('hasil_tracking').style.display = 'block';
+    }
+
+
+    function show_data_old(response) {
+        document.getElementById('id_pengiriman').innerHTML = response.pengiriman.id_pengiriman;
+        document.getElementById('id_nama_customer').innerHTML = response.pengiriman.nama_pengirim;
+        document.getElementById('id_tgl_kirim').innerHTML = response.tgl_pengiriman;
+        document.getElementById('id_nama_penerima').innerHTML = response.pengiriman.nama_penerima;
+        document.getElementById('id_alamat_penerima').innerHTML = response.pengiriman.alamat_penerima;
+        // document.getElementById('id_kendaraan').innerHTML = '-';
+        document.getElementById('id_status').innerHTML = response.status_akhir.status_pengiriman;
+
+        document.getElementById('id_nama_customer_tabel').innerHTML = response.pengiriman.nama_pengirim;
+        document.getElementById('id_jenis_pengiriman').innerHTML = response.layanan.nama_layanan;
+        document.getElementById('id_harga').innerHTML = response.pengiriman.total_tarif;
+        document.getElementById('id_estimasi').innerHTML = response.layanan.estimasi_layanan + ' Hari';
+        if (theMarker != undefined) {
+            mymap.removeLayer(theMarker);
+        };
+
+        if (response.status_akhir.status_pengiriman == 'sent_by') {
+            document.getElementById('advanced_map').style.display = 'block';
+        }
+
+        //Add a marker
+        if (response.status_akhir.titik_lokasi) {
+            var lokasi = response.status_akhir.titik_lokasi;
+            var data_loc = lokasi.split(',');
+            theMarker = L.marker([data_loc[0], data_loc[1]]).addTo(mymap);
+            mymap.setView([data_loc[0], data_loc[1]], 13);
+            setTimeout(function() { mymap.invalidateSize() }, 400);
+        }
+
+    }
+
+    // ER-002131532
+    $("#cek_button").click(function(e) {
+
+        e.preventDefault();
+        if (validation('inputIdPengiriman')) {
+            $("#loadMe").modal({
+                backdrop: "static", //remove ability to close modal with click
+                keyboard: false, //remove option to close with keyboard
+                show: true //Display loader!
+            });
+            var serializeData = $("#formPelacakan")[0];
+            serializeData = new FormData(serializeData);
+            var data_resinya = document.getElementById('inputIdPengiriman').value;
+            $.ajax({
+                url: $("#formPelacakan").data('url'),
+                data: {
+                    csrfmiddlewaretoken: getCookie('csrftoken'),
+                    no_resi: data_resinya
+                },
+                type: 'post',
+                success: function(response) {
+                    setTimeout(function() {
+                        $("#loadMe").modal("hide");
+                        $("#formPelacakan")[0].reset();
+                        data_no_resi = response.pengiriman.id_pengiriman;
+
+                        setTimeout(function() {
+                            tampilkan_pesan(response.msg, response.type);
+                        }, 1500);
+                        show_data(response);
+
+                        // Live Update 
+                        // interval = setInterval(function() {
+                        //    getDevices();
+                        //  }, 5000);
+                        // clearInterval(interval);
+
+                    }, 1000);
+                },
+                error: function(xhr, status, error) {
+                    var error_response = xhr.responseJSON;
+                    setTimeout(function() {
+                        $("#loadMe").modal("hide");
+                    },1000)
+                    
+                    setTimeout(function() {
+                        tampilkan_pesan(error_response.msg, error_response.type);
+                        $("#formPelacakan")[0].reset();
+                        document.getElementById('hasil_tracking').innerHTML = '';
+                        document.getElementById('hasil_tracking').style.display = 'none';
+                    }, 1200)
+                    
+                },
+            })
+        }
+
+    });
+});
+</script>
+{% endblock %}

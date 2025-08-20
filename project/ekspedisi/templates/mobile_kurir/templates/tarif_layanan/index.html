@@ -1,0 +1,113 @@
+{% extends '../base.html' %}
+{% load static %}
+
+{% block title_name %}
+ <title>Cek Tarif | BaliGo Ekspedisi</title>
+{% endblock %}
+
+{% block file_css %}
+<!-- DataTables -->
+<link rel="stylesheet" href="{% static 'assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+<link rel="stylesheet" href="{% static 'assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+ <!-- SweetAlert2 -->
+<link rel="stylesheet" href="{% static 'assets/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css' %}">
+<style>
+	#preview{
+	   width:100%;
+	   height: auto;
+	   margin:0px auto;
+	}
+</style>
+{% endblock %}
+
+{% block breadcrumb_mobile %}
+	Tarif Layanan
+{% endblock breadcrumb_mobile %}
+
+{% block content %}
+
+<div class="card">
+	<!-- /.card-header -->
+	<div class="card-body">
+		<!-- ANY MESSAGE GOES HERE -->
+	    {% if messages %}
+	    {% for message in messages %}
+	    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+	      {{ message }}
+	      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+	        <span aria-hidden="true">&times;</span>
+	      </button>
+	    </div>
+	    {% endfor %}
+	    {% endif %}
+	    <!-- END MESSAGE -->
+
+	    
+    	<div class="text-center mb-3">
+        	<h5 class="text-muted"><strong>Cek Tarif Layanan</strong></h5>
+      	</div>
+      	<div>
+		    <table id="tarif_layanan" class="table table-bordered table-stripped">
+		    	<thead>
+		    		<tr>
+		    			<th>ID</th>
+		    			<th>Nama Layanan</th>
+		    			<th>Tarif</th>
+		    		</tr>
+		    	</thead>
+		    	<tbody>
+		    	</tbody>
+		    </table>
+		</div>
+	</div>
+	<!-- /.card-body -->
+</div>
+{% endblock %}
+
+{% block file_js %}
+<script src="{% static 'assets/plugins/sweetalert2/sweetalert2.min.js' %}"></script>
+<!-- DataTables -->
+<script src="{% static 'assets/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+<script type="text/javascript">
+
+	$('#tarif_layanan thead th').each( function () {
+        var title = $(this).text();
+        $(this).html(`<p style="margin:5px">${title}</p><input type="text" placeholder="Cari Data.."/>` );
+    });
+
+	var table = $('#tarif_layanan').DataTable({
+      "paging": true,
+      "lengthChange": false,
+      "searching": true,
+      "ordering": false,
+      "info": false,
+      "autoWidth": false,
+      "responsive": true,
+      "processing" : true,
+      "serverside" : true,
+      "search": {
+	    "regex": true
+	  },
+      "ajax" : {
+      	"url" : '/mobile_kurir/kurir_tarif_layanan',
+      	"type" : "get"
+      },
+      initComplete: function () {
+        // Apply the search
+        this.api().columns().every( function () {
+            var that = this;
+            $( 'input', this.header() ).on( 'keyup change clear', function () {
+                if ( that.search() !== this.value ) {
+                    that
+                        .search( this.value )
+                        .draw();
+                }
+            } );
+        });
+       }
+    });
+</script>
+{% endblock %}

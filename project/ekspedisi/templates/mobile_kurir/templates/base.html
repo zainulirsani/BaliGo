@@ -1,0 +1,352 @@
+{% load static %}
+{% load custom_filter %}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  {% block title_name %}
+  BaliGo Ekspedisi
+  {% endblock title_name %}
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="{% static 'frontend/img/baligo-sidebar-collapse.png' %}">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="{% static 'assets/plugins/fontawesome-free/css/all.min.css' %}">
+  <!-- Ionicons -->
+  <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+  <!-- Tempusdominus Bbootstrap 4 -->
+  <link rel="stylesheet" href="{% static 'assets/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css' %}">
+  <!-- iCheck -->
+  <link rel="stylesheet" href="{% static 'assets/plugins/icheck-bootstrap/icheck-bootstrap.min.css' %}">
+  <!-- JQVMap -->
+  <link rel="stylesheet" href="{% static 'assets/plugins/jqvmap/jqvmap.min.css' %}">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="{% static 'assets/dist/css/adminlte.min.css' %}">
+  <link rel="stylesheet" href="{% static 'assets/dist/css/style.css' %}">
+  <link rel="stylesheet" href="{% static 'assets/dist/css/pace-theme-minimal.css' %}">
+
+  <!-- overlayScrollbars -->
+  <link rel="stylesheet" href="{% static 'assets/plugins/overlayScrollbars/css/OverlayScrollbars.min.css' %}">
+  {% block file_css %}
+          
+  {% endblock file_css %}
+  
+  <!-- Google Font: Source Sans Pro -->
+  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+</head>
+
+{% block custom_body %}
+<body class="hold-transition sidebar-mini layout-fixed mobile-kurir">
+{% endblock custom_body %}
+
+
+{% block wrapper %}
+{% if request.user.role == 'kurir' or request.user.role == 'adm_gudang' or request.user.role == 'adm_outlet' %}
+<div class="wrapper">
+  <!-- Navbar -->
+  <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        {% block nav_link %}
+        <a class="nav-link breadcrumb_mobile" href="" role="button">
+          {% block breadcrumb_mobile %}
+            Dashboard
+          {% endblock breadcrumb_mobile %}
+        </a>
+        {% endblock nav_link %}
+      </li>
+      
+    </ul>
+    <!-- Left navbar links -->
+    <ul class="navbar-nav mobile-hidden">
+      <li class="nav-item">
+        <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i>{{ request.user|cek_posisi|safe }}</a>
+      </li>
+    </ul>
+    <!-- Right navbar links -->
+    <ul class="navbar-nav ml-auto">
+      <!-- Notifications Dropdown Menu -->
+      <!-- <li class="nav-item dropdown">
+        <a class="nav-link" data-toggle="dropdown" href="#">
+          <i class="far fa-bell"></i>
+          <span class="badge badge-warning navbar-badge">15</span>
+        </a>
+        <div class="dropdown-menu dropdown-menu-lg">
+          <span class="dropdown-item dropdown-header">15 Notifications</span>
+          <a href="#" class="dropdown-item">
+            <i class="fas fa-file mr-2"></i> 3 new reports
+            <span class="float-right text-muted text-sm">2 days</span>
+          </a>
+          <div class="dropdown-divider"></div>
+          <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
+        </div>
+      </li> -->
+      <li class="nav-item dropdown">
+        <a class="nav-link" data-toggle="dropdown" href="#">
+          {% if request.user and request.user.role == 'kurir'%}
+            <i class="fas fa-motorcycle"></i>&nbsp;&nbsp; {{ request.user|get_penempatan }}
+          {% else %}
+            <i class="fas fa-user"></i>&nbsp;&nbsp; {{ request.user|get_penempatan }}
+          {% endif %}
+        </a>
+        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+          <span class="dropdown-item dropdown-header">Pengaturan</span>
+          <div class="dropdown-divider"></div>
+          <!-- <a href="#" class="dropdown-item">
+            <i class="fas fa-users mr-2"></i> Profil
+          </a> -->
+          {% url 'kurir_logout' as logout_url %}
+          <div class="dropdown-divider"></div>
+          <a href="{{ logout_url }}" class="dropdown-item">
+            <i class="fas fa-sign-out-alt mr-2"></i> Logout
+          </a>
+      </li>
+    </ul>
+  </nav>
+  <!-- /.navbar -->
+
+  <div class="mobile-tabs col-lg-12">
+    <!-- Button update location -->
+    {% if request.user.is_authenticated and request.user.role == 'kurir' %}
+    {% comment %}
+    <div class="btn-floating-wrapper">
+      <form method="POST" id="form-update-lokasi">
+        {% csrf_token %}
+       <button type="button" class="btn btn-floating btn-primary btn-update-position float-right">
+        <i class="fas fa-map-marker-alt"></i>
+       </button>
+       <div class="bg-primary text-white p-2 px-4 card update-position-wrapper">
+        <div class="d-block">
+         <span id="updating-location-text">Memperbaharui lokasi anda</span> &nbsp;&nbsp;<img class="img" src="{% static 'assets/dist/img/loader.gif' %}" style="width: 20px">
+        </div>
+        {% if request.user.is_authenticated %}
+        <input type="hidden" name="id_kurir" value="{{ request.user.id }}">
+        {% endif %}
+       </div>
+      </form>
+    </div>
+    {% endcomment %}
+    {% endif %}
+    <!-- END button update location -->
+
+    <div class="container-fluid">
+      <div class="dropdown-item-populate">
+        <div class="dropdown-menu" id="dp" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" href="{% url 'kurir_tarif_gudang' %}">Tarif Gudang</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="{% url 'kurir_tarif_kilometer' %}">Tarif Kilometer</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="{% url 'kurir_tarif_berat' %}">Tarif Berat</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="{% url 'kurir_tarif_layanan' %}">Tarif Layanan</a>
+        </div>
+      </div>
+      <div class="main-menu">
+        <ul class="nav nav-tabs" id="custom-content-above-tab" role="tablist">
+          {% url 'kurir_dashboard' as dashboard_url %}
+          <li class="nav-item">
+            <a class="nav-link text-center {{ is_active_dashboard }}" href="{{ dashboard_url }}"> <i class="nav-icon fas fa-chart-bar"></i><br>Dashboard</a>
+          </li>
+          {% url 'kurir_order_pickup' as pickup_url %}
+          <li class="nav-item">
+            <a class="nav-link text-center {{ is_active_order}}" href="{{ pickup_url }}"><i class="nav-icon fas fa-truck-pickup"></i><br>Order Pickup</a>
+          </li>
+          {% url 'kurir_pengiriman' as pengiriman_url %}
+          <li class="nav-item">
+            <a class="nav-link text-center {{ is_active_pengiriman }}" href="{{ pengiriman_url }}"><i class="nav-icon fas fa-box"></i><br>Pengiriman</a>
+          </li>
+          <!-- <li class="nav-item">
+            <a class="nav-link text-center {{ is_active_tarif }}" href="#"><i class="nav-icon fas fa-dollar-sign"></i><br>Cek Tarif</a>
+          </li> -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle text-center {{ is_active_tarif }}" href="#" data-dropdown="#dp" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <i class="nav-icon fas fa-dollar-sign"></i><br>Cek Tarif
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+      {% block content_header %}
+        
+      {% endblock content_header %}
+    </div>
+    <!-- /.content-header -->
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <!-- ISI HALAMAN -->
+        {% block content %}
+          
+        {% endblock content %}
+      </div><!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+  {% comment %}
+  <footer class="main-footer">
+    <strong>Copyright &copy; 2020 <a href="#">Samitra Ekspedisi</a>.</strong>
+    All rights reserved.
+    <div class="float-right d-none d-sm-inline-block">
+      <b>Version</b> 1.0
+    </div>
+  </footer>
+  {% endcomment %}
+  <!-- Control Sidebar -->
+  <aside class="control-sidebar control-sidebar-dark">
+    <!-- Control sidebar content goes here -->
+  </aside>
+  <!-- /.control-sidebar -->
+</div>
+<!-- ./wrapper -->
+{% else %}
+  <div style="display: flex;flex: 1 1 0%;align-items: center;justify-content: center; min-height: 100vh;">
+    {% url 'kurir_logout' as logout_url %}
+    <div>
+      <a href="{{ logout_url }}" class="btn btn-primary text-white"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+  </div>
+{% endif %}
+{% endblock wrapper %}
+
+<!-- jQuery -->
+<script src="{% static 'assets/plugins/jquery/jquery.min.js' %}"></script>
+<!-- jQuery UI 1.11.4 -->
+<script src="{% static 'assets/plugins/jquery-ui/jquery-ui.min.js' %}"></script>
+<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+<script>
+  $.widget.bridge('uibutton', $.ui.button)
+</script>
+<!-- Bootstrap 4 -->
+<script src="{% static 'assets/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<!-- AdminLTE App -->
+<script src="{% static 'assets/dist/js/adminlte.js' %}"></script>
+<script src="{% static 'assets/dist/js/jquery.validate.js' %}"></script>
+<script src="{% static 'assets/dist/js/jquery.imagereader.js' %}"></script>
+<script src="{% static 'assets/dist/js/pace.min.js' %}"></script>
+
+<script type="text/javascript">
+  $(function(){
+    $('.modal form').on('submit', function(e){
+      e.preventDefault();
+      return false;
+    });
+  });
+</script>
+<script type="text/javascript">
+  $('.dropdown-toggle').click(function(){
+    try{
+      var dropdn = $(this).data('dropdown');
+      $(dropdn).toggleClass('show');
+    } catch(message) {
+      console.log(message)
+    }
+  })
+  $(document).on('click', '.nav-tabs', function(){
+    $('.dropdown-menu').removeClass('show')
+  });
+
+  function getLocation() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(showPosition);
+    } else {
+      var element = $('.btn-update-position');
+      setTimeout(function(){
+        $('.update-position-wrapper').hide('slow')
+        $(element).html('<i class="fas fa-check"></i>')
+      },1000)
+      setTimeout(function(){
+        element.prop('hidden', false);
+        element.removeClass('scale-down').addClass('scale-up');
+      },1500)
+      setTimeout(function(){
+        $(element).html('<i class="fas fa-map-marker-alt"></i>')
+        $(element).prop('disabled', false);
+      },2500);
+    }
+  }
+
+  function showPosition(position) {
+    var latitude =  position.coords.latitude || 0,
+    longitude =  position.coords.longitude || 0;
+    var form = $('#form-update-lokasi')[0]
+    form = new FormData(form);
+    form.append('latitude', latitude);
+    form.append('longitude', longitude);
+
+    $.ajax({
+      url : '/mobile_kurir/kurir_update_lokasi_terkini',
+      type: 'POST',
+      data : form,
+      processData : false,
+      contentType: false,
+      success : function(response){
+        var element = $('.btn-update-position');
+        console.log(response)
+        setTimeout(function(){
+          $('.update-position-wrapper').hide('slow')
+          $(element).html('<i class="fas fa-check"></i>')
+        },1000)
+        setTimeout(function(){
+          element.prop('hidden', false);
+          element.removeClass('scale-down').addClass('scale-up');
+        },1500)
+        setTimeout(function(){
+          $(element).html('<i class="fas fa-map-marker-alt"></i>')
+          $(element).prop('disabled', false);
+        },2500);
+      },
+      error : function(xhr){
+        console.log(xhr.responseJSON)
+        var element = $('.btn-update-position');
+        setTimeout(function(){
+          $('.update-position-wrapper').hide('slow')
+          $(element).html('<i class="fas fa-window-close"></i>')
+        },1000)
+        setTimeout(function(){
+          element.prop('hidden', false);
+          element.removeClass('scale-down').addClass('scale-up');
+        },1500)
+        setTimeout(function(){
+          $(element).html('<i class="fas fa-map-marker-alt"></i>')
+          $(element).prop('disabled', false);
+        },2500);
+      }
+    });
+  }
+
+  function initMap(){
+    $(document).on('click', '.btn-update-position', function(){
+      var element = $(this);
+      $(element).prop('disabled', true);
+      setTimeout(function(){
+        element.removeClass('scale-up').addClass('scale-down');
+      },100)
+      setTimeout(function(){
+        element.prop('hidden', true);
+      },200)
+      setTimeout(function(){
+        $('.update-position-wrapper').show('normal')
+        getLocation();
+      },300)
+    });
+  }
+
+  initMap();
+
+</script>
+{% block file_js %}
+          
+{% endblock file_js %}
+<!-- AdminLTE for demo purposes -->
+<!-- <script src="{% static 'assets/dist/js/demo.js' %}"></script> -->
+</body>
+</html>

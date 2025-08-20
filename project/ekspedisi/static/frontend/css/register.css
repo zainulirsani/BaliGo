@@ -1,0 +1,188 @@
+.carousel-caption {
+    position: relative;
+    border: 1px solid black;
+    top: 0;
+    left: 0;
+    color: black;
+    text-align: left;
+    padding: 20px;
+}
+
+.form-control {
+    border-radius: 25px;
+    background: rgba(255, 255, 255, 0.4);
+}
+
+hr.new1 {
+    border-top: 2px solid #ff2626 !important;
+    height: 2px;
+}
+
+input {
+    background: rgba(255, 255, 255, 0.4);
+    border: none;
+    position: relative;
+    outline: none;
+    width: 400px;
+    height: 30px;
+    top: 5px;
+    margin: 0 auto;
+    margin-bottom: 20px;
+    border-radius: 25px;
+    padding: 10px;
+    color: #333;
+    -webkit-box-shadow: 0 2px 10px 1px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 2px 10px 1px rgba(0, 0, 0, 0.5);
+    transform: translateX(-600px);
+    animation: 1.2s slideIn_x ease-in-out forwards 1s;
+}
+
+::-webkit-input-placeholder {
+    color: #666;
+}
+
+:-moz-placeholder {
+    color: #666;
+}
+
+::-moz-placeholder {
+    color: #666;
+}
+
+:-ms-input-placeholder {
+    color: #666;
+}
+
+textarea {
+    background: rgba(255, 255, 255, 0.4);
+    border: none;
+    position: relative;
+    outline: none;
+    width: 400px;
+    height: 30px;
+    top: 5px;
+    margin: 0 auto;
+    margin-bottom: 20px;
+    border-radius: 25px;
+    padding: 10px;
+    color: #333;
+    -webkit-box-shadow: 0 2px 10px 1px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 2px 10px 1px rgba(0, 0, 0, 0.5);
+    transform: translateX(600px);
+    animation: 1.2s slideIn_x ease-in-out forwards 1s;
+}
+
+::-webkit-input-placeholder {
+    color: #666;
+}
+
+:-moz-placeholder {
+    color: #666;
+}
+
+::-moz-placeholder {
+    color: #666;
+}
+
+:-ms-input-placeholder {
+    color: #666;
+}
+
+select {
+    background: rgba(255, 255, 255, 0.4);
+    border: none;
+    position: relative;
+    outline: none;
+    width: 400px;
+    height: 30px;
+    top: 5px;
+    margin: 0 auto;
+    margin-bottom: 20px;
+    border-radius: 25px;
+    padding: 10px;
+    color: #333;
+    -webkit-box-shadow: 0 2px 10px 1px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 2px 10px 1px rgba(0, 0, 0, 0.5);
+    transform: translateX(600px);
+    animation: 1.2s slideIn_x ease-in-out forwards 1s;
+}
+
+::-webkit-input-placeholder {
+    color: #666;
+}
+
+:-moz-placeholder {
+    color: #666;
+}
+
+::-moz-placeholder {
+    color: #666;
+}
+
+:-ms-input-placeholder {
+    color: #666;
+}
+
+#submit_btn {
+    background: rgba(101, 215, 60, 0.4);
+    border: none;
+    outline: none;
+    width: 100%;
+    top: 5px;
+    margin-top: 25px;
+    margin-bottom: 20px;
+    border-radius: 25px;
+    padding: 10px;
+    color: #333;
+    -webkit-box-shadow: 0 2px 10px 1px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 2px 10px 1px rgba(0, 0, 0, 0.5);
+}
+
+#submit_btn:hover {
+    background: rgba(84, 188, 47, 0.4);
+    border: none;
+    outline: none;
+    width: 100%;
+    top: 5px;
+    margin-bottom: 20px;
+    margin-top: 25px;
+    border-radius: 25px;
+    padding: 10px;
+    color: #333;
+    -webkit-box-shadow: 0 2px 10px 1px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 2px 10px 1px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes username_move {
+    from {
+        right: 600px;
+    }
+
+    to {
+        right: 0px;
+    }
+}
+
+@keyframes password_move {
+    from {
+        right: 800px;
+    }
+
+    to {
+        right: 0px;
+    }
+}
+
+@keyframes slideIn {
+    100% {
+        transform: translateY(0px);
+        opacity: 1;
+    }
+}
+
+@keyframes slideIn_x {
+    100% {
+        transform: translateX(0px);
+        opacity: 1;
+    }
+}

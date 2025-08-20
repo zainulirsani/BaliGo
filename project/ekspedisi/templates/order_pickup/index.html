@@ -1,0 +1,249 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title_name %}
+<title>Order Pickup | BaliGo Ekspedisi</title>
+{% endblock %}
+{% block file_css %}
+<!-- DataTables -->
+<link rel="stylesheet" href="{% static 'assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+<link rel="stylesheet" href="{% static 'assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+<!-- SweetAlert2 -->
+<link rel="stylesheet" href="{% static 'assets/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css' %}">
+<style type="text/css">
+@media (max-width: 768px) {
+
+    #outlet_no_th,
+    #gudang_no_th {
+        font-size: small;
+        width: 16%;
+    }
+
+    #outlet_id_th,
+    #gudang_id_th {
+        font-size: small;
+        width: 28%;
+    }
+
+    #outlet_nama_th,
+    #gudang_nama_th {
+        width: 30%;
+        font-size: small;
+    }
+
+    #outlet_alamat_th,
+    #gudang_alamat_th {
+        font-size: small;
+        width: 20%;
+    }
+
+    #outlet_action_th,
+    #gudang_action_th {
+        font-size: small;
+        width: 36%;
+    }
+
+
+    .detail_text {
+        display: none;
+    }
+}
+</style>
+{% endblock %}
+{% block content_header %}
+<div class="container-fluid">
+    <div class="row mb-2">
+        <div class="col-sm-6">
+            <h1 class="m-0 text-dark">Order Pick Up</h1>
+        </div><!-- /.col -->
+        <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                <li class="breadcrumb-item active">Order Pick Up</li>
+            </ol>
+        </div><!-- /.col -->
+    </div><!-- /.row -->
+</div><!-- /.container-fluid -->
+{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Data Order Pick Up</h3>
+        <div class="card-tools">
+            <ul class="nav nav-pills ml-auto p-2">
+                <li class="nav-item"><a class="nav-link active" href="#tab_outlet" data-toggle="tab"><i class="nav-icon fas fa-store"></i>&emsp;Outlet</a></li>
+                <li class="nav-item"><a class="nav-link" href="#tab_gudang" data-toggle="tab"><i class="nav-icon fas fa-warehouse"></i>&emsp;Gudang</a></li>
+            </ul>
+        </div>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+        <div class="tab-content">
+            <div class="tab-pane active" id="tab_outlet">
+                <!-- ISI DATA TABLE LIST OUTLET/TOKO -->
+                <table id="outlet" class="table table-bordered table-striped" data-url="{% url 'pickup_list_outlet' %}">
+                    <thead>
+                        <tr>
+                            <th id="outlet_no_th">No</th>
+                            <th id="outlet_id_th">Id Outlet</th>
+                            <th id="outlet_nama_th">Nama Outlet</th>
+                            <th id="outlet_alamat_th">Alamat </th>
+                            <th id="outlet_action_th">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>No</th>
+                            <th>Id Outlet</th>
+                            <th>Nama Outlet</th>
+                            <th>Alamat </th>
+                            <th>Action</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <!-- /.tab-pane -->
+            <div class="tab-pane" id="tab_gudang">
+                <!-- ISI DATA TABLE LIST GUDANG -->
+                <table id="gudang" class="table table-bordered table-striped" data-url="{% url 'pickup_list_gudang' %}">
+                    <thead>
+                        <tr>
+                            <th id="gudang_no_th">No</th>
+                            <th id="gudang_id_th">Id Gudang</th>
+                            <th id="gudang_nama_th">Nama Gudang</th>
+                            <th id="gudang_alamat_th">Alamat </th>
+                            <th id="gudang_action_th">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>No</th>
+                            <th>Id Gudang</th>
+                            <th>Nama Gudang</th>
+                            <th>Alamat </th>
+                            <th>Action</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- /.card-body -->
+</div>
+{% endblock %}
+{% block file_js %}
+<!-- Bootstrap 4 -->
+<script src="{% static 'assets/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<!-- DataTables -->
+<script src="{% static 'assets/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+<!-- SweetAlert2 -->
+<script src="{% static 'assets/plugins/sweetalert2/sweetalert2.min.js' %}"></script>
+<script>
+$(window).resize(function() {
+    if ($(window).width() < 768) {
+        $("#outlet_action_th").text("Act");
+        $("#gudang_action_th").text("Act");
+    } else {
+        $("#outlet_action_th").text("Action");
+        $("#gudang_action_th").text("Action");
+    }
+});
+$(document).ready(function() {
+    function formatDate(date) {
+        var hours = date.getHours();
+        var minutes = date.getMinutes();
+        var seconds = date.getSeconds();
+        var ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12; // the hour '0' should be '12'
+        hours = hours < 10 ? '0'+hours : hours;
+        minutes = minutes < 10 ? '0'+minutes : minutes;
+        seconds = seconds < 10 ? '0'+seconds : seconds;
+        var strTime = hours + ':' + minutes + ':' + seconds + `-${ampm}`;
+        // return (date.getMonth()+1) + "/" + date.getDate() + "/" + date.getFullYear() + "  " + strTime;
+        return date.getFullYear() + "-" + ("0" + (date.getMonth()+1)).slice(-2) + "-" + date.getDate() + " " + strTime;
+    }
+
+
+    var csrfToken = $("input[name=csrfmiddlewaretoken]").val();
+    var url_edit = '';
+
+    if ($(window).width() < 768) {
+        $("#outlet_action_th").text("Act");
+        $("#gudang_action_th").text("Act");
+    } else {
+        $("#outlet_action_th").text("Action");
+        $("#gudang_action_th").text("Action");
+    }
+
+    function tampilkan_pesan(pesan, type) {
+        Toast.fire({
+            icon: type,
+            title: pesan
+        });
+    }
+
+    function generate_token() {
+        var now = new Date();
+        timestamp = now.getFullYear().toString(); // 2011
+        timestamp += (now.getMonth < 12 ? '0' : '') + now.getMonth().toString();
+        timestamp += ((now.getDate < 30) ? '0' : '') + now.getDate().toString();
+        timestamp += ((now.getHours < 12) ? '0' : '') + now.getHours().toString();
+        timestamp += ((now.getMinutes < 60) ? '0' : '') + now.getMinutes().toString();
+        timestamp += ((now.getSeconds < 60) ? '0' : '') + now.getSeconds().toString();
+        return timestamp;
+    }
+
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000
+    });
+
+    var table_outlet = $('#outlet').DataTable({
+
+        "paging": true,
+        "lengthChange": false,
+        "searching": true,
+        "ordering": true,
+        "info": true,
+        "autoWidth": false,
+        "responsive": true,
+        "processing": true,
+        "serverside": true,
+        "ajax": {
+            "url": $("#outlet").data('url'),
+            "type": "get"
+        }
+    });
+
+    var table_outlet = $('#gudang').DataTable({
+
+        "paging": true,
+        "lengthChange": false,
+        "searching": true,
+        "ordering": true,
+        "info": true,
+        "autoWidth": false,
+        "responsive": true,
+        "processing": true,
+        "serverside": true,
+        "ajax": {
+            "url": $("#gudang").data('url'),
+            "type": "get"
+        }
+    });
+
+
+
+
+});
+</script>
+{% endblock %}

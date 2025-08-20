@@ -1,0 +1,46 @@
+{% extends '../base.html' %}
+{% load static %}
+{% block title_name %}
+<title>Register | BaliGo Ekspedisi</title>
+{% endblock %}
+{% block file_css %}
+<link href="{% static 'frontend/css/about.css' %}" rel="stylesheet">
+<link href="{% static 'frontend/css/register.css' %}" rel="stylesheet">
+{% endblock %}
+{% block slider %}
+{% endblock %}
+{% block content %}
+<section id="about1" class="about about-1 pb-0">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12" id="form_login" style="width: 100%; height: auto;">
+                <div class="contact-panel contact-panel-2" style="background-image: url({% static 'frontend/gif/login.gif'%}); background-size: 230px auto; background-repeat: no-repeat; background-position: left 10px top 10px;; height: auto; background-color: #ffffff; border: 2px;">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <br>
+                            <br>
+                            <h1 style="text-align: right;">Registrasi Info</h1>
+                            <br>
+                            <h5 style="text-align: right; margin-bottom: 0px;">{{message}}</h5>
+                            <hr class="new1" width="40%" style="float: right;">
+                        </div>
+                    </div>
+
+                </div>
+            </div><!-- /.col-lg-6 -->
+        </div><!-- /.row -->
+    </div><!-- /.container -->
+</section><!-- /.About 1 -->
+<br>
+<br>
+<br>
+{% endblock %}
+{% block file_js %}
+<script type="text/javascript">
+
+$(document).ready(function() {
+
+
+});
+</script>
+{% endblock %}

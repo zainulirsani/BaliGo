@@ -1,0 +1,428 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title_name %}
+<title>Tarif Berat | BaliGo Ekspedisi</title>
+{% endblock %}
+{% block file_css %}
+<!-- DataTables -->
+<link rel="stylesheet" href="{% static 'assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+<link rel="stylesheet" href="{% static 'assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+<!-- SweetAlert2 -->
+<link rel="stylesheet" href="{% static 'assets/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css' %}">
+<style type="text/css">
+@media (max-width: 768px) {
+    #no_th {
+        font-size: small;
+        width: 16%;
+    }
+
+    #id_th {
+        font-size: small;
+        width: 18%;
+    }
+
+    #berat_th {
+        font-size: small;
+        width: 20%;
+    }
+
+    #tarif_th {
+        font-size: small;
+        width: 20%;
+    }
+
+    #action_th {
+        font-size: small;
+        width: 16%;
+    }
+
+    .buttontext {
+        width: 95px;
+        overflow: hidden;
+        white-space: nowrap;
+        display: block;
+        text-overflow: ellipsis;
+    }
+}
+</style>
+{% endblock %}
+{% block content_header %}
+<div class="container-fluid">
+    <div class="row mb-2">
+        <div class="col-sm-6">
+            <h1 class="m-0 text-dark">Tarif Berat</h1>
+        </div><!-- /.col -->
+        <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                <li class="breadcrumb-item active">Tarif Berat</li>
+            </ol>
+        </div><!-- /.col -->
+    </div><!-- /.row -->
+</div><!-- /.container-fluid -->
+{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Data Tarif Berat</h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-block bg-gradient-primary" id="createTarifBerat">
+                <span class="buttontext"><i class="fa fa-plus"></i>&nbsp; Tambah Tarif Berat</span>
+            </button>
+        </div>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+        <table id="tarif_berat" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th id="no_th">No</th>
+                    <th id="id_th">ID</th>
+                    <th id="berat_th">Berat</th>
+                    <th id="tarif_th">Tarif</th>
+                    <th id="action_th">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th>No</th>
+                    <th>ID</th>
+                    <th>Berat</th>
+                    <th>Tarif</th>
+                    <th>Action</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <!-- /.card-body -->
+</div>
+<!-- /.modal -->
+<div class="modal fade" id="modal_tarif_berat">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="title_modal">Detail Data Tarif Berat</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="createTarifBeratForm" method="post" data-url="{% url 'tarif_berat' %}">
+                    {% csrf_token %}
+                    {% for field in form %}
+                    {% if not field.name == 'id_tarif_berat' %}
+                    <div class="form-group row">
+                        <label for="{{ field.name }}" class="col-sm-2 col-form-label">{{ field.label }}</label>
+                        <div class="col-sm-10">
+                            {{ field }}
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                    <input type="hidden" name="id_tarif_berat" id="id_tarif">
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
+                <button type="button" class="btn btn-primary" id="updateButton">Update</button>
+                <button type="button" class="btn btn-primary" id="createButton">Simpan</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+{% endblock %}
+{% block file_js %}
+<!-- Bootstrap 4 -->
+<script src="{% static 'assets/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<!-- DataTables -->
+<script src="{% static 'assets/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+<!-- SweetAlert2 -->
+<script src="{% static 'assets/plugins/sweetalert2/sweetalert2.min.js' %}"></script>
+<!-- jquery-mask -->
+<script src="{% static 'assets/plugins/jquery-mask/jquery.mask.js' %}"></script>
+<script>
+$(window).resize(function() {
+    if ($(window).width() < 320) {
+        $("#berat_th").text("Vol");
+    } else {
+        $("#berat_th").text("Berat");
+    }
+});
+$(document).ready(function() {
+    if ($(window).width() < 320) {
+        $("#berat_th").text("Vol");
+    } else {
+        $("#berat_th").text("Berat");
+    }
+
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    var url_edit = '';
+    $('.tarif').mask('000.000.000', { reverse: true });
+    // Disable input alphabet just allowed numeric input
+    $('#inputBerat').on('input', function() {
+        $(this).val($(this).val().replace(/[^0-9]/g, ''));
+    });
+
+    function remove_last_3_char(data) {
+        var newStr = data.substring(0, data.length - 3);
+        return newStr;
+    }
+
+    function tampilkan_pesan(pesan, type) {
+        Toast.fire({
+            icon: type,
+            title: pesan
+        });
+    }
+
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000
+    });
+
+    var table = $('#tarif_berat').DataTable({
+
+        "paging": true,
+        "lengthChange": false,
+        "searching": true,
+        "ordering": true,
+        "info": true,
+        "autoWidth": false,
+        "responsive": true,
+        "processing": true,
+        "serverside": true,
+        "ajax": {
+            "url": $("#createTarifBeratForm").data('url'),
+            "type": "get"
+        },
+        initComplete: function() {
+            // Apply the search
+            this.api().columns().every(function() {
+                var that = this;
+
+                $('input', this.footer()).on('keyup change clear', function() {
+                    if (that.search() !== this.value) {
+                        that
+                            .search(this.value)
+                            .draw();
+                    }
+                });
+            });
+        }
+    });
+
+    $('#tarif_berat tfoot th').each(function() {
+        var title = $(this).text();
+        if (title != 'Action') {
+            $(this).html('<input type="text" class="form-control" placeholder="Search ' + title + '" />');
+        }
+
+    });
+
+
+    function disable_button_when_not_changes(response) {
+        let input_1 = document.getElementById("inputTarif");
+        let input_2 = document.getElementById("inputBerat");
+        let button = document.getElementById("updateButton");
+        button.disabled = true;
+        input_1.addEventListener("keyup", stateHandle);
+        input_2.addEventListener("keyup", stateHandle);
+
+        function stateHandle() {
+            if (
+                ((($('.tarif').cleanVal() == remove_last_3_char(response.data.tarif)) || ($('.tarif').cleanVal() == '')) &&
+                    ((document.getElementById("inputBerat").value == response.data.berat) || (document.getElementById("inputBerat").value == '')) || document.getElementById("inputBerat").value == '')
+            ) {
+                button.disabled = true;
+            } else {
+                button.disabled = false;
+            }
+        }
+    }
+
+    //CREATE DATA (SHOW FORM)
+    $("#createTarifBerat").click(function(e) {
+        e.preventDefault();
+        $("#createTarifBeratForm")[0].reset();
+        $("#createButton").prop("disabled", false);
+        document.getElementById("updateButton").style.display = "none";
+        document.getElementById("createButton").style.display = "block";
+        document.getElementById("title_modal").innerHTML = "Tambah Data Tarif Berat";
+
+        $('#modal_tarif_berat').modal('show');
+
+    });
+
+
+    // CREATE DATA ACTION
+    $("#createButton").click(function(e) {
+        if (!$("#createTarifBeratForm").valid()) return;
+
+        e.preventDefault();
+        $("#createButton").prop("disabled", true);
+        document.getElementById("inputTarif").value = $('.tarif').cleanVal();
+        var serializeData = $("#createTarifBeratForm")[0];
+        serializeData = new FormData(serializeData);
+
+        $.ajax({
+            url: $("#createTarifBeratForm").data('url'),
+            data: serializeData,
+            type: 'post',
+            cache: false,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                $('#modal_tarif_berat').modal('hide');
+                setTimeout(function() {
+                    table.ajax.reload();
+                    tampilkan_pesan(response.msg, response.type);
+                }, 1000);
+            },
+            error: function(xhr, status, error) {
+                $('#modal_tarif_berat').modal('hide');
+                setTimeout(function() {
+                    var error_response = xhr.responseJSON;
+                    tampilkan_pesan(error_response.msg, error_response.type);
+                }, 1000)
+                $("#createTarifBeratForm")[0].reset();
+            },
+        })
+    });
+
+
+    //BAGIAN DELETE
+    $('body').on('click', '.deleteTarifBerat', function() {
+        var id_tarif_berat = $(this).data("id");
+        var from_gudang = $(this).data("from_gudang");
+        Swal.fire({
+            title: 'Anda yakin?',
+            text: "Yakin menghapus Tarif Dari Gudang : " + from_gudang + "!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!',
+        }).then((result) => {
+            if (result.value) {
+                $.ajax({
+                    url: id_tarif_berat + '/delete/',
+                    data: {
+                        csrfmiddlewaretoken: getCookie('csrfToken'),
+                        id: id_tarif_berat
+                    },
+                    type: 'post',
+                    dataType: 'json',
+                    success: function(response) {
+                        tampilkan_pesan(response.msg, response.type);
+                        table.ajax.reload();
+                    },
+                    error: function(xhr, status, error) {
+                        var error_response = xhr.responseJSON;
+                        tampilkan_pesan(error_response.msg, error_response.type);
+                    }
+                });
+
+            }
+        })
+    });
+
+
+    //EDIT DATA SHOW
+    $('body').on('click', '.editTarifBerat', function(event) {
+        event.preventDefault();
+        $("#createTarifBeratForm")[0].reset();
+        $("#updateButton").prop("disabled", false);
+        var id_tarif_berat = $(this).data("id");
+        url_edit = id_tarif_berat + "/update/";
+        $.ajax({
+            url: id_tarif_berat + '/detail/',
+            type: 'get',
+            success: function(response) {
+                disable_button_when_not_changes(response);
+                document.getElementById("inputBerat").value = response.data.berat;
+                // document.getElementById("inputTarif").value = response.data.tarif;
+                document.getElementById("inputTarif").value = $('.tarif').masked(remove_last_3_char(response.data.tarif));
+                document.getElementById("id_tarif").value = response.data.id_tarif_berat;
+
+                document.getElementById("inputBerat").disabled = false;
+                document.getElementById("inputTarif").disabled = false;
+
+                document.getElementById("updateButton").style.display = "block";
+                document.getElementById("createButton").style.display = "none";
+                document.getElementById("title_modal").innerHTML = "Edit Data Tarif Berat";
+
+                $('#modal_tarif_berat').modal('show');
+            }
+        })
+
+    });
+
+
+    // Update action
+    $("#updateButton").click(function(e) {
+        e.preventDefault();
+        $("#updateButton").prop("disabled", true);
+        document.getElementById("inputTarif").value = $('.tarif').cleanVal();
+        var serializeData = $("#createTarifBeratForm").serialize();
+
+        $.ajax({
+            url: url_edit,
+            data: serializeData,
+            type: 'post',
+            cache: false,
+            success: function(response) {
+                table.ajax.reload();
+                $('#modal_tarif_berat').modal('hide');
+                tampilkan_pesan(response.msg, response.type);
+                $("#createTarifBeratForm")[0].reset();
+                $("#updateButton").prop("disabled", false);
+
+            },
+            error: function(xhr, status, error) {
+                var error_response = xhr.responseJSON;
+
+                tampilkan_pesan(error_response.msg, error_response.type);
+                $("#updateButton").prop("disabled", false);
+
+            },
+        })
+    });
+
+
+    $('#modal_tarif_berat').on('hide.bs.modal', function() {
+        setTimeout(function() {
+            var validator = $("#createTarifBeratForm").validate();
+            validator.resetForm();
+
+        })
+    });
+
+
+});
+</script>
+{% endblock %}

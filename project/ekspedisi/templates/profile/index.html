@@ -1,0 +1,547 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title_name %}
+ <title>Profile | BaliGo Ekspedisi</title>
+{% endblock %}
+
+{% block file_css %}
+<!-- DataTables -->
+ <link rel="stylesheet" href="{% static 'assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+ <link rel="stylesheet" href="{% static 'assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+ <!-- SweetAlert2 -->
+  <link rel="stylesheet" href="{% static 'assets/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css' %}">
+
+
+  <style type="text/css">
+  	/** SPINNER CREATION **/
+
+.loader {
+  position: relative;
+  text-align: center;
+  margin: 15px auto 35px auto;
+  z-index: 9999;
+  display: block;
+  width: 80px;
+  height: 80px;
+  border: 10px solid rgba(0, 0, 0, .3);
+  border-radius: 50%;
+  border-top-color: #000;
+  animation: spin 1s ease-in-out infinite;
+  -webkit-animation: spin 1s ease-in-out infinite;
+}
+
+.img-edit-btn {
+	position: absolute;
+	right: 0;
+}
+
+@keyframes spin {
+  to {
+    -webkit-transform: rotate(360deg);
+  }
+}
+
+@-webkit-keyframes spin {
+  to {
+    -webkit-transform: rotate(360deg);
+  }
+}
+
+
+/** MODAL STYLING **/
+
+.modal-content {
+  border-radius: 0px;
+  box-shadow: 0 0 20px 8px rgba(0, 0, 0, 0.7);
+}
+
+.modal-backdrop.show {
+  opacity: 0.75;
+}
+
+.loader-txt {
+  p {
+    font-size: 13px;
+    color: #666;
+    small {
+      font-size: 11.5px;
+      color: #999;
+    }
+  }
+}
+  </style>
+{% endblock %}
+
+
+{% block content_header %}
+	<section class="content-header">
+		<div class="container-fluid">
+		<div class="row mb-2">
+			<div class="col-sm-6">
+				<h1>Profile</h1>
+			</div>
+			<div class="col-sm-6">
+				<ol class="breadcrumb float-sm-right">
+					<li class="breadcrumb-item"><a href="#">Home</a></li>
+					<li class="breadcrumb-item active">User Profile</li>
+				</ol>
+			</div>
+		</div>
+		</div><!-- /.container-fluid -->
+	</section>
+{% endblock %}
+
+
+
+{% block content %}
+<!-- Modal -->
+<div class="modal fade" id="modal-profile" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Ganti Foto Profil</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="photo-upload-wrapper">
+        	<form id="form-photo-profile-upload" enctype="multipart/form-data" data-url="{% url 'profile_update' %}">
+        		{% csrf_token %}
+        		<input type="hidden" name="id" value="{{data.id}}">
+        		<input class="form-control" type="file" name="photo" accept="image/x-png,image/jpeg" id="photo-upload"/>
+        	</form>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+        <button type="button" class="btn btn-primary" onclick="submitPhoto(document.getElementById('modal-profile'))">Simpan</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="row">
+	<!-- /.col -->
+	<div class="col-md-12">
+		<div class="card">
+			<div class="card-header p-2">
+				<ul class="nav nav-pills">
+					<li class="nav-item"><a class="nav-link active" href="#my_profile" data-toggle="tab">My Profile</a></li>
+					<li class="nav-item"><a class="nav-link" href="#settings" data-toggle="tab">Settings</a></li>
+				</ul>
+				</div><!-- /.card-header -->
+				<div class="card-body">
+					<div class="tab-content">
+						<div class="active tab-pane" id="my_profile">
+							<div class="row">
+								<div class="col-md-4">
+									<div class="card card-primary">
+										<div class="card-body box-profile">
+											<div class="text-center" id="profile_photo" style="position: relative;">
+												<div class="float-right img-edit-btn">
+													<a class="btn btn-secondary btn-xs text-white px-2" data-toggle="modal" data-target="#modal-profile"><i class="fas fa-pencil-alt"></i></a>
+												</div>
+												{% if data.url_photo %}
+													<img style="height: 100px" class="profile-user-img img-fluid img-circle" src="/media/{{data.url_photo}}" alt="User profile picture">
+												{% else %}
+													<img style="height: 100px" class="profile-user-img img-fluid img-circle" src="{% static 'assets/dist/img/user_no_image.jpg' %}" alt="User profile picture">
+												{% endif %}
+												
+											</div>
+											<h3 class="profile-username text-center" id="profile_name">{{data.name}}</h3>
+											<p class="text-muted text-center" id="profile_username">{{data.username}}</p>
+											<ul class="list-group list-group-unbordered mb-3">
+												<li class="list-group-item">
+													<b>ID User</b> <a class="float-right" id="profile_no_personil">{% if data.is_admin %} s_u_p_e_r_a_d_m_i_n {% else %}{{data.no_personil}}{% endif %}</a>
+												</li>
+												<li class="list-group-item">
+													<b>Email</b> <a class="float-right" id="profile_email">{{data.email}}</a>
+												</li>
+												<li class="list-group-item">
+													<b>No. Hp</b> <a class="float-right" id="profile_no_hp">{{data.no_hp}}</a>
+												</li>
+
+											</ul>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-8">
+									<div class="card card-primary">
+						              <div class="card-header">
+						                <h3 class="card-title">About Me</h3>
+						              </div>
+						              <!-- /.card-header -->
+						              <div class="card-body">
+						                <strong><i class="fas fa-book mr-1"></i> Role</strong>
+
+						                <p class="text-muted" id="profile_role">
+						                 {% if data.is_admin %}
+						                 	SUPERADMIN
+						                 {% else %}
+						                 	{{data.role}}
+						                 {% endif %}
+						                </p>
+
+						                <hr>
+
+						                <strong><i class="fas fa-map-marker-alt mr-1"></i> Alamat</strong>
+
+						                <p class="text-muted" id="profile_alamat">{% if data.alamat %}{{data.alamat}}{% else %}Alamat Tidak di Definisikan Untuk User ini{% endif %}</p>
+
+						                <hr>
+
+						                <strong><i class="fas fa-pencil-alt mr-1"></i> Penempatan</strong>
+
+						                <p class="text-muted">
+						                	{% if penempatan.nama %}
+						                	{{penempatan.nama}}
+						                	{% else %}
+						                	-
+						                	{% endif %}
+						                </p>
+
+						                <hr>
+
+						                <strong><i class="far fa-file-alt mr-1"></i> Alamat Penempatan</strong>
+
+						                <p class="text-muted">
+						                	{% if penempatan.nama %}
+						                	{{penempatan.alamat}}
+						                	{% else %}
+						                	-
+						                	{% endif %}
+						                </p>
+						              </div>
+						              <!-- /.card-body -->
+						            </div>
+								</div>
+							</div>
+						</div>
+						
+						<div class="tab-pane" id="settings">
+							<form class="form-horizontal" id="formEdit" data-url="{% url 'profile_update' %}">
+								{% csrf_token %}
+								<input type="hidden" name="id" value="{{data.id}}">
+								<div class="form-group row">
+									<label for="inputUsername" class="col-sm-2 col-form-label">Username</label>
+									<div class="col-sm-10">
+										<input type="text" class="form-control" id="inputUsername" name="username" placeholder="Username" value="{{data.username}}" required="">
+									</div>
+								</div>
+								<div class="form-group row">
+									<label for="inputNama" class="col-sm-2 col-form-label">Nama</label>
+									<div class="col-sm-10">
+										<input type="text" class="form-control" id="inputNama" name="name" placeholder="Nama" value="{{data.name}}" required="">
+									</div>
+								</div>
+								<div class="form-group row">
+									<label for="inputEmail" class="col-sm-2 col-form-label">Email</label>
+									<div class="col-sm-10">
+										<input type="email" class="form-control" id="inputEmail" name="email" placeholder="Email" value="{{data.email}}" required="">
+									</div>
+								</div>
+								
+								<div class="form-group row">
+									<label for="inputNoHp" class="col-sm-2 col-form-label">No. Hp</label>
+									<div class="col-sm-10">
+										<input type="email" class="form-control" id="inputNoHp" name="no_hp" placeholder="No. Hp" value="{{data.no_hp}}" maxlength="12" required="">
+									</div>
+								</div>
+								<div class="form-group row">
+									<label for="inputAlamat" class="col-sm-2 col-form-label">Alamat</label>
+									<div class="col-sm-10">
+										<textarea class="form-control" id="inputAlamat" name="alamat" placeholder="Alamat" required="">{% if data.alamat %}{{data.alamat}}{% else %}{% endif %}</textarea>
+									</div>
+								</div>
+
+								<hr>
+								<div class="form-group row">
+									<label for="inputPassword_1" class="col-sm-2 col-form-label">Password</label>
+									<div class="col-sm-10">
+										<input type="password" class="form-control" id="inputPassword_1" name="password1" placeholder="Kosongkan Jika tidak ingin mengubah Password">
+									</div>
+								</div>
+								<div class="form-group row">
+									<label for="inputPassword_2" class="col-sm-2 col-form-label">Konfirmasi Password</label>
+									<div class="col-sm-10">
+										<input type="password" class="form-control" id="inputPassword_2" name="password2" placeholder="Kosongkan Jika tidak ingin mengubah Password">
+									</div>
+								</div>
+								
+								<div class="form-group row">
+									<div class="offset-sm-2 col-sm-10">
+										<button type="button" class="btn btn-info float-right" id="buttonUpdate">Update</button>
+									</div>
+								</div>
+							</form>
+						</div>
+						<!-- /.tab-pane -->
+					</div>
+					<!-- /.tab-content -->
+					</div><!-- /.card-body -->
+				</div>
+				<!-- /.nav-tabs-custom -->
+			</div>
+			<!-- /.col -->
+		</div>
+
+<!-- Modal -->
+<div class="modal fade" id="loadMe" tabindex="-1" role="dialog" aria-labelledby="loadMeLabel">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-body text-center">
+        <div class="loader"></div>
+        <div clas="loader-txt">
+          <p>Please Wait. <br><br><small>Loading ...</small></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+
+
+
+{% block file_js %}
+<!-- Bootstrap 4 -->
+<script src="{% static 'assets/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<!-- DataTables -->
+<script src="{% static 'assets/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+<!-- SweetAlert2 -->
+<script src="{% static 'assets/plugins/sweetalert2/sweetalert2.min.js' %}"></script>
+
+<script>
+	function tampilkan_pesan(pesan, type){
+		Toast.fire({
+	    icon: type,
+	    title: pesan
+	  });
+	}
+
+	const Toast = Swal.mixin({
+	  toast: true,
+	  position: 'top-end',
+	  showConfirmButton: false,
+	  timer: 3000
+	});
+
+
+	function submitPhoto(elementToHide){
+		try{
+			var photo = $('#photo-upload').val() || null;
+			if(!photo){
+				tampilkan_pesan('Foto tidak boleh kosong', 'warning');
+				return
+			}
+			$(elementToHide).modal('hide');
+		} catch(message) {
+			tampilkan_pesan(message, 'warning');
+			return
+		}
+
+		setTimeout(function(){
+			$("#loadMe").modal({
+		        backdrop: "static", //remove ability to close modal with click
+		        keyboard: false, //remove option to close with keyboard
+		        show: true //Display loader!
+		    });
+		}, 300);
+
+		setTimeout(function(){
+			var serializeData = $("#form-photo-profile-upload")[0];
+			serializeData = new FormData(serializeData);
+			serializeData.append('edit-photo', 'true');
+			// console.log(serializeData);
+			$.ajax({
+		        url: $("#formEdit").data('url'),
+		        data: serializeData,
+		        type: 'POST',
+		        processData: false,
+		        contentType: false,
+		        success: function(response) {
+		        	setTimeout(function(){
+		            	$('#loadMe').modal('hide');
+		            }, 700);
+		            setTimeout(function(){
+		            	tampilkan_pesan(response.msg, response.type);
+		            }, 800);
+		            setTimeout(function(){
+		            	location.reload(true);
+		            }, 1500);
+		        },
+		        error: function(xhr, status, error) {
+		            setTimeout(function(){
+		            	$('#loadMe').modal('hide');
+		            }, 700);
+		            setTimeout(function(){
+		            	var error_response = xhr.responseJSON || {'msg':'Terjadi Kesalahan yang tidak diketahui', 'type':'error'};
+                    	tampilkan_pesan(error_response.msg, error_response.type);
+		            },800);
+		        },
+			});
+		}, 350)
+	}
+
+	$(document).ready(function(){
+		function getCookie(name) {
+		    var cookieValue = null;
+		    if (document.cookie && document.cookie != '') {
+		        var cookies = document.cookie.split(';');
+		        for (var i = 0; i < cookies.length; i++) {
+		            var cookie = jQuery.trim(cookies[i]);
+		            // Does this cookie string begin with the name we want?
+		            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+		                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+		                break;
+		            }
+		        }
+		    }
+		    return cookieValue;
+		}
+		var url_edit = '';
+		var username_lama = "{{data.username}}";
+		var nama_lama = "{{data.name}}";
+		var email_lama = "{{data.email}}";
+		var no_hp_lama = "{{data.no_hp}}";
+		var alamat_lama = "{{data.alamat}}";
+		// disable_button_when_not_changes();
+
+		$(function() {
+		    $("input[name='no_hp']").on('input', function(e) {
+		        $(this).val($(this).val().replace(/[^0-9]/g, ''));
+		    });
+		});
+
+		function validate_form() {
+		    var username = document.getElementById("inputUsername");
+		    var nama = document.getElementById("inputNama");
+		    var email = document.getElementById("inputEmail");
+		    var no_hp = document.getElementById("inputNoHp");
+		    var alamat = document.getElementById("inputAlamat");
+
+		    if (!username.checkValidity()  || !email.checkValidity()) {
+		    	if(!username.checkValidity()){
+		    		tampilkan_pesan($("#inputUsername").attr('placeholder') + ' -> ' +username.validationMessage, 'error');
+		    	}
+		    	
+		    	else if(!email.checkValidity()){
+		    		tampilkan_pesan($("#inputEmail").attr('placeholder') + ' -> ' +email.validationMessage, 'error');
+		    	}
+		    	
+		    	return false;
+		    }else{
+		    	return true;
+		    }
+		}
+
+
+		function disable_button_when_not_changes() {
+		    let input_1 = document.getElementById("inputNama");
+		    let input_2 = document.getElementById("inputUsername");
+		    let input_3 = document.getElementById("inputEmail");
+		    let input_4 = document.getElementById("inputNoHp");
+		    let input_5 = document.getElementById("inputAlamat");
+		    let input_6 = document.getElementById("inputPassword_1");
+		    let input_7 = document.getElementById("inputPassword_2");
+
+		    let button = document.getElementById("buttonUpdate");
+		    button.disabled = true;
+		    input_1.addEventListener("keyup", stateHandle);
+		    input_2.addEventListener("keyup", stateHandle);
+		    input_3.addEventListener("keyup", stateHandle);
+		    input_4.addEventListener("keyup", stateHandle);
+		    input_5.addEventListener("keyup", stateHandle);
+		    input_6.addEventListener("keyup", stateHandle);
+		    input_7.addEventListener("keyup", stateHandle);
+
+		    function stateHandle() {
+		        if (
+		            document.getElementById("inputNama").value == nama_lama &&
+		            document.getElementById("inputUsername").value == username_lama &&
+		            document.getElementById("inputEmail").value == email_lama &&
+		            document.getElementById("inputNoHp").value == no_hp_lama &&
+		            document.getElementById("inputAlamat").value == alamat_lama &&
+		            document.getElementById("inputPassword_1").value == '' &&
+		            document.getElementById("inputPassword_1").value == ''
+		        ) {
+		            button.disabled = true;
+		        } else {
+		            button.disabled = false;
+		        }
+		    }
+		}
+
+		function update_data_show(response){
+			document.getElementById("profile_name").innerHTML = response.name;
+			document.getElementById("profile_username").innerHTML = response.username;
+			document.getElementById("profile_email").innerHTML = response.email;
+			document.getElementById("profile_no_hp").innerHTML = response.no_hp;
+			document.getElementById("profile_alamat").innerHTML = response.alamat;
+
+			nama_lama = response.name;
+			username_lama = response.username;
+			email_lama = response.email;
+			no_hp_lama = response.no_hp;
+			alamat_lama = response.alamat;
+			// disable_button_when_not_changes();
+		}
+		
+		// Update action
+		$("#buttonUpdate").click(function(e) {
+		    e.preventDefault();
+		    if (validate_form() == true) {
+		        $("#loadMe").modal({
+		            backdrop: "static", //remove ability to close modal with click
+		            keyboard: false, //remove option to close with keyboard
+		            show: true //Display loader!
+		        });
+		        var serializeData = $("#formEdit").serialize();
+		        $.ajax({
+		            url: $("#formEdit").data('url'),
+		            data: serializeData,
+		            type: 'post',
+		            cache: false,
+		            success: function(response) {
+		                setTimeout(function() {
+		                    $("#loadMe").modal("hide");
+		                    tampilkan_pesan(response.msg, response.type);
+		                    update_data_show(response.data);
+		                }, 1000);
+		                console.log(response);
+		            },
+		            error: function(xhr, status, error) {
+		                var error_response = xhr.responseJSON;
+		                setTimeout(function() {
+		                    $("#loadMe").modal("hide");
+		                    tampilkan_pesan(error_response.msg, error_response.type);
+		                }, 1000);
+		            },
+		        })
+		    }
+
+		    document.getElementById("inputPassword_1").value = '';
+		    document.getElementById("inputPassword_2").value = '';
+		});
+
+		// $("#buttonUpdate").on("click", function(e) {
+		//     e.preventDefault();
+		//     $("#loadMe").modal({
+		//         backdrop: "static", //remove ability to close modal with click
+		//         keyboard: false, //remove option to close with keyboard
+		//         show: true //Display loader!
+		//     });
+		    // setTimeout(function() {
+		    //     $("#loadMe").modal("hide");
+		    // }, 3500);
+		// });
+
+	});
+</script>
+{% endblock %}

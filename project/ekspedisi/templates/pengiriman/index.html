@@ -1,0 +1,1364 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title_name %}
+<title>Pengiriman | BaliGo Ekspedisi</title>
+{% endblock %}
+{% block file_css %}
+<!-- DataTables -->
+<link rel="stylesheet" href="{% static 'assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+<link rel="stylesheet" href="{% static 'assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+<!-- SweetAlert2 -->
+<link rel="stylesheet" href="{% static 'assets/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css' %}">
+<!-- Select2 -->
+<link rel="stylesheet" href="{% static 'assets/plugins/select2/css/select2.min.css' %}">
+<link rel="stylesheet" href="{% static 'assets/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
+<!-- Load Leaflet from CDN -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+<!-- Load Esri Leaflet from CDN -->
+<script src="https://unpkg.com/esri-leaflet@2.5.0/dist/esri-leaflet.js" integrity="sha512-ucw7Grpc+iEQZa711gcjgMBnmd9qju1CICsRaryvX7HJklK0pGl/prxKvtHwpgm5ZHdvAil7YPxI1oWPOWK3UQ==" crossorigin=""></script>
+<!-- Load Esri Leaflet Geocoder from CDN -->
+<link rel="stylesheet" href="https://unpkg.com/esri-leaflet-geocoder@2.3.3/dist/esri-leaflet-geocoder.css" integrity="sha512-IM3Hs+feyi40yZhDH6kV8vQMg4Fh20s9OzInIIAc4nx7aMYMfo+IenRUekoYsHZqGkREUgx0VvlEsgm7nCDW9g==" crossorigin="">
+<script src="https://unpkg.com/esri-leaflet-geocoder@2.3.3/dist/esri-leaflet-geocoder.js" integrity="sha512-HrFUyCEtIpxZloTgEKKMq4RFYhxjJkCiF5sDxuAokklOeZ68U2NPfh4MFtyIVWlsKtVbK5GD2/JzFyAfvT5ejA==" crossorigin=""></script>
+<style type="text/css">
+.map_size {
+    width: 100%;
+    height: 350px;
+}
+.modal { overflow-y: auto }
+.img-ttd {
+    height: 100%;
+    max-width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    object-fit: contain;
+    padding: 10px;
+}
+
+#maps_tracking {
+    width: 100%;
+    height: 350px;
+}
+
+.leaflet-top,
+.leaflet-bottom {
+    z-index: 400;
+}
+
+@media (max-width: 768px) {
+    #nama_pengirim_th {
+        font-size: small;
+    }
+
+    .buttontext {
+        width: 95px;
+        overflow: hidden;
+        white-space: nowrap;
+        display: block;
+        text-overflow: ellipsis;
+    }
+}
+
+/* Spinner Wrapper */
+.loader {
+    width: 100%;
+    /* Cause Loader in Table Result Cek tarif*/
+    height: 30vh;
+    background: #fff;
+    position: relative;
+    top: 0;
+    left: 0;
+}
+
+.loader-inner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.modal-manual {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    content: "";
+    height: 100%;
+    background: #c1c1c1e3;
+    z-index: 2;
+}
+
+.modal:nth-of-type(even) {
+    z-index: 1049 !important;
+}
+.modal-backdrop.show:nth-of-type(even) {
+    z-index: 1048 !important;
+}
+.modal-backdrop.show:nth-of-type(odd) {
+    z-index: 1049 !important;
+}
+#inputSatuan-error{
+    position: absolute;
+    bottom: 0;
+}
+
+/* Spinner */
+.lds-roller {
+    display: inline-block;
+    position: relative;
+    width: 64px;
+    height: 64px;
+}
+
+.lds-roller div {
+    animation: lds-roller 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    transform-origin: 32px 32px;
+}
+
+.lds-roller div:after {
+    content: " ";
+    display: block;
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #55cb39;
+    margin: -3px 0 0 -3px;
+}
+
+.lds-roller div:nth-child(1) {
+    animation-delay: -0.036s;
+}
+
+.lds-roller div:nth-child(1):after {
+    top: 50px;
+    left: 50px;
+}
+
+.lds-roller div:nth-child(2) {
+    animation-delay: -0.072s;
+}
+
+.lds-roller div:nth-child(2):after {
+    top: 54px;
+    left: 45px;
+}
+
+.lds-roller div:nth-child(3) {
+    animation-delay: -0.108s;
+}
+
+.lds-roller div:nth-child(3):after {
+    top: 57px;
+    left: 39px;
+}
+
+.lds-roller div:nth-child(4) {
+    animation-delay: -0.144s;
+}
+
+.lds-roller div:nth-child(4):after {
+    top: 58px;
+    left: 32px;
+}
+
+.lds-roller div:nth-child(5) {
+    animation-delay: -0.18s;
+}
+
+.lds-roller div:nth-child(5):after {
+    top: 57px;
+    left: 25px;
+}
+
+.lds-roller div:nth-child(6) {
+    animation-delay: -0.216s;
+}
+
+.lds-roller div:nth-child(6):after {
+    top: 54px;
+    left: 19px;
+}
+
+.lds-roller div:nth-child(7) {
+    animation-delay: -0.252s;
+}
+
+.lds-roller div:nth-child(7):after {
+    top: 50px;
+    left: 14px;
+}
+
+.lds-roller div:nth-child(8) {
+    animation-delay: -0.288s;
+}
+
+.lds-roller div:nth-child(8):after {
+    top: 45px;
+    left: 10px;
+}
+
+@keyframes lds-roller {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+</style>
+{% endblock %}
+{% block content_header %}
+<div class="container-fluid">
+    <div class="row mb-2">
+        <div class="col-sm-6">
+            <h1 class="m-0 text-dark">Pengiriman</h1>
+        </div><!-- /.col -->
+        <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                <li class="breadcrumb-item active">Pengiriman</li>
+            </ol>
+        </div><!-- /.col -->
+    </div><!-- /.row -->
+</div><!-- /.container-fluid -->
+{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <div style="float: left">
+            <ul class="nav nav-pills ml-auto p-2">
+                <li class="nav-item"><a class="nav-link active" href="#tab_pengiriman" data-toggle="tab"><i class="nav-icon fas fa-dolly"></i>&emsp;Data Pengiriman</a></li>
+                <li class="nav-item"><a class="nav-link" href="#tab_pengiriman_arsip" data-toggle="tab"><i class="nav-icon fas fa-inbox"></i>&emsp;Arsip</a></li>
+            </ul>
+        </div>
+        <div class="card-tools">
+            <button type="button" class="btn btn-block bg-gradient-primary" id="createPengiriman" title="Tambah Pengiriman">
+                <span class="buttontext"><i class="fa fa-plus"></i>&nbsp; Tambah Pengiriman</span>
+            </button>
+        </div>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+        <div class="tab-content">
+            <div class="tab-pane active" id="tab_pengiriman">
+                <table id="pengiriman" class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th id="no_th">No</th>
+                            <th>ID/Resi</th>
+                            <th id="nama_pengirim_th">Nama Pengirim</th>
+                            <th>Petugas</th>
+                            <th>Status</th>
+                            <th>File</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>No</th>
+                            <th>ID/Resi</th>
+                            <th>Nama Pengirim</th>
+                            <th>Petugas</th>
+                            <th>Status</th>
+                            <th>File</th>
+                            <th>Action</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <div class="tab-pane" id="tab_pengiriman_arsip">
+                <table id="pengiriman_arsip" class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th id="no_arsip_th">No</th>
+                            <th>ID/Resi</th>
+                            <th id="nama_pengirim_arsip_th">Nama Pengirim</th>
+                            <th>Petugas</th>
+                            <th>Status</th>
+                            <th>Billing</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>No</th>
+                            <th>ID/Resi</th>
+                            <th>Nama Pengirim</th>
+                            <th>Petugas</th>
+                            <th>Status</th>
+                            <th>Billing</th>
+                            <th>Action</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- /.card-body -->
+</div>
+
+<!-- /.modal -->
+<div class="modal fade" id="modal_pengiriman" data-backdrop="static">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="title_modal">Detail Data Pengiriman</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="createPengirimanForm" method="post" data-url="{% url 'pengiriman' %}" data-url_provinsi="{% url 'list_provinsi' %}" data-url_layanan="{% url 'tarif_layanan'%}" data-url_berat="{% url 'tarif_berat' %}" data-url_gudang="{% url 'gudang_data' %}" data-url_gudang_province="{% url 'gudang_province'%}" data-url_toko="{% url 'toko' %}" data-outlet_id="{{user.penempatan_toko_id}}" data-url_kilometer="{% url 'tarif_kilometer' %}" data-url_tarif_gudang="{% url 'tarif_gudang'%}" data-url_image="{% static 'assets/dist/img/logo2.jpg' %}" data-url_qrcode="{% static 'assets/plugins/qrcode/qrcode.js' %}" data-url_custom_billing="{% static 'custom_js/unduh_billing_pengiriman.js' %}" data-url_current_location="{% url 'current_location' %}" data-url_pengemasan="{% url 'pengemasan_select2'%}" data-url_detail_pengemasan="{% url 'pengemasan'%}" data-url_layanan_select2="{% url 'layanan_select2' %}" data-url_extra_cash="{% url 'extra_cash_check' %}" data-api_maps_view="{{API_MAPS_VIEW}}" data-api_open_route_service="{{API_OPEN_ROUTE_SERVICE}}" data-url_arsip="{% url 'pengiriman_arsip_list' %}" data-url_pelanggan="{% url 'pelanggan' %}" data-url_satuan="{% url 'satuan_select2' %}" data-url_jenis_kiriman="{% url 'jenis_kiriman_select2' %}" data-url_gudang_plain="{% url 'gudang' %}">
+                    {% csrf_token %}
+                    <!-- ================================================================== -->
+                    <div class="card card-primary card-tabs">
+                        <div class="card-header p-0 pt-1">
+                            <ul class="nav nav-tabs" id="custom-tabs-one-tab" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link header active" id="custom-tabs-one-pengirim-tab" data-toggle="pill" href="#custom-tabs-one-pengirim" role="tab" aria-controls="custom-tabs-one-pengirim" aria-selected="true">Pengirim</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link header" id="custom-tabs-one-penerima-tab" data-toggle="pill" href="#custom-tabs-one-penerima" role="tab" aria-controls="custom-tabs-one-penerima" aria-selected="false">Penerima</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link header" id="custom-tabs-one-barang-tab" data-toggle="pill" href="#custom-tabs-one-barang" role="tab" aria-controls="custom-tabs-one-barang" aria-selected="false">Barang</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link header" id="custom-tabs-one-layanan-tab" data-toggle="pill" href="#custom-tabs-one-layanan" role="tab" aria-controls="custom-tabs-one-layanan" aria-selected="false">Layanan</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="card-body">
+                            <div class="tab-content" id="custom-tabs-one-tabContent">
+                                <div class="tab-pane fade active show" id="custom-tabs-one-pengirim" role="tabpanel" aria-labelledby="custom-tabs-one-pengirim-tab">
+                                    {% for field in form %}
+                                    {% if field.name == 'nama_pengirim' or field.name == 'no_telp_pengirim' or field.name == 'outlet_pengiriman' or field.name == 'alamat_pengirim'%}
+                                    {% if field.name != 'outlet_pengiriman' and not field.name == 'nama_pengirim' %}
+                                    <div class="form-group row">
+                                        <label for="{{ field.name }}" class="col-sm-2 col-form-label">{{ field.label }}</label>
+                                        <div class="col-sm-10">
+                                            {{ field }}
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% if field.name == 'nama_pengirim' %}
+                                    <div class="form-group row">
+                                        <label for="{{ field.name }}" class="col-sm-2 col-form-label">{{ field.label }}</label>
+                                        <div class="col-sm-10">
+                                            <div class="card card-primary card-tabs">
+                                                <div class="card-header p-0 pt-1">
+                                                    <ul class="nav nav-tabs" id="custom-tabs-one-tab" role="tablist">
+                                                        <li class="nav-item">
+                                                            <a class="nav-link active" id="custom-tabs-one-manual_pengirim-tab" data-toggle="pill" href="#custom-tabs-one-manual_pengirim" role="tab" aria-controls="custom-tabs-one-manual_pengirim" aria-selected="true">Input Manual</a>
+                                                        </li>
+                                                        <li class="nav-item">
+                                                            <a class="nav-link" id="custom-tabs-one-cari_pengirim-tab" data-toggle="pill" href="#custom-tabs-one-cari_pengirim" role="tab" aria-controls="custom-tabs-one-cari_pengirim" aria-selected="false">Cari Pelanggan</a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="tab-content" id="custom-tabs-one-tabContent">
+                                                        <div class="tab-pane fade active show" id="custom-tabs-one-manual_pengirim" role="tabpanel" aria-labelledby="custom-tabs-one-manual_pengirim-tab">
+                                                            {{ field }}
+                                                        </div>
+                                                        <div class="tab-pane fade" id="custom-tabs-one-cari_pengirim" role="tabpanel" aria-labelledby="custom-tabs-one-cari_pengirim-tab">
+                                                            <select class="form-control" id="cari_pengirim"></select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% if field.name == 'outlet_pengiriman' %}
+                                    <div class="form-group row">
+                                        <label for="{{ field.name }}" class="col-sm-2 col-form-label">{{ field.label }}</label>
+                                        <div class="col-sm-10">
+                                            <input type="hidden" name="outlet_pengiriman" id="id_outlet_pengiriman" value="{{ request.user.penempatan_toko.id }}">
+                                            <input type="text" id="tampil_outlet_pengiriman" readonly value="{{ request.user.penempatan_toko }}" class="form-control" placeholder="Outlet Pengirim Muncul Disini">
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% if field.name == 'alamat_pengirim' %}
+                                    <div class="form-group row">
+                                        <label for="inputProvinsiPengirim" class="col-sm-2 col-form-label">Provinsi Pengirim</label>
+                                        <div class="col-sm-10">
+                                            <select class="form-control" name="provinsi_pengirim" id="inputProvinsiPengirim" required>
+                                                <option></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="inputKotaPengirim" class="col-sm-2 col-form-label">Kab./Kota Pengirim</label>
+                                        <div class="col-sm-10">
+                                            <select class="form-control" name="kota_pengirim" id="inputKotaPengirim" required>
+                                                <option></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="inputKecamatanPengirim" class="col-sm-2 col-form-label">Kecamatan Pengirim</label>
+                                        <div class="col-sm-10">
+                                            <select class="form-control" name="kecamatan_pengirim" id="inputKecamatanPengirim" required>
+                                                <option></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="inputDesaPengirim" class="col-sm-2 col-form-label">Desa Pengirim</label>
+                                        <div class="col-sm-10">
+                                            <select class="form-control" name="desa_pengirim" id="inputDesaPengirim" required>
+                                                <option></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="inputKodePosPengirim" class="col-sm-2 col-form-label">Kode Pos</label>
+                                        <div class="col-sm-10">
+                                            <select class="form-control" name="kode_pos_pengirim" id="inputKodePosPengirim" required>
+                                                <option></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% endif %}
+                                    {% endfor %}
+                                    <button class="btn btn-success btn-lg float-right tombol-navigasi" onclick="$('#custom-tabs-one-penerima-tab').trigger('click')">Selanjutnya</button>
+                                </div>
+                                <div class="tab-pane fade" id="custom-tabs-one-penerima" role="tabpanel" aria-labelledby="custom-tabs-one-penerima-tab">
+                                    {% for field in form %}
+                                    {% if field.name == 'nama_penerima' or field.name == 'no_telp_penerima' or field.name == 'alamat_penerima' %}
+                                    {% if field.name != 'nama_penerima' %}
+                                    <div class="form-group row">
+                                        <label for="{{ field.name }}" class="col-sm-2 col-form-label">{{ field.label }}</label>
+                                        <div class="col-sm-10">
+                                            {{ field }}
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% if field.name == 'nama_penerima' %}
+                                    <div class="form-group row">
+                                        <label for="{{ field.name }}" class="col-sm-2 col-form-label">{{ field.label }}</label>
+                                        <div class="col-sm-10">
+                                            <div class="card card-primary card-tabs">
+                                                <div class="card-header p-0 pt-1">
+                                                    <ul class="nav nav-tabs" id="custom-tabs-one-tab" role="tablist">
+                                                        <li class="nav-item">
+                                                            <a class="nav-link active" id="custom-tabs-one-manual_penerima-tab" data-toggle="pill" href="#custom-tabs-one-manual_penerima" role="tab" aria-controls="custom-tabs-one-manual_penerima" aria-selected="true">Input Manual</a>
+                                                        </li>
+                                                        <li class="nav-item">
+                                                            <a class="nav-link" id="custom-tabs-one-cari_penerima-tab" data-toggle="pill" href="#custom-tabs-one-cari_penerima" role="tab" aria-controls="custom-tabs-one-cari_penerima" aria-selected="false">Cari Pelanggan</a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="tab-content" id="custom-tabs-one-tabContent">
+                                                        <div class="tab-pane fade active show" id="custom-tabs-one-manual_penerima" role="tabpanel" aria-labelledby="custom-tabs-one-manual_penerima-tab">
+                                                            {{ field }}
+                                                        </div>
+                                                        <div class="tab-pane fade" id="custom-tabs-one-cari_penerima" role="tabpanel" aria-labelledby="custom-tabs-one-cari_penerima-tab">
+                                                            <select class="form-control" id="cari_penerima"></select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% if field.name == 'alamat_penerima' %}
+                                    <div class="form-group row">
+                                        <label for="inputProvinsiPenerima" class="col-sm-2 col-form-label">Provinsi Penerima</label>
+                                        <div class="col-sm-10">
+                                            <select class="form-control" name="provinsi_penerima" id="inputProvinsiPenerima" required>
+                                                <option></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="inputKotaPenerima" class="col-sm-2 col-form-label">Kab./Kota Penerima</label>
+                                        <div class="col-sm-10">
+                                            <select class="form-control" name="kota_penerima" id="inputKotaPenerima" required>
+                                                <option></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="inputKecamatanPenerima" class="col-sm-2 col-form-label">Kecamatan Penerima</label>
+                                        <div class="col-sm-10">
+                                            <select class="form-control" name="kecamatan_penerima" id="inputKecamatanPenerima" required>
+                                                <option></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="inputDesaPenerima" class="col-sm-2 col-form-label">Desa Penerima</label>
+                                        <div class="col-sm-10">
+                                            <select class="form-control" name="desa_penerima" id="inputDesaPenerima" required>
+                                                <option></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="inputKodePosPenerima" class="col-sm-2 col-form-label">Kode Pos</label>
+                                        <div class="col-sm-10">
+                                            <select class="form-control" name="kode_pos_penerima" id="inputKodePosPenerima" required>
+                                                <option></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% endif %}
+                                    {% endfor %}
+                                    <div class="btn-group float-right">
+                                        <button class="btn btn-secondary btn-lg tombol-navigasi" onclick="$('#custom-tabs-one-pengirim-tab').trigger('click')">Sebelumnya</button>
+                                        <button class="btn btn-success btn-lg tombol-navigasi" onclick="$('#custom-tabs-one-barang-tab').trigger('click')">Selanjutnya</button>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="custom-tabs-one-barang" role="tabpanel" aria-labelledby="custom-tabs-one-barang-tab">
+                                    {% for field in form %}
+                                    {% if field.name == 'jenis_barang' or field.name == 'detail_barang' or field.name == 'berat' or field.name == 'pengemasan' or field.name == 'jumlah' %}
+                                    <div class="form-group row">
+                                        <label for="{{ field.name }}" class="col-sm-2 col-form-label">{{ field.label }}</label>
+                                        <div class="col-sm-10">
+                                            {% if field.name == 'jumlah' %}
+                                            <div class="row">
+                                                <div class="col-md-8">
+                                                    {{ field }}
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <select class="form-control" id="inputSatuan" name="satuan" required></select>
+                                                </div>
+                                            </div>
+                                            {% elif field.name == 'berat' %}
+                                            <div class="card card-primary card-tabs">
+                                                <div class="card-header p-0 pt-1">
+                                                    <ul class="nav nav-tabs" id="custom-tabs-one-tab" role="tablist">
+                                                        <li class="nav-item">
+                                                            <a class="nav-link active" id="tab_berat" data-toggle="pill" href="#konten_berat_barang" role="tab" aria-controls="tab_berat" aria-selected="true">Berat</a>
+                                                        </li>
+                                                        <li class="nav-item">
+                                                            <a class="nav-link" id="tab_volume" data-toggle="pill" href="#konten_volume_barang" role="tab" aria-controls="tab_volume" aria-selected="false">Volume</a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="tab-content" id="custom-tabs-one-tabContent">
+                                                        <div class="tab-pane fade active show" id="konten_berat_barang" role="tabpanel" aria-labelledby="tab_berat">
+                                                            <input type="number" step="0.01" name="berat" class="form-control" placeholder="Masukan berat Barang (Kg)" id="inputBerat" required="">
+                                                        </div>
+                                                        <div class="tab-pane fade" id="konten_volume_barang" role="tabpanel" aria-labelledby="tab_volume">
+                                                            <div class="row">
+                                                                <div class="col-4">
+                                                                    <input type="number" class="form-control" id="panjang_barang" placeholder="Panjang (Cm)">
+                                                                </div>
+                                                                <div class="col-4">
+                                                                    <input type="number" class="form-control" id="lebar_barang" placeholder="Lebar (Cm)">
+                                                                </div>
+                                                                <div class="col-4">
+                                                                    <input type="number" class="form-control" id="tinggi_barang"  placeholder="Tinggi (Cm)">
+                                                                </div>
+                                                            </div>
+                                                            <br>
+                                                            <div class="row">
+                                                                <div class="col-md-6">
+                                                                    <label>Volume (cm3)</label>
+                                                                    <input type="text" class="form-control" id="volume" placeholder="Volume" readonly>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <label>Berat (Kg)</label>        
+                                                                    <input type="text" class="form-control" id="volume2berat" placeholder="Berat" readonly>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% else %}
+                                            {{ field }}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% endfor %}
+                                    <div class="btn-group float-right">
+                                        <button class="btn btn-secondary btn-lg tombol-navigasi" onclick="$('#custom-tabs-one-penerima-tab').trigger('click')">Sebelumnya</button>
+                                        <button class="btn btn-success btn-lg tombol-navigasi" onclick="$('#custom-tabs-one-layanan-tab').trigger('click')">Selanjutnya</button>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="custom-tabs-one-layanan" role="tabpanel" aria-labelledby="custom-tabs-one-layanan-tab">
+                                    {% for field in form %}
+                                    {% if field.name == 'layanan' %}
+                                    <div class="form-group row">
+                                        <label for="{{ field.name }}" class="col-sm-2 col-form-label">{{ field.label }}</label>
+                                        <div class="col-sm-10">
+                                            {{ field }}
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div id="rute_gudang"></div>
+                                            <div id="keterangan"></div>
+                                            <div id="log"></div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p class="lead" id="label_total">Rincian Tarif</p>
+                                            <div class="form-group row">
+                                                <input type="hidden" name="total_tarif" class="form-control" id="inputTotalTarif" placeholder="Input Tarif">
+                                            </div>
+                                            <div class="table-responsive" id="rincian_tarif">
+                                                <table class="table">
+                                                    <tbody>
+                                                        <tr>
+                                                            <th style="width:60%">
+                                                                <a href="#" data-toggle="modal" data-target="#modalUbahTarifBerat" class="btn btn-primary btn-sm editTarifBerat">
+                                                                    <i class="fa fa-edit"></i>
+                                                                </a> &nbsp;
+                                                                <span>Tarif Berat</span>
+                                                            </th>
+                                                            <td id="tarifBerat">Rp. 0</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>
+                                                                <a href="#" data-toggle="modal" data-target="#modalUbahTarifKilometer" class="btn btn-primary btn-sm editTarifKilometer">
+                                                                    <i class="fa fa-edit"></i>
+                                                                </a> &nbsp;
+                                                                <span>Tarif Kilometer</span>
+                                                            </th>
+                                                            <td id="tarifKilometer">Rp. 0</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>
+                                                                <a href="#" data-toggle="modal" data-target="#modalUbahTarifGudang" class="btn btn-primary btn-sm editTarifGudang">
+                                                                    <i class="fa fa-edit"></i>
+                                                                </a> &nbsp;
+                                                                <span>Tarif Gudang</span>
+                                                            </th>
+                                                            <td id="tarifGudang">Rp. 0</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>
+                                                                <a href="#" data-toggle="modal" data-target="#modalUbahTarifLayanan" class="btn btn-primary btn-sm editTarifLayanan">
+                                                                    <i class="fa fa-edit"></i>
+                                                                </a> &nbsp;
+                                                                <span>Tarif Layanan</span>
+                                                            </th>
+                                                            <td id="tarifLayanan">Rp. 0</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>
+                                                                <a href="#" data-toggle="modal" data-target="#modalUbahTarifPengemasan" class="btn btn-primary btn-sm editTarifPengemasan">
+                                                                    <i class="fa fa-edit"></i>
+                                                                </a> &nbsp;
+                                                                <span>Tarif Pengemasan</span>
+                                                            </th>
+                                                            <td id="tarifPengemasan">Rp. 0</td>
+                                                        </tr>
+                                                        <!-- <tr>
+                                                            <th>Extra Tarif Pengirim</th>
+                                                            <td id="tarifExtraPengirim">Rp. 0</td>
+                                                        </tr> -->
+                                                        <tr>
+                                                            <th>
+                                                                <a href="#" data-toggle="modal" data-target="#modalUbahTarifExtraPenerima" class="btn btn-primary btn-sm editTarifPenerima">
+                                                                    <i class="fa fa-edit"></i>
+                                                                </a> &nbsp;
+                                                                <span>Extra Tarif Penerima</span>
+                                                            </th>
+                                                            <td id="tarifExtraPenerima">Rp. 0</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>
+                                                                <a href="#" data-toggle="modal" data-target="#modalUbahTarifLain" class="btn btn-primary btn-sm editTarifLain">
+                                                                    <i class="fa fa-edit"></i>
+                                                                </a> &nbsp;
+                                                                <span>Tarif Lain - Lain</span>
+                                                            </th>
+                                                            <td id="tarifLain">Rp. 0</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>Total</th>
+                                                            <td id="tarifTotal">Rp. 0</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div id="status_pengiriman"></div>
+                                            <div id="qrcode" style="width:100px; height:100px; margin-top:15px; float: right; margin-bottom: 2em"></div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% endfor %}
+                                    {% if user.is_authenticated %}
+                                    <input type="hidden" name="pencatat" id="pencatat" value="{{user.id}}">
+                                    {% endif %}
+                                    <input type="hidden" name="status_pengirim" id="inputStatusPengirim" value="personal">
+                                    <input type="hidden" disabled name="outlet_pengiriman_deprecated" id="inputOutletPengiriman">
+                                    <input type="hidden" name="outlet_penerimaan" id="inputOutletPenerimaan">
+                                    <input type="hidden" name="rute_pengiriman_gudang" id="inputGudang1">
+                                    <input type="hidden" name="gudang_pengiriman" id="inputGudangPengiriman">
+                                    <input type="hidden" name="rute_pengiriman_gudang_akhir" id="inputGudang2">
+                                    <input type="hidden" name="gudang_penerimaan" id="inputGudangPenerimaan">
+                                    <input type="hidden" name="tarif_berat" id="inputTarifBerat">
+                                    <input type="hidden" name="tarif_kilometer" id="inputTarifKilometer">
+                                    <input type="hidden" name="tarif_gudang" id="inputTarifGudang">
+                                    <input type="hidden" name="tarif_layanan" id="inputTarifLayanan">
+                                    <input type="hidden" name="tarif_lain" id="inputTarifLain">
+                                    <input type="hidden" name="tarif_pengemasan" id="inputTarifPengemasan">
+                                    <input type="hidden" name="extra_tarif_pengirim" id="inputExtraTarifPengirim" value="0">
+                                    <input type="hidden" name="extra_tarif_penerima" id="inputExtraTarifPenerima" value="0">
+                                    <input type="hidden" name="keterangan_extra_tarif" id="inputKeteranganExtraTarif">
+                                    <input type="hidden" name="id_pengiriman" id="id_pengiriman">
+                                    <div class="row" id="maps_tracking"></div>
+                                    <div class="btn-group float-right" id="group_order_button">
+                                        <button class="btn btn-secondary btn-lg tombol-navigasi" onclick="$('#custom-tabs-one-barang-tab').trigger('click')">Sebelumnya</button>
+                                        <button type="button" class="btn btn-primary btn-lg tombol-navigasi" id="updateButton">Update</button>
+                                        <button type="button" class="btn btn-primary btn-lg tombol-navigasi" id="createButton">Simpan</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default btn-lg" data-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<!-- Modal Rute manual-->
+<div class="modal fade" id="modal-rute-manual" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" style="min-width: 60%">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Pilih Outlet dan Gudang</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        </div><div class="container"></div>
+        <div class="modal-body">
+          <div class="first-wrapper">
+            <div class="form-group row">
+                <label class="col-3 col-form-label">Outlet Pengirim <br> (Outlet #1)</label>
+                <div class="col-9">
+                    <select class="form-control select2-manual" name="outlet_pengirim_manual" id="inputOutletPengirimManual">
+                        <option value="" disabled selected>Pilih Outlet Pengirim</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-3 col-form-label">Gudang Pengirim <br> (Gudang #1)</label>
+                <div class="col-9">
+                    <select class="form-control select2-manual" name="gudang_pengirim_manual" id="inputGudangPengirimManual">
+                        <option value="" disabled selected>Pilih Gudang Pengirim</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-3 col-form-label">Gudang Penerima <br> (Gudang #2)</label>
+                <div class="col-9">
+                    <select class="form-control select2-manual" name="gudang_penerima_manual" id="inputGudangPenerimaManual">
+                       <option value="" disabled selected>Pilih Gudang Penerima</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-3 col-form-label">Outlet Penerima <br> (Outlet #2)</label>
+                <div class="col-9">
+                    <select class="form-control select2-manual" name="outlet_penerima_manual" id="inputOutletPenerimaManual">
+                        <option value="" disabled selected>Pilih Outlet Penerima</option>
+                    </select>
+                </div>
+            </div>
+          </div>
+          <div class="second-wrapper">
+              <h6 class="text-muted"><i class="fa fa-info-circle"></i> &nbsp;Outlet dan Gudang yang tampil sesuai dengan cover area kecamatan pengirim & penerima</h6>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <a data-dismiss="modal" class="btn btn-default">Batal</a>
+          <button disabled type="button" class="btn btn-primary btn-simpan-manual text-white">Simpan</button>
+        </div>
+      </div>
+    </div>
+</div>
+<!-- End Modal Rute manual -->
+
+<div class="modal fade" id="modal-pos">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">CATAT TRANSAKSI</h4>
+                {% comment %}
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                {% endcomment %}
+            </div>
+            <div class="modal-body">
+                <div class="form-group row">
+                    <label for="{{ form_pos.nominal_bayar.name }}" class="col-sm-12 col-form-label">Total Tagihan</label>
+                    <div class="col-sm-12">
+                        <h4 id="total-bayar-text">Rp. 0</span></h4>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="{{ form_pos.nominal_bayar.name }}" class="col-sm-12 col-form-label">Total Kembalian</label>
+                    <div class="col-sm-12">
+                        <h4>Rp. <span id="total-kembali-text">-</span></h4>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="{{ form_pos.nominal_bayar.name }}" class="col-sm-12 col-form-label">{{ form_pos.nominal_bayar.label }}</label>
+                    <form id="form-pos" style="width: 100%;display: block;">
+                        {% csrf_token %}
+                        <div class="col-sm-12">
+                            {{ form_pos.id_pengiriman }}
+                            {{ form_pos.total_tagihan }}
+                            {{ form_pos.nominal_bayar }}
+                            {{ form_pos.total_kembali }}
+                            <input type="text" class="form-control nominal_bayar" placeholder="Masukkan nominal yang dibayarkan customer">
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-between">
+                {% comment %}
+                <button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
+                {% endcomment %}
+                <button type="button" class="btn btn-primary btn-simpan-pos" disabled>Simpan</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+<!-- Modal Ubah Berat -->
+<div class="modal fade" id="modalUbahTarifBerat" tabindex="-1" role="dialog" aria-labelledby="loadMeLabel">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title">Opsi Ubah Tarif Berat</h4>
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="loader-txt row" style="justify-content: space-evenly">
+                    <input type="text" class="form-control" id="inputUbahTarifBerat" placeholder="Tarif Berat ....">
+                </div>
+            </div>
+            <div class="modal-footer">
+              <a data-dismiss="modal" class="btn btn-default">Batal</a>
+              <button type="button" class="btn btn-primary btn-simpan-tarif-berat text-white">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END Modal Ubah Berat -->
+
+<!-- Modal Foto TTD -->
+<div class="modal fade" id="modalTTD" tabindex="-1" role="dialog" aria-labelledby="loadMeLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <div class="loader-txt row" style="justify-content: space-evenly">
+                    <p>Memuat gambar &nbsp;<i class="fa fa-spin fa-spinner"></i></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END Modal Foto TTD -->
+
+<!-- Modal Ubah Berat -->
+<div class="modal fade" id="modalUbahTarifKilometer" tabindex="-1" role="dialog" aria-labelledby="loadMeLabel">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title">Opsi Ubah Tarif Kilometer</h4>
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="loader-txt row" style="justify-content: space-evenly">
+                    <input type="text" class="form-control" id="inputUbahTarifKilometer" placeholder="Tarif Kilometer ....">
+                </div>
+            </div>
+            <div class="modal-footer">
+              <a data-dismiss="modal" class="btn btn-default">Batal</a>
+              <button type="button" class="btn btn-primary btn-simpan-tarif-kilometer text-white">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END Modal Ubah Berat -->
+
+<!-- Modal Loading -->
+<div class="modal fade" id="loadMe" tabindex="-1" role="dialog" aria-labelledby="loadMeLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <div class="loader"></div>
+                <div clas="loader-txt">
+                    <p>Please Wait. <br><br><small>Loading ...</small></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END Modal Loading -->
+
+<!-- Modal Ubah Berat -->
+<div class="modal fade" id="modalUbahTarifGudang" tabindex="-1" role="dialog" aria-labelledby="loadMeLabel">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title">Opsi Ubah Tarif Gudang</h4>
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="loader-txt row" style="justify-content: space-evenly">
+                    <input type="text" class="form-control" id="inputUbahTarifGudang" placeholder="Tarif Gudang ....">
+                </div>
+            </div>
+            <div class="modal-footer">
+              <a data-dismiss="modal" class="btn btn-default">Batal</a>
+              <button type="button" class="btn btn-primary btn-simpan-tarif-gudang text-white">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END Modal Ubah Berat -->
+
+<!-- Modal Pseudo -->
+<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="loadMeLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+        </div>
+    </div>
+</div>
+<!-- END Modal Pseudo -->
+
+<!-- Modal Ubah Berat -->
+<div class="modal fade" id="modalUbahTarifLayanan" tabindex="-1" role="dialog" aria-labelledby="loadMeLabel">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title">Opsi Ubah Tarif Layanan</h4>
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="loader-txt row" style="justify-content: space-evenly">
+                    <input type="text" class="form-control" id="inputUbahTarifLayanan" placeholder="Tarif Layanan ....">
+                </div>
+            </div>
+            <div class="modal-footer">
+              <a data-dismiss="modal" class="btn btn-default">Batal</a>
+              <button type="button" class="btn btn-primary btn-simpan-tarif-layanan text-white">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END Modal Ubah Berat -->
+
+<!-- Modal Pseudo -->
+<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="loadMeLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+        </div>
+    </div>
+</div>
+<!-- END Modal Pseudo -->
+
+<!-- Modal Ubah Berat -->
+<div class="modal fade" id="modalUbahTarifPengemasan" tabindex="-1" role="dialog" aria-labelledby="loadMeLabel">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title">Opsi Ubah Tarif Layanan</h4>
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="loader-txt row" style="justify-content: space-evenly">
+                    <input type="text" class="form-control" id="inputUbahTarifPengemasan" placeholder="Tarif Pengemasan ....">
+                </div>
+            </div>
+            <div class="modal-footer">
+              <a data-dismiss="modal" class="btn btn-default">Batal</a>
+              <button type="button" class="btn btn-primary btn-simpan-tarif-pengemasan text-white">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END Modal Ubah Berat -->
+
+<!-- Modal Pseudo -->
+<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="loadMeLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+        </div>
+    </div>
+</div>
+<!-- END Modal Pseudo -->
+
+<!-- Modal Ubah Berat -->
+<div class="modal fade" id="modalUbahTarifExtraPenerima" tabindex="-1" role="dialog" aria-labelledby="loadMeLabel">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title">Opsi Ubah Tarif Layanan</h4>
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="loader-txt row" style="justify-content: space-evenly">
+                    <input type="text" class="form-control" id="inputUbahTarifExtraPenerima" placeholder="Extra Tarif Penerima ....">
+                </div>
+            </div>
+            <div class="modal-footer">
+              <a data-dismiss="modal" class="btn btn-default">Batal</a>
+              <button type="button" class="btn btn-primary btn-simpan-extra-tarif text-white">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END Modal Ubah Berat -->
+
+<!-- Modal Pseudo -->
+<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="loadMeLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+        </div>
+    </div>
+</div>
+<!-- END Modal Pseudo -->
+
+<!-- Modal Ubah Berat -->
+<div class="modal fade" id="modalUbahTarifLain" tabindex="-1" role="dialog" aria-labelledby="loadMeLabel">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title">Opsi Tarif Lain - lain</h4>
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="loader-txt row" style="justify-content: space-evenly">
+                    <input type="text" class="form-control" id="inputUbahTarifLain" placeholder="Tarif lain - lain disini ....">
+                </div>
+            </div>
+            <div class="modal-footer">
+              <a data-dismiss="modal" class="btn btn-default">Batal</a>
+              <button type="button" class="btn btn-primary btn-simpan-tarif-lain text-white">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END Modal Ubah Berat -->
+
+
+{% endblock %}
+{% block file_js %}
+<!-- Bootstrap 4 -->
+<script src="{% static 'assets/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<!-- DataTables -->
+<script src="{% static 'assets/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+<!-- SweetAlert2 -->
+<script src="{% static 'assets/plugins/sweetalert2/sweetalert2.min.js' %}"></script>
+<!-- Select2 -->
+<script src="{% static 'assets/plugins/select2/js/select2.full.min.js' %}"></script>
+<!-- QR Code JS -->
+<script type="text/javascript" src="{% static 'assets/plugins/qrcode/qrcode.js' %}"></script>
+<!-- jquery-mask -->
+<script src="{% static 'assets/plugins/jquery-mask/jquery.mask.js' %}"></script>
+<script src="{% static 'custom_js/pengiriman.js' %}"></script>
+<script src="https://js.pusher.com/7.0/pusher.min.js"></script>
+<script type="text/javascript">
+$(function() {
+    function numberWithCommas(x) {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    }
+
+    $('.nominal_bayar').mask('000.000.000', {
+        reverse: true
+    });
+    // document.getElementById("id_nominal_bayar").value = $('.nominal_bayar').cleanVal();
+    function remove_last_3_char(data) {
+        var newStr = data.substring(0, data.length - 3);
+        return newStr;
+    }
+
+    $('.nominal_bayar').on('keyup', function(e) {
+        $('.btn-simpan-pos').prop('disabled', true);
+        $('#total-kembali-text').text('-');
+        $('#id_total_kembali').val(0);
+        var obj = this;
+        setTimeout(function() {
+            if ($(obj).cleanVal()) {
+                var val_to_subs = parseInt(document.getElementById('id_total_tagihan').value) || 0;
+                var balance = parseInt($(obj).cleanVal()) - val_to_subs;
+                $('#id_total_kembali').val(balance);
+                $('#id_nominal_bayar').val($(obj).cleanVal());
+
+                $('#total-kembali-text').text(numberWithCommas(balance));
+                if ($(obj).cleanVal() > 0) {
+                    $('.btn-simpan-pos').prop('disabled', false);
+                }
+            }
+        }, 600);
+    });
+
+    $(document).on('click','.buttonTTD', function(){
+        var id_pengiriman = $(this).data('id') || 0;
+        console.log(id_pengiriman)
+        $('#modalTTD').modal('show');
+        $.ajax({
+            url: '/admin/pengiriman/'+ id_pengiriman +'/bukti_tanda_terima/',
+            type: 'POST',
+            success : function(res){
+                setTimeout(function(){
+                    if(typeof(res) == 'object' && res.data){
+                        var img = '';
+
+                        for(var i=0; i<res.data.length; i++){
+                            var column = 12 / res.data.length || 2;
+                            img += '<div class="col-'+ column +' py-2" style="min-height:200px"><a href="'+ res.data[i] +'" target="_blank">' +
+                                '<img class="img img-responsive img-ttd" src="'+ res.data[i] +'"></a></div>'
+                        }
+                        $('.loader-txt').html(img);
+                    }
+                    else {
+                        $('.loader-txt').html('<p>Tidak ada bukti foto ditemukan :(</p>');
+                    }
+                }, 600)
+            },
+            error : function(xhr){
+                $('.loader-txt').html('<p>Gagal mendapatkan bukti foto, coba beberapa saat lagi</p>');
+                console.log(xhr)
+            }
+        })
+    })
+
+    $('#modalTTD').on('hidden.bs.modal', function(){
+        $('.loader-txt').html('<p>Memuat gambar &nbsp;<i class="fa fa-spin fa-spinner"></i></p>');
+    });
+
+    $('#modal-rute-manual').on('hidden.bs.modal', function(){
+        $('.btn-simpan-manual').prop('disabled', true);
+        $('.btn-simpan-manual').html('Simpan');
+
+        $('#inputOutletPengirimManual').html('<option value="" disabled selected>Pilih Outlet Pengirim</option>');
+        $('#inputOutletPengirimManual').trigger('change');
+
+        $('#inputGudangPengirimManual').html('<option value="" disabled selected>Pilih Gudang Pengirim</option>');
+        $('#inputGudangPengirimManual').trigger('change');
+
+        $('#inputGudangPenerimaManual').html('<option value="" disabled selected>Pilih Gudang Penerima</option>');
+        $('#inputGudangPenerimaManual').trigger('change');
+
+        $('#inputOutletPenerimaManual').html('<option value="" disabled selected>Pilih Outlet Penerima</option>');
+        $('#inputOutletPenerimaManual').trigger('change');
+    });
+
+    $('#modal-rute-manual').on('show.bs.modal', function(){
+        var kecamatan_pengirim = $('#inputKecamatanPengirim').val();
+        var kecamatan_penerima = $('#inputKecamatanPenerima').val();
+        var id_outlet_pengiriman = $('#id_outlet_pengiriman').val();
+
+        // $('.btn-simpan-manual').prop('disabled', false);
+        $('.btn-simpan-manual').html('Simpan');
+
+        $('#inputOutletPengirimManual').html('<option value="" disabled selected>Pilih Outlet Pengirim</option>');
+        $('#inputOutletPengirimManual').trigger('change');
+
+        $('#inputGudangPengirimManual').html('<option value="" disabled selected>Pilih Gudang Pengirim</option>');
+        $('#inputGudangPengirimManual').trigger('change');
+
+        $('#inputGudangPenerimaManual').html('<option value="" disabled selected>Pilih Gudang Penerima</option>');
+        $('#inputGudangPenerimaManual').trigger('change');
+
+        $('#inputOutletPenerimaManual').html('<option value="" disabled selected>Pilih Outlet Penerima</option>');
+        $('#inputOutletPenerimaManual').trigger('change');
+
+        $.ajax({
+            url: '/admin/pengiriman/cek_outlet_gudang_by_kecamatan',
+            type : 'POST',
+            data : {'kecamatan_pengirim' :kecamatan_pengirim, 'kecamatan_penerima' :kecamatan_penerima, 'id_outlet_pengirim':id_outlet_pengiriman},
+            success : function(data){
+                if(Object.keys(data).includes('data') && data.data){
+                    var outlet_pengirim = `<option value="${data.data.outlet_pengirim.id}">${data.data.outlet_pengirim.nama_toko}</option>`;
+                    $('#inputOutletPengirimManual').append(outlet_pengirim);
+                    $("#inputOutletPengirimManual").val(id_outlet_pengiriman);
+                    $("#inputOutletPengirimManual").prop('disabled', true);
+                    $('#inputOutletPengirimManual').trigger('change');
+
+                    var gudang_pengirim = '';
+                    $.each(data.data.gudang_pengirim, function(index, item){
+                        var alamat = ` | Alamat : ${item.hasOwnProperty('alamat') && item.alamat ? item.alamat : '' + item.hasOwnProperty('desa') && item.desa ? ', Desa '+item.desa : '' + item.hasOwnProperty('kec') && item.kec ? ', Kec. '+item.kec : '' + item.hasOwnProperty('kota') && item.kota ? ', '+item.kota : '' + item.hasOwnProperty('provinsi') && item.provinsi ? ', '+item.provinsi : '' + item.hasOwnProperty('kode_pos') && item.kode_pos ? ' '+item.kode_pos : ''}` 
+                        gudang_pengirim += `<option value="${item.id}">${item.nama_gudang} ${alamat}</option>`;
+                    });
+                    if(gudang_pengirim) {
+                        $('#inputGudangPengirimManual').append(gudang_pengirim);
+                        $('#inputGudangPengirimManual').trigger('change');
+                    }
+
+                    var gudang_penerima = '';
+                    $.each(data.data.gudang_penerima, function(index, item){
+                        var alamat = ` | Alamat : ${item.hasOwnProperty('alamat') && item.alamat ? item.alamat : '' + item.hasOwnProperty('desa') && item.desa ? ', Desa '+item.desa : '' + item.hasOwnProperty('kec') && item.kec ? ', Kec. '+item.kec : '' + item.hasOwnProperty('kota') && item.kota ? ', '+item.kota : '' + item.hasOwnProperty('provinsi') && item.provinsi ? ', '+item.provinsi : '' + item.hasOwnProperty('kode_pos') && item.kode_pos ? ' '+item.kode_pos : ''}`
+                        gudang_penerima += `<option value="${item.id}">${item.nama_gudang} ${alamat}</option>`;
+                    });
+                    if(gudang_penerima) {
+                        $('#inputGudangPenerimaManual').append(gudang_penerima);
+                        $('#inputGudangPenerimaManual').trigger('change');
+                    }
+
+                    var outlet_penerima = '';
+                    $.each(data.data.outlet_penerima, function(index, item){
+                        var alamat = ` | Alamat : ${item.hasOwnProperty('alamat') && item.alamat ? item.alamat : '' + item.hasOwnProperty('desa') && item.desa ? ', Desa '+item.desa : '' + item.hasOwnProperty('kec') && item.kec ? ', Kec. '+item.kec : '' + item.hasOwnProperty('kota') && item.kota ? ', '+item.kota : '' + item.hasOwnProperty('provinsi') && item.provinsi ? ', '+item.provinsi : '' + item.hasOwnProperty('kode_pos') && item.kode_pos ? ' '+item.kode_pos : ''}`
+                        outlet_penerima += `<option value="${item.id}">${item.nama_toko} ${alamat}</option>`;
+                    });
+                    if(outlet_penerima) {
+                        $('#inputOutletPenerimaManual').append(outlet_penerima);
+                        $('#inputOutletPenerimaManual').trigger('change');
+                    }
+
+                }
+            },
+            error : function(xhr){
+                setTimeout(function(){
+                    $('#modal-rute-manual').modal('hide')
+                },600);
+                setTimeout(function(){
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
+
+                    Toast.fire({
+                        icon: 'error',
+                        title: 'Gagal memperoleh data gudang dan toko, coba ulangi sesaat lagi'
+                    });
+                },1200)
+                console.log(xhr);
+            }
+        })
+
+        $('#inputOutletPengirimManual').select2({
+            theme: 'bootstrap4',
+            placeholder: 'Pilih Data Outlet Pengirim',
+            language: {
+                noResults: () => "Tidak ditemukan Outlet pada cover area kecamatan pengirim"
+            }
+        })
+        $('#inputOutletPenerimaManual').select2({
+            theme: 'bootstrap4',
+            placeholder: 'Pilih Data Outlet Penerima',
+            language: {
+                noResults: () => "Tidak ditemukan Outlet pada cover area kecamatan penerima"
+            }
+        }).on('select2:select', function(e){
+            var value = e.params.data.id || 0;
+            if(value)
+                $('.btn-simpan-manual').prop('disabled', false);
+        });
+        $('#inputGudangPengirimManual').select2({
+            theme: 'bootstrap4',
+            placeholder: 'Pilih Data Gudang Pengirim',
+            language: {
+                noResults: () => "Tidak ditemukan Gudang pada cover area kecamatan pengirim"
+            }
+        }).on('select2:select', function(e){
+            var value = e.params.data.id || 0;
+            if(value)
+                $('.btn-simpan-manual').prop('disabled', false);
+        });
+        $('#inputGudangPenerimaManual').select2({
+            theme: 'bootstrap4',
+            placeholder: 'Pilih Data Gudang Penerima',
+            language: {
+                noResults: () => "Tidak ditemukan Gudang pada cover area kecamatan penerima"
+            }
+        }).on('select2:select', function(e){
+            var value = e.params.data.id || 0;
+            if(value)
+                $('.btn-simpan-manual').prop('disabled', false);
+        });
+    });
+});
+
+var pusher = new Pusher('89e810361b5ea26c0dfb', {
+    cluster: 'ap1'
+});
+
+var channel = pusher.subscribe('my-channel');
+channel.bind('my-event', function(data) {
+    var title = data.title,
+        msg = data.message,
+    type = data.type;
+    console.log('BERHASIL DIUBAH', data);
+    try{
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'bottom-end',
+            showConfirmButton: false,
+            timer: 5000
+        });
+        Toast.fire({
+            icon: type,
+            title: msg
+        });
+    } catch(error){`Gagal menampilkan pesan pengiriman ${error}`}
+
+    setTimeout(function(){
+        try {
+            $('#pengiriman').DataTable().clear().destroy();
+            var table = $('#pengiriman').DataTable({
+                "columns": [{
+                        "width": "6%"
+                    }, {
+                        "width": "12%"
+                    }, {
+                        "width": "14%"
+                    }, {
+                        "width": "16%"
+                    }, {
+                        "width": "10%"
+                    },
+                    {
+                        "width": "10%"
+                    }, {
+                        "width": "18%"
+                    },
+                ],
+                "paging": true,
+                "lengthChange": false,
+                "searching": true,
+                "ordering": true,
+                "info": true,
+                "autoWidth": false,
+                "responsive": true,
+                "processing": true,
+                "serverside": true,
+                "ajax": {
+                    "url": $("#createPengirimanForm").data('url'),
+                    "type": "get"
+                },
+                "deferRender": true,
+            });
+        } catch (err) {
+            console.log(err)
+        }
+    }, 5000)
+});
+</script>
+{% endblock %}

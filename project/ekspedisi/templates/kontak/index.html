@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title_name %}
+ <title>Kontak | BaliGo Ekspedisi</title>
+{% endblock %}
+
+{% block file_css %}
+<!-- DataTables -->
+ <link rel="stylesheet" href="{% static 'assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+ <link rel="stylesheet" href="{% static 'assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+ <!-- SweetAlert2 -->
+  <link rel="stylesheet" href="{% static 'assets/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css' %}">
+{% endblock %}
+
+
+{% block content_header %}
+<div class="container-fluid">
+    <div class="row mb-2">
+    	<div class="col-sm-6">
+            <h1 class="m-0 text-dark">Kontak Ekspedisi</h1>
+        </div><!-- /.col -->
+	    <div class="col-sm-6">
+	    	<ol class="breadcrumb float-sm-right">
+	    		<li class="breadcrumb-item"><a href="#">Home</a></li>
+	    		<li class="breadcrumb-item active">Kontak</li>
+	    	</ol>
+	    </div><!-- /.col -->
+	</div><!-- /.row -->
+</div><!-- /.container-fluid -->
+{% endblock %}
+
+
+
+{% block content %}
+<div class="card">
+	<div class="card-header">
+		<h3 class="card-title">Data Kontak</h3>
+	</div>
+	<!-- /.card-header -->
+	<div class="card-body">
+		<form id="kontakForm" method="post" data-url="{% url 'kontak' %}">
+			{% csrf_token %}
+			{% for field in form %}
+
+			<div class="form-group row">
+	            <label for="{{ field.name }}" class="col-sm-2 col-form-label">{{ field.label }}</label>
+		        <div class="col-sm-10">
+		        {{ field }}
+		        </div>
+	        </div>
+			{% endfor %}
+		</form>
+	</div>
+	<div class="card-body">
+		<div class="float-md-right">
+			<button type="button" class="btn btn-primary" id="updateButton">Update</button>
+		</div>
+	</div>
+	<!-- /.card-body -->
+</div>
+
+{% endblock %}
+
+
+
+
+{% block file_js %}
+<!-- Bootstrap 4 -->
+<script src="{% static 'assets/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<!-- DataTables -->
+<script src="{% static 'assets/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+<!-- SweetAlert2 -->
+<script src="{% static 'assets/plugins/sweetalert2/sweetalert2.min.js' %}"></script>
+
+<script>
+	$(document).ready(function(){
+		var csrfToken = $("input[name=csrfmiddlewaretoken]").val();
+
+		function get_data(){
+			$.ajax({
+				url: $("#kontakForm").data("url"),
+				type: 'get',
+				cache: false,
+				success: function(response){
+					var alamat_ = response.alamat;
+					var no_tlp_ = response.no_tlp;
+					var email_ = response.email;
+					if(alamat_){
+						document.getElementById("inputAlamat").value = alamat_;
+						document.getElementById("inputNoTlp").value = no_tlp_;
+						document.getElementById("inputEmail").value = email_;
+					}else{
+						document.getElementById("inputAlamat").value = "";
+						document.getElementById("inputNoTlp").value = "";
+						document.getElementById("inputEmail").value = "";
+					}
+				},
+				error: function(xhr, status, error){
+					var error_response = xhr.responseJSON;
+
+					tampilkan_pesan(error_response.msg, error_response.type);
+				},
+			})
+		}
+
+		get_data();
+
+		
+
+		function tampilkan_pesan(pesan, type){
+	    	Toast.fire({
+	        icon: type,
+	        title: pesan
+	      });
+	    }
+
+		const Toast = Swal.mixin({
+	      toast: true,
+	      position: 'top-end',
+	      showConfirmButton: false,
+	      timer: 3000
+	    });
+
+		// Update action
+		$("#updateButton").click(function(e){
+			e.preventDefault();
+			var serializeData = $("#kontakForm").serialize();
+			
+			$.ajax({
+				url: $("#kontakForm").data("url") + "1/update/",
+				data: serializeData,
+				type: 'post',
+				cache: false,
+				success: function(response){
+					get_data();
+					tampilkan_pesan(response.msg, response.type);
+				},
+				error: function(xhr, status, error){
+					var error_response = xhr.responseJSON;
+
+					tampilkan_pesan(error_response.msg, error_response.type);
+				},
+			})
+		});
+
+
+	});
+</script>
+{% endblock %}

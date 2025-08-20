@@ -1,0 +1,200 @@
+/*-----------------------
+    Request quote
+ ------------------------*/
+.request__form {
+  background-color: #fff;
+  box-shadow: 0px 5px 83px 0px rgba(40, 40, 40, 0.08);
+  z-index: 2;
+}
+
+.request__form .request__form-body {
+  /*padding: 50px;*/
+  padding: 15px;
+}
+
+.request__form .input-radio {
+  margin-right: 20px;
+}
+
+.request__form .input-radio:last-child {
+  margin-right: 0;
+}
+
+.request-quote-tabs .request__form {
+  position: relative;
+  border-radius: 5px;
+}
+
+.request-quote-tabs .request__form:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -39px;
+  width: 41px;
+  height: 160px;
+  background-color: #243548;
+  border-radius: 5px 0 0 0;
+}
+
+@media only screen and (max-width: 768px) {
+  .owl-nav{
+    display: none !important;
+  }
+  .request-quote-tabs .request__form{
+    overflow: hidden !important;
+  }
+  .request-quote-tabs .request__form:after {
+    content: "";
+    position: absolute;
+    display: none !important;
+    top: 0;
+    right: -39px;
+    width: 41px;
+    height: 160px;
+    background-color: #243548;
+    border-radius: 0 5px 0 0;
+  }
+
+  .request-quote-tabs .request__form:before {
+    content: "";
+    position: absolute;
+    display: none !important;
+    top: 0;
+    left: -39px;
+    width: 41px;
+    height: 160px;
+    background-color: #243548;
+    border-radius: 5px 0 0 0;
+  }
+}
+
+.request-quote-tabs .request__form:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: -39px;
+  width: 41px;
+  height: 160px;
+  background-color: #243548;
+  border-radius: 0 5px 0 0;
+}
+
+.request-quote-tabs .request__form h6 {
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  line-height: 1;
+  margin-bottom: 17px;
+}
+
+.request-quote-tabs .request__form .form-control {
+  padding-left: 15px;
+}
+
+.request-quote-tabs .request__form .nav-tabs {
+  background-color: #243548;
+  padding-left: 50px;
+}
+
+.request-quote-tabs .request__form .nav-tabs .nav__link {
+  padding: 30px 0;
+  margin: 0 40px 0 0;
+  color: #ffffff;
+}
+
+.request-quote-tabs .request__form .nav-tabs .nav__link:after {
+  height: 3px;
+}
+
+.request-quote-tabs .request__form .nav-tabs .nav__link.active {
+  color: #ff2626;
+}
+
+.request-quote-tabs .request__form .tab-content {
+  padding-top: 0;
+}
+
+.request-quote-tabs .request__form .request-quote-panel {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-wrap: wrap;
+  -moz-flex-wrap: wrap;
+  flex-wrap: wrap;
+}
+
+.request-quote-tabs .request__form .request__form-body {
+  flex-basis: 71%;
+  max-width: 71%;
+}
+
+.request-quote-tabs .request__form .widget-download {
+  flex-basis: 29%;
+  max-width: 29%;
+  box-shadow: none;
+  padding: 50px;
+  border-radius: 0 0 5px 0;
+}
+
+.request-quote-tabs .request__form .widget-download:after {
+  bottom: -220px;
+  right: -120px;
+  font-size: 400px;
+}
+
+.request-quote-tabs .request__form .widget-download p {
+  font-size: 14px;
+  line-height: 23px;
+  color: #ffffff;
+  margin-bottom: 30px;
+}
+
+.request-quote-tabs .request__form .widget-download h5 {
+  font-size: 25px;
+  line-height: 34px;
+  color: #ffffff;
+}
+
+.request-quote-tabs .request__form .widget-download .btn {
+  padding: 0 10px;
+  height: 50px;
+  width: 220px;
+  position: absolute;
+  bottom: 50px;
+  left: 50px;
+  background-color: #ffffff;
+}
+
+/* Large Size Screens */
+@media only screen and (max-width: 1200px) {
+  .request__form .request__form-body {
+    padding: 50px 20px;
+  }
+}
+
+/* Medium Size Screens */
+@media only screen and (max-width: 992px) {
+  .request-quote-tabs .request__form .request-quote-panel {
+    display: block;
+  }
+
+  .request-quote-tabs .request__form .request-quote-panel .request__form-body,
+  .request-quote-tabs .request__form .request-quote-panel .widget-download {
+    max-width: none;
+  }
+
+  .request-quote-tabs .request__form .request-quote-panel .widget-download .btn {
+    position: static;
+  }
+}
+
+/* Extra Small Devices */
+@media only screen and (min-width: 320px) and (max-width: 575px) {
+  .request__form .request__form-body {
+    padding: 20px 10px;
+  }
+
+  .request__form .input-radio {
+    margin-right: 0;
+    flex-basis: 50%;
+  }
+}

@@ -1,0 +1,1160 @@
+{% extends '../base.html' %}
+{% load static %}
+{% block title_name %}
+<title>Home | BaliGo Ekspedisi</title>
+{% endblock %}
+{% block file_css %}
+<!-- Load Leaflet from CDN -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+<!-- Load Esri Leaflet from CDN -->
+<script src="https://unpkg.com/esri-leaflet@2.5.0/dist/esri-leaflet.js" integrity="sha512-ucw7Grpc+iEQZa711gcjgMBnmd9qju1CICsRaryvX7HJklK0pGl/prxKvtHwpgm5ZHdvAil7YPxI1oWPOWK3UQ==" crossorigin=""></script>
+<!-- Load Esri Leaflet Geocoder from CDN -->
+<link rel="stylesheet" href="https://unpkg.com/esri-leaflet-geocoder@2.3.3/dist/esri-leaflet-geocoder.css" integrity="sha512-IM3Hs+feyi40yZhDH6kV8vQMg4Fh20s9OzInIIAc4nx7aMYMfo+IenRUekoYsHZqGkREUgx0VvlEsgm7nCDW9g==" crossorigin="">
+<script src="https://unpkg.com/esri-leaflet-geocoder@2.3.3/dist/esri-leaflet-geocoder.js" integrity="sha512-HrFUyCEtIpxZloTgEKKMq4RFYhxjJkCiF5sDxuAokklOeZ68U2NPfh4MFtyIVWlsKtVbK5GD2/JzFyAfvT5ejA==" crossorigin=""></script>
+<link href="{% static 'frontend/css/carousel.css' %}" rel="stylesheet">
+<link href="{% static 'frontend/css/icons.css' %}" rel="stylesheet">
+<link href="{% static 'frontend/css/fancybox.css' %}" rel="stylesheet">
+<link href="{% static 'frontend/css/request-quote.css' %}" rel="stylesheet">
+<link href="{% static 'frontend/css/service.css' %}" rel="stylesheet">
+<link href="{% static 'frontend/css/tabs.css' %}" rel="stylesheet">
+<link href="{% static 'frontend/css/sidebar.css' %}" rel="stylesheet">
+<link href="{% static 'frontend/css/timeline.css' %}" rel="stylesheet">
+<!-- SweetAlert2 -->
+<link rel="stylesheet" href="{% static 'assets/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css' %}">
+<!-- Font Awesome -->
+<link rel="stylesheet" href="{% static 'assets/plugins/fontawesome-free/css/all.min.css' %}">
+<!-- Select2 -->
+<link rel="stylesheet" href="{% static 'assets/plugins/select2/css/select2.min.css' %}">
+<link rel="stylesheet" href="{% static 'assets/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
+<style type="text/css">
+/** SPINNER CREATION **/
+.loader {
+    position: relative;
+    text-align: center;
+    margin: 15px auto 35px auto;
+    z-index: 9999;
+    display: block;
+    width: 80px;
+    height: 80px;
+    border: 10px solid rgba(0, 0, 0, .3);
+    border-radius: 50%;
+    border-top-color: #000;
+    animation: spin 1s ease-in-out infinite;
+    -webkit-animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to {
+        -webkit-transform: rotate(360deg);
+    }
+}
+
+@-webkit-keyframes spin {
+    to {
+        -webkit-transform: rotate(360deg);
+    }
+}
+
+/** MODAL STYLING **/
+.modal-content {
+    border-radius: 0px;
+    box-shadow: 0 0 20px 8px rgba(0, 0, 0, 0.7);
+}
+
+.modal-backdrop.show {
+    opacity: 0.75;
+}
+
+.loader-txt {
+    p {
+        font-size: 13px;
+        color: #666;
+
+        small {
+            font-size: 11.5px;
+            color: #999;
+        }
+    }
+}
+</style>
+{% endblock file_css %}
+{% block slider %}
+<section id="hero">
+    <div id="heroCarousel" class="carousel slide carousel-fade" data-ride="carousel">
+        <ol class="carousel-indicators" id="hero-carousel-indicators"></ol>
+        <div class="carousel-inner" role="listbox">
+            <!-- Slide 1 -->
+            <div class="carousel-item active" style="background-image: url({% static 'frontend/img/slide/slide-1.jpg'%})">
+                <div class="carousel-container">
+                    <div class="container">
+                        <h2 class="animate__animated animate__fadeInDown" style="float: left;">Naikan Rating Bisnis Online Anda</h2>
+                        <p class="animate__animated animate__fadeInUp" style="float: left;">Jasa pengiriman berbasis teknologi yang menyokong pertumbuhan bisnis E-commerce.</p>
+                        <!-- <a href="#about" class="btn-get-started animate__animated animate__fadeInUp scrollto">Read More</a>-->
+                    </div>
+                </div>
+            </div>
+            <!-- Slide 2 -->
+            <div class="carousel-item" style="background-image: url({% static 'frontend/img/slide/slide-2.jpg'%})">
+                <div class="carousel-container">
+                    <div class="container">
+                        <h2 class="animate__animated animate__fadeInDown">Layanan Pengemasan</h2>
+                        <p class="animate__animated animate__fadeInUp">Kami menyediakan layanan pengemasan untuk paket kiriman anda sehingga paket menjadi lebih aman di perjalanan</p>
+                        <!-- <a href="#about" class="btn-get-started animate__animated animate__fadeInUp scrollto">Read More</a> -->
+                    </div>
+                </div>
+            </div>
+            <!-- Slide 3 -->
+            <div class="carousel-item" style="background-image: url({% static 'frontend/img/slide/slide-3.jpg'%})">
+                <div class="carousel-container">
+                    <div class="container">
+                        <h2 class="animate__animated animate__fadeInDown" style="float: right;">Lacak Paketmu</h2>
+                        <p class="animate__animated animate__fadeInUp" style="float: right;">Menyediakan fitur pelacakan secara realtime, lacak dan amati paket anda menjadi lebih mudah</p>
+                        <!-- <a href="#about" class="btn-get-started animate__animated animate__fadeInUp scrollto">Read More</a> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <a class="carousel-control-prev" href="#heroCarousel" role="button" data-slide="prev">
+            <span class="carousel-control-prev-icon icofont-simple-left" aria-hidden="true"></span>
+            <span class="sr-only">Previous</span>
+        </a>
+        <a class="carousel-control-next" href="#heroCarousel" role="button" data-slide="next">
+            <span class="carousel-control-next-icon icofont-simple-right" aria-hidden="true"></span>
+            <span class="sr-only">Next</span>
+        </a>
+    </div>
+</section>
+{% endblock %}
+{% block content %}
+<!-- ========================
+        Services
+    =========================== -->
+<section id="services" class="services pb-90">
+    <div class="container">
+        <div class="row heading heading-2 mb-40">
+            <div class="col-sm-12 col-md-12 col-lg-12">
+                <span class="heading__subtitle">Solusi Nyata, & Sangat Cepat!</span>
+            </div><!-- /.col-lg-12 -->
+            <div class="col-sm-12 col-md-12 col-lg-6">
+                <h2 class="heading__title">Memberikan Solusi Logistik Global Terbaik.</h2>
+            </div><!-- /.col-lg-5 -->
+            <div class="col-sm-12 col-md-12 col-lg-6 ">
+                <p class="heading__desc" style="text-align: justify; text-justify: inter-word;">Keahlian logistik global kami, teknologi rantai pasokan canggih & disesuaikan
+                    solusi logistik akan membantu Anda menganalisis, mengembangkan, dan menerapkan manajemen rantai pasokan yang berhasil
+                    strategi.</p>
+            </div><!-- /.col-lg-6 -->
+        </div><!-- /.row -->
+        <div class="row text-center">
+            <div class="col-sm-6 col-md-6 col-lg-4">
+                <div class="service-item">
+                    <div class="service__icon"><i class="icon-air-freight"></i></div>
+                    <div class="service__content">
+                        <h4 class="service__title">Angkutan Udara</h4>
+                        <p class="service__desc" style="text-align: justify; text-justify: inter-word;">Kami dapat mengatur dan menyediakan layanan komprehensif di bidang
+                            kargo mendesak, berharga, rapuh atau kargo apa pun yang dipercepat dengan hati-hati melalui udara.</p>
+                            <!-- <a href="#" class="readmore-btn">
+                                <span>Read More</span><i class="icon-arrow-right"></i>
+                            </a> -->
+                    </div>
+                </div><!-- /.service-item -->
+            </div><!-- /.col-lg-4 -->
+            <div class="col-sm-6 col-md-6 col-lg-4">
+                <div class="service-item">
+                    <div class="service__icon"><i class="icon-cargo-ship"></i></div>
+                    <div class="service__content">
+                        <h4 class="service__title">Angkutan Laut</h4>
+                        <p class="service__desc" style="text-align: justify; text-justify: inter-word;">Kami menyediakan dengan jenis utama kondisi dasar laut Internasional
+                            pengangkutan dilakukan oleh kapal mitra kami, pengangkut laut terbesar.</p>
+                        <!-- <a href="#" class="readmore-btn">
+                            <span>Read More</span><i class="icon-arrow-right"></i>
+                        </a> -->
+                        <br>
+                    </div>
+                </div><!-- /.service-item -->
+            </div><!-- /.col-lg-4 -->
+            <div class="col-sm-6 col-md-6 col-lg-4">
+                <div class="service-item">
+                    <div class="service__icon"><i class="icon-truck"></i></div>
+                    <div class="service__content">
+                        <h4 class="service__title">Pengangkutan Darat</h4>
+                        <p class="service__desc" style="text-align: justify; text-justify: inter-word;">Kami menyediakan dengan jenis utama kondisi dasar laut Internasional
+                            pengangkutan dilakukan oleh kapal mitra kami, pengangkut laut terbesar.</p>
+                        <!-- <a href="#" class="readmore-btn">
+                            <span>Read More</span><i class="icon-arrow-right"></i>
+                        </a> -->
+                        <br>
+                    </div>
+                </div><!-- /.service-item -->
+            </div><!-- /.col-lg-4 -->
+        </div><!-- /.row -->
+        <div class="row">
+            <div class="col-sm-12 col-md-12 col-lg-12 text-center">
+                <p class="text__link mb-0">Solusi Logistik & Transportasi Menghemat Waktu Anda <a href="{% url 'customer_tarif' %}" style="color:#ff2626">Temukan solusi Anda</a>
+                </p>
+            </div><!-- /.col-lg-12 -->
+        </div><!-- /.row -->
+    </div><!-- /.container -->
+</section><!-- /.Services -->
+<!-- =========================== 
+      fancybox Carousel
+    ============================= -->
+<section id="fancyboxCarousel" class="fancybox-layout4 fancybox-carousel bg-overlay bg-overlay-gradient-secondary-2" style="background-color: #dedede;">
+    <!-- <div class="bg-img"><img src="{% static 'frontend/images/backgrounds/5.jpg' %}" alt="background"></div> -->
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12 col-md-12 col-lg-6 offset-lg-3">
+                <div class="heading text-center mb-40">
+                    <span class="heading__subtitle">Fitur Kami</span>
+                    <h2 class="heading__title color-white" style="color: #ff2626;">Mengapa Memilih Kami!</h2>
+                    <p class="heading__desc">Kami terus mengejar visi yang sama di dunia yang kompleks dan tidak pasti saat ini,
+                        bekerja setiap hari untuk mendapatkan kepercayaan pelanggan kami!</p>
+                </div><!-- /.heading -->
+            </div><!-- /.col-lg-6 -->
+        </div><!-- /.row -->
+        <div class="row">
+            <div class="col-sm-12 col-md-12 col-lg-12">
+                <div class="carousel owl-carousel carousel-arrows" data-slide="4" data-slide-md="2" data-slide-sm="1" data-autoplay="true" data-nav="true" data-dots="false" data-space="20" data-loop="true" data-speed="800">
+                    <!-- fancybox item #1 -->
+                    <div class="fancybox-item">
+                        <div class="fancybox__icon">
+                            <i class="icon-wallet"></i>
+                        </div><!-- /.fancybox-icon -->
+                        <div class="fancybox__content">
+                            <h4 class="fancybox__title">Penetapan Harga Transparan</h4>
+                            <p class="fancybox__desc">Rantai pasokan internasional melibatkan regulasi yang menantang.</p>
+                        </div><!-- /.fancybox-content -->
+                    </div><!-- /.fancybox-item -->
+                    <!-- fancybox item #2 -->
+                    <div class="fancybox-item">
+                        <div class="fancybox__icon">
+                            <i class="icon-search"></i>
+                        </div><!-- /.fancybox-icon -->
+                        <div class="fancybox__content">
+                            <h4 class="fancybox__title">Pelacakan Real-Time</h4>
+                            <br>
+                            <p class="fancybox__desc">Pastikan rantai pasokan pelanggan sepenuhnya sesuai dengan praktik.</p>
+                        </div><!-- /.fancybox-content -->
+                    </div><!-- /.fancybox-item -->
+                    <!-- fancybox item #3 -->
+                    <div class="fancybox-item">
+                        <div class="fancybox__icon">
+                            <i class="icon-trolley"></i>
+                        </div><!-- /.fancybox-icon -->
+                        <div class="fancybox__content">
+                            <h4 class="fancybox__title">Warehouse Storage</h4>
+                            <br>
+                            <p class="fancybox__desc">Tergantung pada produk Anda, kami menyediakan aktivitas gudang.</p>
+                        </div><!-- /.fancybox-content -->
+                    </div><!-- /.fancybox-item -->
+                    <!-- fancybox item #4 -->
+                    <div class="fancybox-item">
+                        <div class="fancybox__icon">
+                            <i class="icon-package-6"></i>
+                        </div><!-- /.fancybox-icon -->
+                        <div class="fancybox__content">
+                            <h4 class="fancybox__title">Keamanan Untuk Kargo</h4>
+                            <br>
+                            <p class="fancybox__desc">Persyaratan keamanan tinggi dan disertifikasi dengan standar lokal.</p>
+                        </div><!-- /.fancybox-content -->
+                    </div><!-- /.fancybox-item -->
+                    <!-- fancybox item #5 -->
+                    <div class="fancybox-item">
+                        <div class="fancybox__icon">
+                            <i class="icon-payment-method"></i>
+                        </div><!-- /.fancybox-icon -->
+                        <div class="fancybox__content">
+                            <h4 class="fancybox__title">Easy Payment Methods</h4>
+                            <br>
+                            <p class="fancybox__desc">Anda dapat menggunakan opsi pembayaran mudah, yang tercantum di bawah ini.</p>
+                        </div><!-- /.fancybox-content -->
+                    </div><!-- /.fancybox-item -->
+                    <!-- fancybox item #6 -->
+                    <div class="fancybox-item">
+                        <div class="fancybox__icon">
+                            <i class="icon-delivery-4"></i>
+                        </div><!-- /.fancybox-icon -->
+                        <div class="fancybox__content">
+                            <h4 class="fancybox__title">Pengiriman Cepat & Efisien</h4>
+                            <p class="fancybox__desc">Kami meningkatkan operasi kami dengan membebaskan Anda dari kekhawatiran.</p>
+                        </div><!-- /.fancybox-content -->
+                    </div><!-- /.fancybox-item -->
+                    <!-- fancybox item #7 -->
+                    <div class="fancybox-item">
+                        <div class="fancybox__icon">
+                            <i class="icon-wishlist"></i>
+                        </div><!-- /.fancybox-icon -->
+                        <div class="fancybox__content">
+                            <h4 class="fancybox__title">Solusi yang dipersonalisasi</h4>
+                            <p class="fancybox__desc">Kami terus mengejar visi yang sama dalam solusi kompleks saat ini.</p>
+                        </div><!-- /.fancybox-content -->
+                    </div><!-- /.fancybox-item -->
+                </div><!-- /.carousel -->
+            </div><!-- /.col-lg-12 -->
+        </div><!-- /.row -->
+        <div class="row">
+            <div class="col-sm-12 col-md-12 col-lg-12 text-center">
+                <p class="text__link mb-0">Bekerja setiap hari untuk mendapatkan kepercayaan pelanggan kami.
+                    {% if user.is_authenticated %}
+                    {% else %}
+                    <a href="{% url 'customer_register'%}" class="color-theme" style="color:#ff2626">
+                        Register Sekarang!
+                    </a>
+                    {% endif %}
+                </p>
+            </div><!-- /.col-lg-12 -->
+        </div><!-- /.row -->
+    </div><!-- /.container -->
+</section><!-- /.fancybox Carousel -->
+<!-- ========================
+        Request Quote Tabs
+    =========================== -->
+<section id="requestQuoteTabs" class="request-quote request-quote-tabs p-0">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12 col-md-12 col-lg-12">
+                <div class="request__form">
+                    <nav class="nav nav-tabs">
+                        <a class="nav__link active" data-toggle="tab" href="#tarif" id="tab_cek_tarif">Cek Tarif</a>
+                        <a class="nav__link" data-toggle="tab" href="#track" id="tab_cek_paket">Lacak Kiriman</a>
+                    </nav>
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="tarif">
+                            <form action="" method="post" class="registration-form" id="formCekTarif" data-url_gudang="{% url 'gudang'%}" data-url_outlet="{% url 'toko'%}" data-url_tarif_kilometer="{% url 'tarif_kilometer' %}" data-url_tarif_gudang="{% url 'tarif_gudang'%}" data-url_tarif_layanan="{% url 'layanan_list'%}" data-url_tarif_berat="{% url 'tarif_berat'%}" data-nama_customer="{% if request.user.first_name != '' %}{{user.first_name}}{%else%}{{user.email}}{%endif%}" data-url_pengemasan="{% url 'pengemasan_select2' %}">
+                                <div class="request-quote-panel" style="box-shadow: 0px 5px 11px 1px #ccccccd9">
+                                    <div class="request__form-body">
+                                        <div class="row">
+                                            {% csrf_token %}
+                                            <div class="col-sm-12">
+                                                <h6 class="mb-2">Asal Paket</h6>
+                                            </div>
+                                            <div class="col-sm-12 mb-2">
+                                                <div class="form-group">
+                                                    <input type="text" class="form-control input_field" id="inputAsal" name="alamat_asal" placeholder="Alamat Asal (Desa/Kelurahan, Kec., Kota/Kab., Provinsi)" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-12">
+                                                <h6 class="mb-2">Tujuan Paket</h6>
+                                            </div>
+                                            <div class="col-sm-12 mb-2">
+                                                <div class="form-group">
+                                                    <input type="text" class="form-control input_field" id="inputTujuan" name="alamat_tujuan" placeholder=" Alamat Tujuan (Desa/Kelurahan, Kec., Kota/Kab., Provinsi)" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-12 col-md-4 col-md-8 mb-2">
+                                                <div class="form-group">
+                                                    <label for="inputPengemasan">
+                                                        <h6 class="mb-2">Pengemasan</h6>
+                                                    </label>
+                                                    <select class="form-control" id="inputPengemasan" name="pengemasan">
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-12 col-md-4 col-md-4 mb-2">
+                                                <div class="form-group">
+                                                    <label for="inputBerat">
+                                                        <h6 class="mb-2">Berat</h6>
+                                                    </label>
+                                                    <input type="number" step="0.01" class="form-control input_field" id="inputBerat" name="berat" placeholder="Kilogram" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-12 col-md-12 col-lg-12">
+                                                <button type="submit" id="tombol_cek" class="primary-btn float-right">Cek Tarif</button>
+                                            </div><!-- /.col-lg-12 -->
+                                        </div>
+                                    </div><!-- /.request__form-body -->
+                                    <div class="widget widget-download bg-theme">
+                                        <div class="widget__content">
+                                            <h5>Cek Tarif,<br>yang Gampang!</h5>
+                                            <p>Kemudahan akses informasi penting juga merupakan prioritas kami, untuk itu kami menyediakan fasilitas cek harga pengiriman untuk mempermudah anda dan memperlancar bisnis anda.</p>
+                                        </div><!-- /.widget__content -->
+                                    </div><!-- /.widget-download -->
+                                </div><!-- /.request-quote-panel-->
+                            </form>
+                        </div><!-- /.tab -->
+                        <div class="tab-pane fade" id="track">
+                            <form action="" method="post" class="registration-form" id="formPelacakan" data-url="{% url 'customer_track'%}" data-url_live_track="{% url 'customer_live_track'%}">
+                                {% csrf_token %}
+                                <div class="request-quote-panel">
+                                    <div class="request__form-body">
+                                        <div class="row">
+                                            <img src="{% static 'frontend/gif/courier-truck.gif'%}" style="width: 100%; height: auto;">
+                                        </div>
+                                        <div class="row">
+                                            <div class="input-group input-group-md px-4">
+                                                <input type="text" class="form-control" id="inputIdPengiriman" name="no_resi" required="" placeholder="Resi Paket, ex: ER-002131532">
+                                                <button type="submit" class="lacak-btn" id="cek_button">Lacak Kiriman</button>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div><!-- /.request__form-body -->
+                                    <div class="widget widget-download bg-theme">
+                                        <div class="widget__content">
+                                            <h5>Bisa Lacak<br>Kiriman anda!</h5>
+                                            <p>Melihat kemana dan sedang berada dimana paket anda kini mudah dilakukan dengan hanya sekali klik, Hal ini tentunya membuat anda lega dan tidak perlu khawatir tidak tahu sedang dimana paket anda :).</p>
+                                        </div><!-- /.widget__content -->
+                                    </div><!-- /.widget-download -->
+                                </div><!-- /.request-quote-panel-->
+                            </form>
+                        </div><!-- /.tab -->
+                    </div><!-- /.tab-content -->
+                </div><!-- /.request-form -->
+            </div><!-- /.col-lg-12 -->
+        </div><!-- /.row -->
+    </div><!-- /.container -->
+</section><!-- /.Request Quote Tabs -->
+<div class="container">
+    <br>
+    <div class="row">
+        <div id="advanced_map" class="gmap" style="display: none;"></div>
+    </div>
+    <div class="row">
+        <!-- The Timeline -->
+        <ul class="timeline" id="hasil_tracking" style="display: none;">
+        </ul>
+    </div>
+    <br>
+    <br>
+</div>
+<!-- Modal Loading -->
+<div class="modal fade" id="loadMe" tabindex="-1" role="dialog" aria-labelledby="loadMeLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <div class="loader"></div>
+                <div clas="loader-txt">
+                    <p>Please Wait. <br><br><small>Loading ...</small></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END Modal Loading -->
+<!-- /.modal -->
+<div class="modal fade" id="modal_tampil_hasil_tarif">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="title_modal">List Tarif</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div style="align-content: center;">
+                    <table class="table table-hover table-responsive">
+                        <thead>
+                            <tr>
+                                <th scope="col">No</th>
+                                <th scope="col">Jenis Pengiriman</th>
+                                <th scope="col">Harga</th>
+                                <th scope="col">Estimasi Waktu</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabel_hasil">
+                            <tr>
+                                <th scope="row">1</th>
+                                <td>Kosong</td>
+                                <td>Kosong</td>
+                                <td>Kosong</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-between" style="float: right;">
+                <button type="button" class="primary-btn float-right" data-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+{% endblock %}
+{% block file_js %}
+<script type="text/javascript">
+/*==========   Owl Carousel  ==========*/
+$('.carousel.owl-carousel.carousel-arrows').each(function() {
+    $(this).owlCarousel({
+        nav: $(this).data('nav'),
+        dots: $(this).data('dots'),
+        loop: $(this).data('loop'),
+        margin: $(this).data('space'),
+        center: $(this).data('center'),
+        dotsSpeed: $(this).data('speed'),
+        autoplay: $(this).data('autoplay'),
+        transitionStyle: $(this).data('transition'),
+        animateOut: $(this).data('animate-out'),
+        animateIn: $(this).data('animate-in'),
+        autoplayTimeout: 15000,
+        responsive: {
+            0: {
+                items: 1,
+            },
+            400: {
+                items: $(this).data('slide-sm'),
+            },
+            700: {
+                items: $(this).data('slide-md'),
+            },
+            1000: {
+                items: $(this).data('slide'),
+            }
+        }
+    });
+});
+// Owl Carousel With Thumbnails
+$('.thumbs-carousel').owlCarousel({
+    thumbs: true,
+    thumbsPrerendered: true,
+    loop: true,
+    margin: 0,
+    autoplay: $(this).data('autoplay'),
+    nav: $(this).data('nav'),
+    dots: $(this).data('dots'),
+    dotsSpeed: $(this).data('speed'),
+    transitionStyle: $(this).data('transition'),
+    animateOut: $(this).data('animate-out'),
+    animateIn: $(this).data('animate-in'),
+    autoplayTimeout: 15000,
+    responsive: {
+        0: {
+            items: 1
+        },
+        600: {
+            items: 1
+        },
+        1000: {
+            items: 1
+        }
+    }
+});
+</script>
+<!-- SweetAlert2 -->
+<script src="{% static 'assets/plugins/sweetalert2/sweetalert2.min.js' %}"></script>
+<!-- Select2 -->
+<script src="{% static 'assets/plugins/select2/js/select2.full.min.js' %}"></script>
+<script type="text/javascript">
+function check_height_owl(){
+    var max_height = [];
+    $.each($('.owl-item > .fancybox-item'), function(index, el){
+        max_height.push($(el).outerHeight());
+    });
+    var max = max_height.reduce(function(a, b) { return Math. max(a, b); }, 0);
+    $('.owl-item > .fancybox-item').css('height', max + 'px')
+}
+
+$(document).ready(function() {
+
+    $("#formCekTarif")[0].reset();
+
+    $('#modal_tampil_hasil_tarif').on('shown.bs.modal', function(e) {
+        // Saat Modal terbuka sembunyakan tombol menu yang berhimpitan dengan tombol close modal
+        document.getElementsByClassName('mobile-nav-toggle')[0].style.display = 'none';
+    });
+
+    $('#modal_tampil_hasil_tarif').on('hidden.bs.modal', function(e) {
+        // saat modal tertutup
+        document.getElementsByClassName('mobile-nav-toggle')[0].style.display = 'block';
+    });
+
+    $('#loadMe').on('shown.bs.modal', function(e) {
+        // Saat Modal terbuka sembunyakan tombol menu yang berhimpitan dengan tombol close modal
+        document.getElementsByClassName('mobile-nav-toggle')[0].style.display = 'none';
+    });
+
+    $('#loadMe').on('hidden.bs.modal', function(e) {
+        // saat modal tertutup
+        document.getElementsByClassName('mobile-nav-toggle')[0].style.display = 'block';
+    });
+
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000
+    });
+
+    function tampilkan_pesan(pesan, type) {
+        Toast.fire({
+            icon: type,
+            title: pesan
+        })
+    }
+
+    $('#inputPengemasan').select2({
+        allowClear: true,
+        ajax: {
+            url: $("#formCekTarif").data('url_pengemasan'),
+            dataType: "json",
+            type: "GET",
+            delay: 250,
+            cache: false,
+            data: function(params) {
+                return {
+                    q: params.term,
+                    page: params.page || 1,
+                }
+            },
+            processResults: function(data, params) {
+                var page = params.page || 1;
+                return {
+                    results: $.map(data.results, function(item) {
+                        return {
+                            id: item.id,
+                            text: item.text
+                        }
+                    }),
+                    pagination: {
+                        more: data.total_count >= (page * 10)
+                    }
+                };
+            },
+        },
+        theme: 'bootstrap4',
+        placeholder: 'Kosongkan jika tidak ingin dikemas lagi',
+        language: "id"
+    });
+
+    function numberWithCommas(x) {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+    function process_str(msg) {
+        var out = msg.replace("_", " ");
+        var splitStr = out.toLowerCase().split(' ');
+        for (var i = 0; i < splitStr.length; i++) {
+            // You do not need to check if i is larger than splitStr length, as your for does that for you
+            // Assign it back to the array
+            splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);
+        }
+        // Directly return the joined string
+        return splitStr.join(' ');
+    }
+
+    function validation(id_input_field) {
+        var inpObj = document.getElementById(id_input_field);
+        if (!inpObj.checkValidity()) {
+            tampilkan_pesan(process_str(inpObj.name) + ' <= ' + inpObj.validationMessage, 'error');
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function hitung_jarak(lat1, lon1, lat2, lon2) {
+        var R = 6371; // Radius of the earth in km
+        var dLat = deg2rad(lat2 - lat1); // deg2rad below
+        var dLon = deg2rad(lon2 - lon1);
+        var a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        var d = R * c;
+        return d //return km
+        // return d * 1000; //return meter
+    }
+
+    function deg2rad(deg) {
+        return deg * (Math.PI / 180);
+    }
+
+    function str2int(data) {
+        if (data == '') {
+            return 0;
+        } else {
+            return isNaN(parseInt(data)) ? 0 : parseInt(data);
+        }
+    }
+
+
+    async function get_coordinate(alamat_asal, alamat_tujuan) {
+        console.log("ASAL", alamat_asal, "TUJUAN", alamat_tujuan)
+        var t_arr = alamat_asal.split(',');
+        var r_arr = alamat_tujuan.split(',');
+        let response_1 = await fetch('https://api.openrouteservice.org/geocode/search?api_key=5b3ce3597851110001cf62486f09c07e222343b09d62cf8daadf701d&text=' + t_arr[1].trim() + ',' + t_arr[0].trim() + ',' + t_arr[3].trim() + '&boundary.country=IDN&size=1');
+        // let response_1 = await fetch('https://api.openrouteservice.org/geocode/search?api_key=5b3ce3597851110001cf62486f09c07e222343b09d62cf8daadf701d&text=' + alamat_asal + '&boundary.country=IDN&size=1');
+
+        let response_2 = await fetch('https://api.openrouteservice.org/geocode/search?api_key=5b3ce3597851110001cf62486f09c07e222343b09d62cf8daadf701d&text=' + r_arr[1].trim() + ',' + r_arr[0].trim() + ',' + r_arr[3].trim() + '&boundary.country=IDN&size=1');
+        // let response_2 = await fetch('https://api.openrouteservice.org/geocode/search?api_key=5b3ce3597851110001cf62486f09c07e222343b09d62cf8daadf701d&text=' + alamat_tujuan + '&boundary.country=IDN&size=1');
+
+        let data_asal = await response_1.json();
+        let data_tujuan = await response_2.json();
+
+        console.log("LOC PENGIRIM", data_asal.features[0].geometry.coordinates, "LOC PENERIMA", data_tujuan.features[0].geometry.coordinates);
+        return {
+            asal: { koordinat: data_asal.features[0].geometry.coordinates, provinsi: data_asal.features[0].properties.region },
+            tujuan: { koordinat: data_tujuan.features[0].geometry.coordinates, provinsi: data_tujuan.features[0].properties.region }
+        };
+    }
+
+    async function hitung_tarif(obj_asal, obj_tujuan, berat) {
+        var api_key = '5b3ce3597851110001cf62486f09c07e222343b09d62cf8daadf701d';
+        var url_outlet = $("#formCekTarif").data('url_outlet');
+        var url_gudang = $("#formCekTarif").data('url_gudang');
+        var url_tarif_kilometer = $("#formCekTarif").data('url_tarif_kilometer');
+        var url_tarif_gudang = $("#formCekTarif").data('url_tarif_gudang');
+        var url_tarif_layanan = $("#formCekTarif").data('url_tarif_layanan');
+        var url_tarif_berat = $("#formCekTarif").data('url_tarif_berat');
+        var nama_customer = $("#formCekTarif").data('nama_customer');
+        var url_pengemasan = $("#formCekTarif").data('url_pengemasan');
+        var total_tarif_km = 0;
+        var html_hasil = '';
+
+        if (nama_customer == '') {
+            nama_customer = 'Customer Anonim';
+        }
+
+        // =========================================== Mendapatkan DATA OUTLET ===================================================
+        let response_outlet_1 = await fetch(url_outlet + obj_asal.koordinat[1] + '/' + obj_asal.koordinat[0] + '/'); //mencari outlet terdekat dengan asal
+        let response_outlet_2 = await fetch(url_outlet + obj_tujuan.koordinat[1] + '/' + obj_tujuan.koordinat[0] + '/'); //mencari outlet terdekat dengan tujuan
+
+        let data_outlet_1 = await response_outlet_1.json();
+        let data_outlet_2 = await response_outlet_2.json();
+
+        var outlet_1 = data_outlet_1.data.titik_lokasi;
+        var outlet_2 = data_outlet_2.data.titik_lokasi;
+
+        var lokasi_outlet_1 = outlet_1.split(","); //lat, long
+        var lokasi_outlet_2 = outlet_2.split(",");
+
+        // =========================================== Mendapatkan DATA GUDANG ===================================================
+        let response_gudang_1 = await fetch(url_gudang + lokasi_outlet_1[0] + '/' + lokasi_outlet_1[1] + '/');
+        let response_gudang_2 = await fetch(url_gudang + lokasi_outlet_2[0] + '/' + lokasi_outlet_2[1] + '/');
+
+        let data_gudang_1 = await response_gudang_1.json();
+        let data_gudang_2 = await response_gudang_2.json();
+        //console.log(data_gudang_1, data_gudang_2);
+
+        var lokasi_gudang_1 = data_gudang_1.data.titik_lokasi.split(","); //lat, long
+        var lokasi_gudang_2 = data_gudang_2.data.titik_lokasi.split(",");
+
+        console.log("LOKASI OUTLET 1", lokasi_outlet_1);
+        console.log("LOKASI OUTLET 2", lokasi_outlet_2);
+        console.log("LOKASI GUDANG 1", lokasi_gudang_1);
+        console.log("LOKASI GUDANG 2", lokasi_gudang_2);
+
+
+        // =========================================== Mendapatkan DATA JARAK ===================================================
+        //var jarak_1 = hitung_jarak(obj_asal.koordinat[1], obj_asal.koordinat[0], lokasi_outlet_1[0], lokasi_outlet_1[1]);
+        //var jarak_2 = hitung_jarak(obj_tujuan.koordinat[1], obj_tujuan.koordinat[0], lokasi_outlet_2[0], lokasi_outlet_2[1]);
+        // =========================================== Mendapatkan TARIF KILOMETER ==============================================
+        /*
+        var jarak_total = jarak_1 + jarak_2; //jarak total sudah ketemu tinggal hitung harganya lewat API
+        console.log('Jarak Total: ');
+        console.log(jarak_total);
+
+        let response_tarif_km = await fetch(url_tarif_kilometer + jarak_total + '/harga/');
+        var tarif_km = await response_tarif_km.json();
+        var total_tarif_km = tarif_km.harga;
+        console.log(tarif_km);
+        console.log('Tarif KM: ');
+        console.log(total_tarif_km);
+        */
+
+        // GUSTU TEST
+        /*
+        var url_api_penerima = "https://api.openrouteservice.org/v2/directions/driving-car?api_key=5b3ce3597851110001cf62486f09c07e222343b09d62cf8daadf701d&start=" + obj_tujuan.koordinat[0] + "," + obj_tujuan.koordinat[1] + "&end=" + lokasi_gudang_2[1] + "," + lokasi_gudang_2[0];
+        var url_api_pengirim = "https://api.openrouteservice.org/v2/directions/driving-car?api_key=5b3ce3597851110001cf62486f09c07e222343b09d62cf8daadf701d&start=" + obj_asal.koordinat[0] + "," + obj_asal.koordinat[1] + "&end=" + lokasi_gudang_1[1] + "," + lokasi_gudang_1[0];
+        */
+
+        var url_api_outlet_1_gudang_1 = "https://api.openrouteservice.org/v2/directions/driving-car?api_key=" + api_key + "&start=" + lokasi_outlet_1[1] + "," + lokasi_outlet_1[0] + "&end=" + lokasi_gudang_1[1] + "," + lokasi_gudang_1[0];
+        var url_api_gudang_1_gudang_2 = "https://api.openrouteservice.org/v2/directions/driving-car?api_key=" + api_key + "&start=" + lokasi_gudang_1[1] + "," + lokasi_gudang_1[0] + "&end=" + lokasi_gudang_2[1] + "," + lokasi_gudang_2[0];
+        var url_api_gudang_2_outlet_2 = "https://api.openrouteservice.org/v2/directions/driving-car?api_key=" + api_key + "&start=" + lokasi_gudang_2[1] + "," + lokasi_gudang_2[0] + "&end=" + lokasi_outlet_2[1] + "," + lokasi_outlet_2[0];
+        var url_api_outlet_2_loc_penerima = "https://api.openrouteservice.org/v2/directions/driving-car?api_key=" + api_key + "&start=" + lokasi_outlet_2[1] + "," + lokasi_outlet_2[0] + "&end=" + obj_tujuan.koordinat[0] + "," + obj_tujuan.koordinat[1];
+
+        // =========================================== Mendapatkan TARIF GUDANG ==============================================
+        var total_tarif_gd = 0;
+        let response_tarif_gd = await fetch(url_tarif_gudang + data_gudang_1.data.id + '/' + data_gudang_2.data.id + '/');
+        var tarif_gd = await response_tarif_gd.json();
+        if (tarif_gd.data){
+            total_tarif_gd = str2int(tarif_gd.data.tarif);
+        }else{
+            total_tarif_gd = 0;
+        }
+        
+        console.log(tarif_gd.data);
+        console.log('Tarif Gudang: ');
+        console.log(total_tarif_gd);
+
+        // =========================================== Mendapatkan TARIF berat ==============================================
+        if (berat == '') {
+            berat = 0;
+        }
+
+        try {
+            var beratCekOns = parseFloat("0" +parseFloat(berat).toFixed(1).slice(-2));
+            console.log("BERAT ONS", beratCekOns)
+            if(beratCekOns >= 0.1)
+                berat = Math.floor(parseFloat(berat)) + 1;
+            else 
+                berat = (parseInt(berat).toFixed(0))
+        } catch(error){
+            console.log(error);
+            berat = Math.round(parseFloat(berat));
+        }
+
+        console.log("BERAT", berat)
+        let response_tarif_vl = await fetch(url_tarif_berat + berat + '/harga/');
+        var tarif_vl = await response_tarif_vl.json();
+        var total_tarif_vl = tarif_vl.harga;
+        console.log('Tarif Berat: ');
+        console.log(total_tarif_vl);
+
+        // =========================================== Mendapatkan TARIF LAYANAN ==============================================
+        let response_tarif_ly = await fetch(url_tarif_layanan);
+        var tarif_ly = await response_tarif_ly.json();
+
+        // =========================================== Mendapatkan TARIF Pengemasan ==============================================
+        var total_tarif_pg = 0;
+        if (document.getElementById('inputPengemasan').value != '') {
+            let response_tarif_pg = await fetch(url_pengemasan + document.getElementById('inputPengemasan').value);
+            var tarif_pg = await response_tarif_pg.json();
+            total_tarif_pg = str2int(tarif_pg.data.tarif);
+            
+        } else {
+            total_tarif_pg = 0;
+        }
+
+        console.log('Tarif Pengemasan: ');
+        console.log(total_tarif_pg);
+        // ==================================== MENGHITUNG TARIF TOTAL TIAP LAYANAN ===========================================
+        try{
+            var outlet_1_gudang_1 = await fetch(url_api_outlet_1_gudang_1)
+            outlet_1_gudang_1 = await outlet_1_gudang_1.json();
+            var jarak_outlet_1_gudang_1 = outlet_1_gudang_1.features[0].properties.summary.distance;
+        }catch(error){
+            try {
+                var jarak_outlet_1_gudang_1 = hitung_jarak(lokasi_outlet_1[0], lokasi_outlet_1[1], lokasi_gudang_1[0], lokasi_gudang_1[1]);
+            } catch(error){
+                var jarak_outlet_1_gudang_1 = 0
+            }
+        }
+        console.log("JARAK OUTLET 1 GUDANG 1", jarak_outlet_1_gudang_1);
+
+        try{
+            var gudang_1_gudang_2 = await fetch(url_api_gudang_1_gudang_2)
+            gudang_1_gudang_2 = await gudang_1_gudang_2.json();
+            var jarak_gudang_1_gudang_2 = gudang_1_gudang_2.features[0].properties.summary.distance;
+        }catch(error){
+            try {
+                var jarak_gudang_1_gudang_2 = hitung_jarak(lokasi_gudang_2[0], lokasi_gudang_2[1], lokasi_gudang_1[0], lokasi_gudang_1[1]);
+            } catch(error){
+                var jarak_gudang_1_gudang_2 = 0
+            }
+        }
+        console.log("JARAK GUDANG 1 GUDANG 2", jarak_gudang_1_gudang_2);
+
+        try{
+            var gudang_2_outlet_2 = await fetch(url_api_gudang_2_outlet_2)
+            gudang_2_outlet_2 = await gudang_2_outlet_2.json();
+            var jarak_gudang_2_outlet_2 = gudang_2_outlet_2.features[0].properties.summary.distance;
+        }catch(error){
+            try {
+                var jarak_gudang_2_outlet_2 = hitung_jarak(lokasi_gudang_2[0], lokasi_gudang_2[1], lokasi_outlet_2[0], lokasi_outlet_2[1]);
+            } catch(error){
+                var jarak_gudang_2_outlet_2 = 0
+            }
+        }
+        console.log("JARAK GUDANG 2 OUTLET 2", jarak_gudang_2_outlet_2);
+
+        try{
+            var outlet_2_penerima = await fetch(url_api_outlet_2_loc_penerima)
+            outlet_2_penerima = await outlet_2_penerima.json();
+            var jarak_outlet_2_penerima = outlet_2_penerima.features[0].properties.summary.distance;
+        }catch(error){
+            try {
+                var jarak_outlet_2_penerima = hitung_jarak(lokasi_outlet_2[0], lokasi_outlet_2[1], obj_tujuan.koordinat[1], obj_tujuan.koordinat[0]);
+            } catch(error){
+                var jarak_outlet_2_penerima = 0
+            }
+        }
+        console.log("JARAK OUTLET 2 DAN PENERIMA", jarak_outlet_2_penerima);
+        
+        jarak_outlet_1_gudang_1 = typeof(jarak_outlet_1_gudang_1) !== "undefined" && !isNaN(jarak_outlet_1_gudang_1) ? jarak_outlet_1_gudang_1 : 0;
+        jarak_gudang_1_gudang_2 = typeof(jarak_gudang_1_gudang_2) !== "undefined" && !isNaN(jarak_gudang_1_gudang_2) ? jarak_gudang_1_gudang_2 : 0;
+        jarak_gudang_2_outlet_2 = typeof(jarak_gudang_2_outlet_2) !== "undefined" && !isNaN(jarak_gudang_2_outlet_2) ? jarak_gudang_2_outlet_2 : 0;
+        jarak_outlet_2_penerima = typeof(jarak_outlet_2_penerima) !== "undefined" && !isNaN(jarak_outlet_2_penerima) ? jarak_outlet_2_penerima : 0;
+
+
+        jarak_total = (jarak_outlet_1_gudang_1 + jarak_gudang_1_gudang_2 + jarak_gudang_2_outlet_2 + jarak_outlet_2_penerima) / 1000;
+        console.log("JARAK TOTAL", jarak_total);
+
+        let response_tarif_km = await fetch(url_tarif_kilometer + jarak_total + '/harga/')
+        let response_tarif_km_json = await response_tarif_km.json();
+        total_tarif_km = response_tarif_km_json.harga;
+        console.log('Tarif KM: ');
+        console.log(total_tarif_km);
+
+        /*
+        console.log("TARIF LY", tarif_ly);
+        }*/
+
+        for (var i = 0; i < tarif_ly.data.length; i++) {
+            var total_tarif = "-"
+            var tarif_estimasi = tarif_ly.data[i].estimasi ? tarif_ly.data[i].estimasi + " Hari" : "Belum tersedia";
+            if(tarif_ly.data[i].harga){
+                total_tarif = str2int(tarif_ly.data[i].harga) + total_tarif_km + total_tarif_gd + total_tarif_vl + total_tarif_pg;
+                total_tarif = numberWithCommas(total_tarif) ? numberWithCommas(total_tarif) : 0
+            }
+
+            html_hasil += '<tr><th scope="row">' + (i + 1) + '</th><td>' + tarif_ly.data[i].nama_layanan + '</td><td>' + total_tarif + '</td><td>' + tarif_estimasi + '</td></tr>';
+        }
+        
+
+        return {'html':html_hasil};
+        // END GUSTU TEST
+    }
+
+    $("#tombol_cek").click(function(e) {
+        e.preventDefault();
+        if (validation('inputAsal') && validation('inputTujuan') && validation('inputBerat')) {
+            $("#loadMe").modal({
+                backdrop: "static", //remove ability to close modal with click
+                keyboard: false, //remove option to close with keyboard
+                show: true //Display loader!
+            });
+            var data_asal = document.getElementById("inputAsal").value;
+            var data_tujuan = document.getElementById("inputTujuan").value;
+            var data_berat = document.getElementById("inputBerat").value;
+            let asal;
+            let tujuan;
+            let html_result;
+
+            // GET COORDINATE FROM ADDRESS
+            get_coordinate(data_asal, data_tujuan).then(function(data) {
+                asal = data.asal;
+                tujuan = data.tujuan;
+            }).then(function(){
+                hitung_tarif(asal, tujuan, data_berat)
+                .then(function(data){
+                    html_result = data.html;
+                }).then(function() {
+                    console.log(html_result);
+                    // SHOWING PRICES
+                    $("#loadMe").modal("hide");
+                    document.getElementById("tabel_hasil").innerHTML = html_result;
+                    $('#modal_tampil_hasil_tarif').modal('show');
+                }).catch((error) => {
+                    if(error){
+                        $("#loadMe").modal("hide");
+                        setTimeout(tampilkan_pesan('&emsp;Tidak dapat menemukan lokasi, <br> silahkan coba kembali', 'error'), 800);
+                    }
+                });
+
+            }).catch((error) => {
+                if(error){
+                    $("#loadMe").modal("hide");
+                    setTimeout(tampilkan_pesan('&emsp;Tidak dapat menemukan lokasi, <br> silahkan coba kembali', 'error'), 800);
+                }
+            });
+
+        } else {
+
+        }
+    });
+
+    $("#tab_cek_tarif").click(function(e) {
+        e.preventDefault();
+        document.getElementById('hasil_tracking').style.display = 'none';
+    });
+
+    $("#tab_cek_paket").click(function(e) {
+        e.preventDefault();
+        document.getElementById('hasil_tracking').style.display = 'none';
+    });
+
+
+    // ============================================== LACAK PAKET ================================
+    var my_token = '{{API_MAPS_VIEW}}';
+
+    //Basic map
+    // DOCUMENTATION https://esri.github.io/esri-leaflet/examples/search-map-service.html
+
+    var mymap = L.map('advanced_map').setView([-8.652415520702286, 115.21718502044679], 13);
+    L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v10/tiles/256/{z}/{x}/{y}?access_token={accessToken}', {
+        maxZoom: 18,
+        id: 'advanced_map',
+        accessToken: my_token
+    }).addTo(mymap);
+
+    var theMarker = {};
+
+    var arcgisOnline = L.esri.Geocoding.arcgisOnlineProvider();
+
+    L.esri.Geocoding.geosearch({
+        providers: [
+            arcgisOnline,
+            L.esri.Geocoding.mapServiceProvider({
+                label: 'States and Counties',
+                url: 'https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer',
+                layers: [2, 3],
+                searchFields: ['NAME', 'STATE_NAME']
+            })
+        ]
+    }).addTo(mymap);
+
+    let interval;
+    // ER-002131532
+    
+    function formatDate(date) {
+        var hours = date.getHours();
+        var minutes = date.getMinutes();
+        var seconds = date.getSeconds();
+        var ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12; // the hour '0' should be '12'
+        hours = hours < 10 ? '0'+hours : hours;
+        minutes = minutes < 10 ? '0'+minutes : minutes;
+        seconds = seconds < 10 ? '0'+seconds : seconds;
+        var strTime = hours + ':' + minutes + ':' + seconds + `-${ampm}`;
+        // return (date.getMonth()+1) + "/" + date.getDate() + "/" + date.getFullYear() + "  " + strTime;
+        return date.getFullYear() + "-" + ("0" + (date.getMonth()+1)).slice(-2) + "-" + date.getDate() + " " + strTime;
+    }
+    
+    function show_data(response) {
+
+        var data_timeline = '<li><div class="direction-r"><div class="flag-wrapper"><span class="flag">Paket Diproses</span><span class="time-wrapper"><span class="time">' + formatDate(new Date(response.tgl_pengiriman)) + '</span></span></div><div class="desc">Resi : ' + response.pengiriman.id_pengiriman + '<br>Layanan: ' + response.layanan.nama_layanan + '<br> Estimasi: ' + response.layanan.estimasi_layanan + ' Hari</div></div></li>';
+        var i;
+        var direction = 'direction-r';
+        var deskripsi;
+        
+        for (i = 0; i < response.log_pengiriman.length; i++) {
+            var titik_lokasi = '';
+            if(response.log_pengiriman[i].titik_lokasi){
+                titik_lokasi = response.log_pengiriman[i].titik_lokasi.split(',')
+                titik_lokasi = titik_lokasi.reduce(function(pre, next) {
+                    return '<br>' + parseFloat(pre).toFixed(6).toString() + ', ' + parseFloat(next).toFixed(6).toString();
+                });
+            }
+
+            if (i > 0 && i % 2 == 0) {
+                direction = 'direction-r';
+            } else {
+                direction = 'direction-l';
+            }
+            if (response.log_pengiriman[i].status_pengiriman == 'waiting') {
+                deskripsi = 'Menunggu Kurir, untuk diantar ke gudang';
+            }
+            else if (response.log_pengiriman[i].status_pengiriman == 'arrive_at' && i == 1){
+                deskripsi = 'Paket telah sampai di Outlet Penerimaan, <br> Titik Lokasi: ' + titik_lokasi;
+            }
+            else if (response.log_pengiriman[i].status_pengiriman == 'arrive_at' && i == 2){
+                deskripsi = 'Paket telah sampai di Gudang #1, <br> Titik Lokasi: ' + titik_lokasi;
+            }
+            else if (response.log_pengiriman[i].status_pengiriman == 'done'){
+                deskripsi = 'Paket telah sampai pada penerima.';
+            }
+            else{
+                deskripsi = 'Paket telah dikirim dari Titik Lokasi: ' + titik_lokasi;
+            }
+            
+
+            data_timeline += '<li><div class="' + direction + '"><div class="flag-wrapper"><span class="flag">' + response.log_pengiriman[i].status_pengiriman + '</span><span class="time-wrapper"><span class="time">' + formatDate(new Date(response.log_pengiriman[i].created_at)) + '</span></span></div><div class="desc">' + deskripsi + '</div></div></li>';
+        }
+
+        if (response.status_akhir.status_pengiriman == 'arrive_at') {
+            if (theMarker != undefined) {
+                mymap.removeLayer(theMarker);
+            };
+
+            //Add a marker
+            if (response.status_akhir.titik_lokasi) {
+                var lokasi = response.status_akhir.titik_lokasi;
+                var data_loc = lokasi.split(',');
+                theMarker = L.marker([data_loc[0], data_loc[1]]).addTo(mymap);
+                mymap.setView([data_loc[0], data_loc[1]], 13);
+                setTimeout(function() { mymap.invalidateSize() }, 400);
+            }
+            document.getElementById('advanced_map').style.display = 'block';
+
+            // Live Update 
+            interval = setInterval(function() {
+                getDevices();
+            }, 600000);
+            clearInterval(interval);
+        }
+
+        document.getElementById('hasil_tracking').innerHTML = data_timeline;
+        document.getElementById('hasil_tracking').style.display = 'block';
+    }
+
+    $("#cek_button").click(function(e) {
+
+        e.preventDefault();
+        if (validation('inputIdPengiriman')) {
+            $("#loadMe").modal({
+                backdrop: "static", //remove ability to close modal with click
+                keyboard: false, //remove option to close with keyboard
+                show: true //Display loader!
+            });
+            var serializeData = $("#formPelacakan")[0];
+            serializeData = new FormData(serializeData);
+            var data_resinya = document.getElementById('inputIdPengiriman').value;
+            $.ajax({
+                url: $("#formPelacakan").data('url'),
+                data: {
+                    csrfmiddlewaretoken: getCookie('csrftoken'),
+                    no_resi: data_resinya
+                },
+                type: 'post',
+                success: function(response) {
+                    setTimeout(function() {
+                        $("#loadMe").modal("hide");
+                        $("#formPelacakan")[0].reset();
+                        data_no_resi = response.pengiriman.id_pengiriman;
+
+                        setTimeout(function() {
+                            tampilkan_pesan(response.msg, response.type);
+                        }, 1500);
+                        show_data(response);
+
+                        // Live Update 
+                        // interval = setInterval(function() {
+                        //    getDevices();
+                        //  }, 5000);
+                        // clearInterval(interval);
+
+                    }, 1000);
+                },
+                error: function(xhr, status, error) {
+                    var error_response = xhr.responseJSON;
+                    setTimeout(function() {
+                        $("#loadMe").modal("hide");
+                    },1000)
+                    
+                    setTimeout(function() {
+                        tampilkan_pesan(error_response.msg, error_response.type);
+                        $("#formPelacakan")[0].reset();
+                        document.getElementById('hasil_tracking').innerHTML = '';
+                        document.getElementById('hasil_tracking').style.display = 'none';
+                    }, 1200)
+                    
+                },
+            })
+        }
+    });
+
+    check_height_owl();
+});
+</script>
+{% endblock file_js %}

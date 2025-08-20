@@ -1,0 +1,60 @@
+<!-- dashboard.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Dashboard SSO</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 2rem;
+      }
+      pre {
+        background: #f4f4f4;
+        padding: 1rem;
+        border-radius: 4px;
+        overflow-x: auto;
+      }
+      ul {
+        list-style: none;
+        padding: 0;
+      }
+      li {
+        margin-bottom: 0.5rem;
+      }
+      strong {
+        display: inline-block;
+        width: 150px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Dashboard SSO</h1>
+
+    <section>
+      <h2>Access Token</h2>
+      {% if access_token %}
+      <pre>{{ access_token }}</pre>
+      {% else %}
+      <p><em>Token tidak ditemukan.</em></p>
+      {% endif %}
+    </section>
+
+    <section>
+      <h2>User Data</h2>
+      <ul>
+        {% for key, value in user_data.items %}
+        <li>
+          <strong>{{ key|capfirst }}:</strong>
+          {{ value }}
+        </li>
+        {% empty %}
+        <li><em>Data user kosong.</em></li>
+        {% endfor %}
+      </ul>
+    </section>
+
+    <p><a href="{% url 'logout' %}">Logout</a></p>
+  </body>
+</html>

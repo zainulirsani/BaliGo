@@ -1,0 +1,195 @@
+{% load static %}
+{% load humanize %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Print Billing</title>
+    <!-- Theme style -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <table>
+                    <tbody>
+                        <tr>
+                            <td style="float: left; text-align: left;">
+                                <img src="https://ekspedisi.bithouse.id/static/frontend/img/baligo.png" style="width: 120px; height: auto;">
+                            </td>
+                            <td style="float: right; text-align: right;">
+                                <h3>INVOICE/RESI: {{data.id_pengiriman}}</h3>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-md-12">
+                <table>
+                    <tbody>
+                        <tr>
+                            <td style="float: left; text-align: left;">
+                                <address>
+                                    <strong>PT. Saguna Mitra Transindo</strong><br>Jl. Tukad Batanghari <br>No. 1C, Renon, Dauh Puri Klod,<br> Kec. Denpasar Bar., Kota Denpasar,<br> Bali 80234
+                                    <abbr title="Phone">P:</abbr> +62361257055
+                                </address>
+                            </td>
+                            <td style="float: right; text-align: right;">
+                                <p><strong>Tanggal Order: </strong> {{data.created_at}}</p>
+                                <p class="mb-0"><strong>Status: </strong> <span class="badge bg-orange">
+                                {% if status.data %}
+                                LUNAS
+                                {% else %}
+                                -
+                                {% endif %}
+                                </span></p>
+                                <!-- <p class="mb-0"><strong>Order ID: </strong> {{data.id_pengiriman}}</p> -->
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <hr><hr>
+        <div class="row">
+            <table>
+                <tbody>
+                    <tr>
+                        <td>Pelanggan (pengirim)</td>
+                        <td style="width: 10px;">:</td>
+                        <td style="text-align: left;">{{data.nama_pengirim}}</td>
+                        <td colspan="2"></td>
+                        <td>Penerima</td>
+                        <td style="width: 10px;">:</td>
+                        <td style="text-align: left;width: 20%">{{data.nama_penerima}}</td>
+                    </tr>
+                    <tr>
+                        <td>Alamat</td>
+                        <td style="width: 10px;">:</td>
+                        <td style="text-align: left;">{{data.alamat_pengirim|title|add:','}} <br> {{data.desa_pengirim|title|add:','}} {{data.kecamatan_pengirim|title|add:','}}
+                        <br> {{data.kota_pengirim|title|add:','}} {{data.provinsi_pengirim|title|add:','}} {{data.kode_pos_pengirim|title}} 
+                        {% comment %}
+                        <br>
+                        {{data.alamat_pengirim|title}}
+                        {% endcomment %}
+                        </td>
+                        <td colspan="2"></td>
+                        <td>Alamat</td>
+                        <td style="width: 10px;">:</td>
+                        <td style="text-align: left;">{{data.alamat_penerima|title|add:','}} <br> {{data.desa_penerima|title|add:','}} {{data.kecamatan_penerima|title|add:','}} 
+                        <br> {{data.kota_penerima|title|add:','}} {{data.provinsi_penerima|title|add:','}} {{data.kode_pos_penerima|title}} 
+                        {% comment %}
+                        <br>
+                        {{data.alamat_penerima|title}}
+                        {% endcomment %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>No.Hp</td>
+                        <td style="width: 10px;">:</td>
+                        <td style="text-align: left;">{{data.no_telp_pengirim}}</td>
+                        <td colspan="2"></td>
+                        <td>No.Hp</td>
+                        <td style="width: 10px;">:</td>
+                        <td style="text-align: left;">{{data.no_telp_penerima}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <hr>
+        <div class="row">
+            <h4>Rute Pengiriman:</h4>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>Outlet #1 (Paket dikirim)</td>
+                        <td style="width: 10px;">:</td>
+                        <td style="text-align: left;">{{data.outlet_pengiriman}}</td>
+                    </tr>
+                    <!-- <tr>
+                        <td>Gudang #1</td>
+                        <td style="width: 10px;">:</td>
+                        <td style="text-align: left;">{{data.nama_pengirim}}</td>
+                    </tr>
+                    <tr>
+                        <td>Gudang #2</td>
+                        <td style="width: 10px;">:</td>
+                        <td style="text-align: left;">{{data.nama_pengirim}}</td>
+                    </tr>
+                    <tr> -->
+                        <td>Outlet #2 (Paket diterima)</td>
+                        <td style="width: 10px;">:</td>
+                        <td style="text-align: left;">{{data.outlet_penerimaan}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-md-6">
+                
+            </div>
+            <div class="col-md-6">
+                <div class="table-responsive">
+                    <table id="mainTable" class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th style="float: left; text-align: left;">Item</th>
+                                <th style="float: left; text-align: left;">Harga</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Tarif Berat</td>
+                                <td>Rp. {{data.tarif_berat|intcomma}}</td>
+                            </tr>
+                            <tr>
+                                <td>Tarif Kilometer</td>
+                                <td>Rp. {{data.tarif_kilometer|intcomma}}</td>
+                            </tr>
+                            <tr>
+                                <td>Tarif Gudang</td>
+                                <td>Rp. {{data.tarif_gudang|intcomma}}</td>
+                            </tr>
+                            <tr>
+                                <td>Tarif Layanan</td>
+                                <td>Rp. {{data.tarif_layanan|intcomma}}</td>
+                            </tr>
+                            <tr>
+                                <td>Tarif Pengemasan</td>
+                                <td>Rp. {{data.tarif_pengemasan|intcomma}}</td>
+                            </tr>
+                            <tr>
+                                <td>Extra tarif pengirim</td>
+                                <td>Rp. {{data.extra_tarif_pengirim|intcomma}}</td>
+                            </tr>
+                            <tr>
+                                <td>Extra tarif penerima</td>
+                                <td>Rp. {{data.extra_tarif_penerima|intcomma}}</td>
+                            </tr>
+                            <tr>
+                                <td>Tarif Lain - Lain</td>
+                                <td>Rp. {{ data.tarif_lain|intcomma }}</td>
+                            </tr>
+
+                            <tr style="padding-top: 10px; background-color: #b2bec3;">
+                                <td colspan="1" style="text-align: center;"><h1>TOTAL</h1></td>
+                                <td style="float: left; text-align: left;"><h1>Rp. {{data.total_tarif|intcomma}}</h1></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <hr>
+    </div>
+    <!-- {{data}} -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>

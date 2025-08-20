@@ -1,0 +1,150 @@
+{% extends '../base.html' %}
+{% load static %}
+{% load custom_filter %}
+
+{% block title_name %}
+ <title>Pengiriman | BaliGo Ekspedisi</title>
+{% endblock %}
+
+{% block file_css %}
+<!-- Daterange picker -->
+<link rel="stylesheet" href="{% static 'assets/plugins/daterangepicker/daterangepicker.css' %}">
+<!-- summernote -->
+<link rel="stylesheet" href="{% static 'assets/plugins/summernote/summernote-bs4.css' %}">
+<link rel="stylesheet" href="{% static 'assets/plugins/sweetalert2/sweetalert2.min.css' %}">
+
+<style>
+  #preview,
+  #preview-sampai{
+     width:100%;
+     height: auto;
+     margin:0px auto;
+  }
+</style>
+{% endblock %}
+
+{% block nav_link %}
+  <a class="nav-link breadcrumb_mobile" href="{% url 'kurir_dashboard' %}">
+    <i class="fas fa-chevron-left"></i>&nbsp;&nbsp;Detail Order
+  </a>
+{% endblock nav_link %}
+
+{% block content %}
+  <div class="callout callout-danger">
+    <h5 class="mb-0">{{ data.id_order }}</h5>
+    <small class="text-muted">*Berikut data detail order pickup</small>
+  </div>
+  <hr>
+  <div class="card">
+    <div class="card-header">
+      <div class="row">
+        <div class="form-group col-6">
+          <div class="callout callout-danger">
+            <h5 class="text-center mb-0">PENGIRIM</h5>
+            <div class="text-center">
+              <small class="text-center">*Info Detail Pengirim</small>
+            </div>
+          </div>
+          <div>
+            <h6><strong><i class="fas fa-user"></i>&nbsp;&nbsp;Nama :</strong></h6>
+            <h6>{{ data.id_customer.first_name }}</h6>
+          </div>
+          <div>
+            <h6><strong><i class="fas fa-phone-alt"></i>&nbsp;&nbsp;No Telp :</strong></h6>
+            <h6>{{ data.id_customer.no_telp }}</h6>
+          </div>
+          <div>
+            <h6><strong><i class="fas fa-envelope"></i>&nbsp;&nbsp;Email :</strong></h6>
+            <h6>{{ data.id_customer.email }}</h6>
+          </div>
+          <div>
+            <h6><strong><i class="fas fa-map-marker-alt"></i>&nbsp;&nbsp;Alamat :</strong></h6>
+            <h6>
+              {% if data.alamat_pengirim_alt %}
+                {{ data.alamat_pengirim_alt }}
+              {% else %}
+                {{ data.id_customer.alamat }}
+              {% endif %}
+            </h6>
+          </div>
+          <div class="callout callout-danger">
+            <h5 class="text-center mb-0">Lokasi</h5>
+            <div class="text-center">
+              <small class="text-center">*Lokasi Pengirim</small>
+            </div>
+          </div>
+          <div>
+            <h6><strong>Provinsi :</strong></h6>
+            <h6>{{ data.provinsi_pengirim }}</h6>
+          </div>
+          <div>
+            <h6><strong>Kabupaten :</strong></h6>
+            <h6>{{ data.kota_pengirim }}</h6>
+          </div>
+          <div>
+            <h6><strong>Kecamatan :</strong></h6>
+            <h6>{{ data.kecamatan_pengirim }}</h6>
+          </div>
+          <div>
+            <h6><strong>Kode POS :</strong></h6>
+            <h6>{{ data.kode_pos_pengirim }}</h6>
+          </div>
+        </div>
+        <div class="form-group col-6">
+          <div class="callout callout-danger">
+            <h5 class="text-center mb-0">PENERIMA</h5>
+            <div class="text-center">
+              <small class="text-center">*Info Detail Penerima</small>
+            </div>
+          </div>
+          <div>
+            <h6><strong><i class="fas fa-user"></i>&nbsp;&nbsp;Nama :</strong></h6>
+            <h6>{{ data.nama_penerima }}</h6>
+          </div>
+          <div>
+            <h6><strong><i class="fas fa-phone-alt"></i>&nbsp;&nbsp;No Telp :</strong></h6>
+            <h6>{{ data.no_tlp_penerima }}</h6>
+          </div>
+          <div>
+            <h6><strong><i class="fas fa-envelope"></i>&nbsp;&nbsp;Email :</strong></h6>
+            <h6>{{ data.email_penerima }}</h6>
+          </div>
+          <div>
+            <h6><strong><i class="fas fa-map-marker-alt"></i>&nbsp;&nbsp;Alamat :</strong></h6>
+            <h6>{{ data.alamat_penerima }}</h6>
+          </div>
+          <div>
+            <div class="callout callout-danger">
+            <h5 class="text-center mb-0">Lokasi</h5>
+            <div class="text-center">
+              <small class="text-center">*Lokasi Penerima</small>
+            </div>
+          </div>
+            <h6><strong>Provinsi :</strong></h6>
+            <h6>{{ data.provinsi_penerima }}</h6>
+          </div>
+          <div>
+            <h6><strong>Kabupaten :</strong></h6>
+            <h6>{{ data.kota_penerima }}</h6>
+          </div>
+          <div>
+            <h6><strong>Kecamatan :</strong></h6>
+            <h6>{{ data.kecamatan_penerima }}</h6>
+          </div>
+          <div>
+            <h6><strong>Kode POS :</strong></h6>
+            <h6>{{ data.kode_pos_penerima }}</h6>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
+
+{% block file_js %}
+<!-- ChartJS -->
+<script src="{% static 'custom_js/qr_scan.js' %}"></script>
+<script src="{% static 'assets/plugins/sweetalert2/sweetalert2.min.js' %}"></script>
+<script src="https://js.pusher.com/7.0/pusher.min.js"></script>
+{% endblock file_js %}

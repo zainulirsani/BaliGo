@@ -1,0 +1,618 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title_name %}
+<title>Kendaraan | BaliGo Ekspedisi</title>
+{% endblock %}
+{% block file_css %}
+<!-- DataTables -->
+<link rel="stylesheet" href="{% static 'assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+<link rel="stylesheet" href="{% static 'assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+<!-- SweetAlert2 -->
+<link rel="stylesheet" href="{% static 'assets/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css' %}">
+<!-- Select2 -->
+<link rel="stylesheet" href="{% static 'assets/plugins/select2/css/select2.min.css' %}">
+<link rel="stylesheet" href="{% static 'assets/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
+<style type="text/css">
+@media (max-width: 768px) {
+
+    .buttontext {
+        width: 95px;
+        overflow: hidden;
+        white-space: nowrap;
+        display: block;
+        text-overflow: ellipsis;
+    }
+}
+</style>
+{% endblock %}
+{% block content_header %}
+<div class="container-fluid">
+    <div class="row mb-2">
+        <div class="col-sm-6">
+            <h1 class="m-0 text-dark">Kendaraan</h1>
+        </div><!-- /.col -->
+        <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                <li class="breadcrumb-item active">Kendaraan</li>
+            </ol>
+        </div><!-- /.col -->
+    </div><!-- /.row -->
+</div><!-- /.container-fluid -->
+{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Data Kendaraan</h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-block bg-gradient-primary" id="createKendaraan" title="Tambah Kendaraan">
+                <span class="buttontext"><i class="fa fa-plus"></i>&nbsp; Tambah Kendaraan</span>
+            </button>
+        </div>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+        <table id="kendaraan" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>ID</th>
+                    <th>Nama</th>
+                    <th>No. Plat</th>
+                    <th>Jenis</th>
+                    <th>Penempatan</th>
+                    <th>Kapasitas Tank</th>
+                    <th>Bahan Bakar</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th>No</th>
+                    <th>ID</th>
+                    <th>Nama</th>
+                    <th>No. Plat</th>
+                    <th>Jenis</th>
+                    <th>Penempatan</th>
+                    <th>Kapasitas Tank</th>
+                    <th>Bahan Bakar</th>
+                    <th>Action</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <!-- /.card-body -->
+</div>
+<!-- /.modal -->
+<div class="modal fade" id="modal_kendaraan">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="title_modal">Detail Data Kendaraan</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="createKendaraanForm" enctype="multipart/form-data" method="post" data-url="{% url 'kendaraan' %}" data-url_api_gudang="{% url 'gudang_select2' %}" data-url_api_toko="{% url 'toko_select2' %}">
+                    {% csrf_token %}
+                    {% for field in form %}
+                    {% if not field.name == 'id_kendaraan' %}
+                    <div class="form-group row">
+                        <label for="{{ field.name }}" class="col-sm-2 col-form-label">{{ field.label }}</label>
+                        <div class="col-sm-10">
+                            {{ field }}
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                    <div id="penempatan_tugas"></div>
+                    <input type="hidden" name="id_kendaraan" id="id_kendaraan">
+                    <input type="hidden" name="id" id="id">
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
+                <button type="button" class="btn btn-primary" id="updateButton">Update</button>
+                <button type="button" class="btn btn-primary" id="createButton">Simpan</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+{% endblock %}
+{% block file_js %}
+<!-- Bootstrap 4 -->
+<script src="{% static 'assets/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<!-- DataTables -->
+<script src="{% static 'assets/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+<!-- SweetAlert2 -->
+<script src="{% static 'assets/plugins/sweetalert2/sweetalert2.min.js' %}"></script>
+<!-- Select2 -->
+<script src="{% static 'assets/plugins/select2/js/select2.full.min.js' %}"></script>
+<script>
+$(document).ready(function() {
+
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    var url_edit = '';
+
+    var is_admin = "{{user.is_superuser}}";
+    var role_user = "{{user.role}}";
+    var outlet_tugas = "{{user.penempatan_toko_id}}";
+    var nama_outlet_tugas = "{{user.penempatan_toko.nama_toko}}";
+    var gudang_tugas = "{{user.penempatan_gudang_id}}";
+    var nama_gudang_tugas = "{{user.penempatan_gudang.nama_gudang}}";
+
+    function check_user_login() {
+        if (is_admin == "False") {
+            console.log("Bukan SuperAdmin!");
+            if (role_user == "adm_outlet") {
+                console.log("Sebagai ADM Outlet");
+                document.getElementById("inputGudang").value = "";
+                document.getElementById("inputGudang").disabled = true;
+                document.getElementById("inputToko").value = outlet_tugas;
+                document.getElementById("inputToko").placeholder = nama_outlet_tugas;
+                document.getElementById("select2-inputToko-container").innerHTML = '<span class="select2-selection__placeholder">' + nama_outlet_tugas + '</span>';
+                document.getElementById("inputToko").innerHTML = '<option value="' + outlet_tugas + '" selected>' + nama_outlet_tugas + '</option>';
+                document.getElementById("penempatan_tugas").innerHTML = '<input type="hidden" name="penempatan_toko" value="' + outlet_tugas + '">';
+                $("#inputToko").prop("disabled", true);
+            } else if (role_user == "adm_gudang") {
+                console.log("Sebagai ADM Gudang");
+                document.getElementById("inputToko").value = "";
+                document.getElementById("inputToko").disabled = true;
+                document.getElementById("inputGudang").value = gudang_tugas;
+                document.getElementById("inputGudang").placeholder = nama_gudang_tugas;
+                document.getElementById("select2-inputGudang-container").innerHTML = '<span class="select2-selection__placeholder">' + nama_gudang_tugas + '</span>';
+                document.getElementById("inputGudang").innerHTML = '<option value="' + gudang_tugas + '" selected>' + nama_gudang_tugas + '</option>';
+                document.getElementById("penempatan_tugas").innerHTML = '<input type="hidden" name="penempatan_gudang" value="' + gudang_tugas + '">';
+                $("#inputGudang").prop("disabled", true);
+            }
+        }
+    }
+
+    function tampilkan_pesan(pesan, type) {
+        Toast.fire({
+            icon: type,
+            title: pesan
+        });
+    }
+
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000
+    });
+
+    $(function() {
+        $("input[name='kapasitas_tank']").on('input', function(e) {
+            $(this).val($(this).val().replace(/[^0-9]/g, ''));
+        });
+    });
+
+    var table = $('#kendaraan').DataTable({
+        "columns": [{
+                "width": "6%"
+            },
+            {
+                "width": "10%"
+            },
+            {
+                "width": "17%"
+            },
+            {
+                "width": "12%"
+            },
+            {
+                "width": "9%"
+            },
+            {
+                "width": "12%"
+            },
+            {
+                "width": "16%"
+            },
+            {
+                "width": "8%"
+            },
+            {
+                "width": "16%"
+            },
+        ],
+        "paging": true,
+        "lengthChange": false,
+        "searching": true,
+        "ordering": true,
+        "info": true,
+        "autoWidth": false,
+        "responsive": true,
+        "processing": true,
+        "serverside": true,
+        "ajax": {
+            "url": $("#createKendaraanForm").data('url'),
+            "type": "get"
+        }
+    });
+
+    $('#inputGudang').select2({
+        allowClear: true,
+        ajax: {
+            url: $("#createKendaraanForm").data('url_api_gudang'),
+            dataType: "json",
+            type: "GET",
+            delay: 250,
+            cache: false,
+            data: function(params) {
+                return {
+                    q: params.term,
+                    page: params.page || 1,
+                }
+            },
+            processResults: function(data, params) {
+                var page = params.page || 1;
+                return {
+                    results: $.map(data.results, function(item) { return { id: item.id, text: item.text } }),
+                    pagination: {
+                        more: data.total_count >= (page * 10)
+                    }
+                };
+            },
+        },
+        theme: 'bootstrap4',
+        placeholder: 'Pilih Gudang',
+        language: "id",
+
+    });
+
+    $('#inputToko').select2({
+        allowClear: true,
+        ajax: {
+            url: $("#createKendaraanForm").data('url_api_toko'),
+            dataType: "json",
+            type: "GET",
+            delay: 250,
+            cache: false,
+            data: function(params) {
+                return {
+                    q: params.term,
+                    page: params.page || 1,
+                }
+            },
+            processResults: function(data, params) {
+                var page = params.page || 1;
+                return {
+                    results: $.map(data.results, function(item) { return { id: item.id, text: item.text } }),
+                    pagination: {
+                        more: data.total_count >= (page * 10)
+                    }
+                };
+            },
+        },
+        theme: 'bootstrap4',
+        placeholder: 'Pilih Outlet',
+        language: "id",
+    });
+
+    //CREATE DATA (SHOW FORM)
+    $("#createKendaraan").click(function(e) {
+        e.preventDefault();
+        $("#createKendaraanForm")[0].reset();
+        $("#createButton").prop("disabled", false);
+        document.getElementById("inputToko").value = '';
+        document.getElementById("select2-inputToko-container").innerHTML = 'Pilih Penempatan Outlet';
+        document.getElementById("inputGudang").value = '';
+        document.getElementById("select2-inputGudang-container").innerHTML = 'Pilih Penempatan Gudang';
+        document.getElementById("inputToko").disabled = false;
+        document.getElementById("inputGudang").disabled = false;
+
+        document.getElementById("updateButton").style.display = "none";
+        document.getElementById("createButton").style.display = "block";
+        document.getElementById("title_modal").innerHTML = "Tambah Data Kendaraan";
+
+        $('#modal_kendaraan').modal('show');
+        check_user_login();
+
+    });
+
+
+    // CREATE DATA ACTION
+    $("#createButton").click(function(e) {
+        if (!$("#createKendaraanForm").valid()) return;
+
+        e.preventDefault();
+        $("#createButton").prop("disabled", true);
+        var serializeData = $("#createKendaraanForm")[0];
+        serializeData = new FormData(serializeData);
+
+        $.ajax({
+            url: $("#createKendaraanForm").data('url'),
+            data: serializeData,
+            type: 'post',
+            cache: false,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                $('#modal_kendaraan').modal('hide');
+                setTimeout(function() {
+                    table.ajax.reload();
+                    tampilkan_pesan(response.msg, response.type);
+                }, 1000);
+                $("#createKendaraanForm")[0].reset();
+                $("#createButton").prop("disabled", false);
+
+            },
+            error: function(xhr, status, error) {
+                setTimeout(function() {
+                    var error_response = xhr.responseJSON;
+                    tampilkan_pesan(error_response.msg, error_response.type);
+                }, 1000)
+                $("#createButton").prop("disabled", false);
+
+            },
+        })
+    });
+
+
+    //BAGIAN DELETE
+    $('body').on('click', '.deleteKendaraan', function() {
+        var id_kendaraan = $(this).data("id");
+        var nama_kendaraan = $(this).data("nama");
+        Swal.fire({
+            title: 'Anda yakin?',
+            text: "Yakin menghapus " + nama_kendaraan + "!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Tidak, Batalkan!',
+        }).then((result) => {
+            if (result.value) {
+                $.ajax({
+                    url: $("#createKendaraanForm").data('url') + 'delete/',
+                    data: {
+                        csrfmiddlewaretoken: getCookie('csrftoken'),
+                        id: id_kendaraan
+                    },
+                    type: 'post',
+                    dataType: 'json',
+                    success: function(response) {
+                        tampilkan_pesan(response.msg, response.type);
+                        table.ajax.reload();
+                    },
+                    error: function(xhr, status, error) {
+                        var error_response = xhr.responseJSON;
+                        tampilkan_pesan(error_response.msg, error_response.type);
+                    }
+                });
+
+            }
+        })
+    });
+
+
+    //BAGIAN ARSIP
+    $('body').on('click', '.arsipKendaraan', function() {
+        var id_kendaraan = $(this).data("id");
+        var nama_kendaraan = $(this).data("nama");
+        Swal.fire({
+            title: 'Anda yakin?',
+            text: "Yakin Mengarsipkan " + nama_kendaraan + "!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, Arsipkan!',
+            cancelButtonText: 'Tidak, Batalkan!',
+        }).then((result) => {
+            if (result.value) {
+                $.ajax({
+                    url: $("#createKendaraanForm").data('url') + 'arsip/',
+                    data: {
+                        csrfmiddlewaretoken: getCookie('csrftoken'),
+                        id: id_kendaraan
+                    },
+                    type: 'post',
+                    dataType: 'json',
+                    success: function(response) {
+                        tampilkan_pesan(response.msg, response.type);
+                        table.ajax.reload();
+                    },
+                    error: function(xhr, status, error) {
+                        var error_response = xhr.responseJSON;
+                        tampilkan_pesan(error_response.msg, error_response.type);
+                    }
+                });
+
+            }
+        })
+    });
+
+    //BAGIAN ARSIP
+    $('body').on('click', '.unarsipKendaraan', function() {
+        var id_kendaraan = $(this).data("id");
+        var nama_kendaraan = $(this).data("nama");
+        Swal.fire({
+            title: 'Anda yakin?',
+            text: "Yakin Mengembalikan " + nama_kendaraan + "!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, Kembalikan data!',
+            cancelButtonText: 'Tidak, Batalkan!',
+        }).then((result) => {
+            if (result.value) {
+                $.ajax({
+                    url: $("#createKendaraanForm").data('url') + 'unarsip/',
+                    data: {
+                        csrfmiddlewaretoken: getCookie('csrftoken'),
+                        id: id_kendaraan
+                    },
+                    type: 'post',
+                    dataType: 'json',
+                    success: function(response) {
+                        tampilkan_pesan(response.msg, response.type);
+                        table.ajax.reload();
+                    },
+                    error: function(xhr, status, error) {
+                        var error_response = xhr.responseJSON;
+                        tampilkan_pesan(error_response.msg, error_response.type);
+                    }
+                });
+
+            }
+        })
+    });
+
+
+    //EDIT DATA SHOW
+    $('body').on('click', '.editKendaraan', function(event) {
+        event.preventDefault();
+        $("#createKendaraanForm")[0].reset();
+        document.getElementById("inputToko").innerHTML = '';
+        document.getElementById("inputGudang").innerHTML = '';
+        document.getElementById("select2-inputToko-container").innerHTML = '';
+        document.getElementById("select2-inputGudang-container").innerHTML = '';
+        $("#updateButton").prop("disabled", false);
+        var id_kendaraan = $(this).data("id");
+        $.ajax({
+            url: $("#createKendaraanForm").data('url') + 'detail/',
+            type: 'get',
+            data: {
+                csrfmiddlewaretoken: getCookie('csrftoken'),
+                id: id_kendaraan
+            },
+            success: function(response) {
+                document.getElementById("id").value = response.data.id;
+                document.getElementById("inputNama").value = response.data.nama_kendaraan;
+                document.getElementById("inputNo").value = response.data.no_kendaraan;
+                document.getElementById("inputJenisKendaraan").value = response.data.jenis_kendaraan;
+                document.getElementById("inputKapasitas").value = response.data.kapasitas_tank;
+                document.getElementById("inputBahanBakar").value = response.data.bahan_bakar;
+
+                document.getElementById("inputGudang").value = response.data.id_gudang;
+                document.getElementById("inputToko").value = response.data.id_toko;
+                document.getElementById("id_kendaraan").value = response.data.id_kendaraan;
+
+                if (response.data.id_gudang != '' && response.data.id_toko == '') {
+                    document.getElementById("inputToko").disabled = true;
+                    document.getElementById("select2-inputGudang-container").innerHTML = response.data.nama_gudang;
+                } else {
+                    document.getElementById("inputToko").disabled = false;
+                }
+
+                if (response.data.id_toko != '' && response.data.id_gudang == '') {
+                    document.getElementById("inputGudang").disabled = true;
+                    document.getElementById("select2-inputToko-container").innerHTML = response.data.nama_toko;
+                } else {
+                    document.getElementById("inputGudang").disabled = false;
+                }
+
+                document.getElementById("inputNama").disabled = false;
+                document.getElementById("inputNo").disabled = false;
+                document.getElementById("inputJenisKendaraan").disabled = false;
+                document.getElementById("inputKapasitas").disabled = false;
+                document.getElementById("inputBahanBakar").disabled = false;
+
+
+                document.getElementById("updateButton").style.display = "block";
+                document.getElementById("createButton").style.display = "none";
+                document.getElementById("title_modal").innerHTML = "Edit Data Kendaraan";
+
+                $('#modal_kendaraan').modal('show');
+                check_user_login();
+            }
+        })
+
+    });
+
+
+    // Update action
+    $("#updateButton").click(function(e) {
+        e.preventDefault();
+        $("#updateButton").prop("disabled", true);
+        var serializeData = $("#createKendaraanForm").serialize();
+
+        $.ajax({
+            url: $("#createKendaraanForm").data('url') + 'update/',
+            data: serializeData,
+            type: 'post',
+            cache: false,
+            success: function(response) {
+                table.ajax.reload();
+                $('#modal_kendaraan').modal('hide');
+                tampilkan_pesan(response.msg, response.type);
+                $("#createKendaraanForm")[0].reset();
+                $("#updateButton").prop("disabled", false);
+
+            },
+            error: function(xhr, status, error) {
+                var error_response = xhr.responseJSON;
+
+                tampilkan_pesan(error_response.msg, error_response.type);
+                $("#updateButton").prop("disabled", false);
+            },
+        })
+
+
+    });
+
+
+    $('#modal_kendaraan').on('hide.bs.modal', function() {
+        setTimeout(function() {
+            var validator = $("#createKendaraanForm").validate();
+            validator.resetForm();
+
+        })
+    });
+
+
+    $('#inputGudang').on('change', function() {
+        var value_gudang = document.getElementById("inputGudang").value;
+        if (value_gudang) {
+            document.getElementById("inputToko").value = "";
+            document.getElementById("inputToko").disabled = true;
+        } else {
+            document.getElementById("inputToko").value = "";
+            document.getElementById("inputToko").disabled = false;
+        }
+    });
+
+    $('#inputToko').on('change', function() {
+        var value_toko = document.getElementById("inputToko").value;
+        if (value_toko) {
+            document.getElementById("inputGudang").value = "";
+            document.getElementById("inputGudang").disabled = true;
+        } else {
+            document.getElementById("inputGudang").value = "";
+            document.getElementById("inputGudang").disabled = false;
+        }
+    });
+
+
+});
+</script>
+{% endblock %}

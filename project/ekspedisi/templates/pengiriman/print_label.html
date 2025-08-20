@@ -1,0 +1,244 @@
+{% load static %}
+{% load humanize %}
+{% load qr_code %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title></title>
+    <style type="text/css">
+    @page {
+        size: A5;
+        /* can use also 'landscape' for orientation */
+        width: 14.8 cm;
+        height: 21 cm;
+        margin-bottom: 5px;
+        margin-left: 5px;
+        margin-right: 5px;
+        margin-top: 5px;
+        border: 1px solid black;
+    }
+
+    #main {
+        font-size: 10px;
+    }
+
+    /*table, th, td {
+	  border: 1px solid black;
+	  border-collapse: collapse;
+	}*/
+
+
+    .rotate90 {
+        -webkit-transform: rotate(90deg);
+        -moz-transform: rotate(90deg);
+        -o-transform: rotate(90deg);
+        -ms-transform: rotate(90deg);
+        transform: rotate(90deg);
+    }
+    .page-break {
+        page-break-after: always;
+    }
+    </style>
+</head>
+
+<body>
+    {% if user and user.role or user and user.is_staff %}
+        {% for x in '01'|make_list %}
+        <div class="page-break">
+            <!-- Logo dan Pengirim -->
+            <table>
+                <tbody>
+                    <tr style="border-bottom: 1px solid black;">
+                        <td style="border-right: 1px solid black; width: 40%; padding-bottom: 2px; padding-left: 2px; padding-right: 2px; padding-top: 2px;">
+                            <center>
+                                <img src="https://ekspedisi.bithouse.id/static/frontend/img/baligo.png" style="width: auto; height: 50px;">
+                            </center>
+                        </td>
+                        <td style="width: 60%; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; padding-top: 5px;">
+                            <p><span style="font-size:5;">Pengirim:</span><br>
+                                {{data.nama_pengirim}}<br>
+                                {{data.alamat_pengirim|title|add:','}} <br> {{data.desa_pengirim|title|add:','}} {{data.kecamatan_pengirim|title|add:','}}
+                                {{data.kota_pengirim|title|add:','}} {{data.provinsi_pengirim|title|add:','}} {{data.kode_pos_pengirim|title}} 
+                                {% comment %}
+                                <br> {{data.alamat_pengirim|title}}
+                                {% endcomment %}
+                                <br> {{data.no_telp_pengirim}}</p>
+                        </td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid black;">
+                    	<td style="width: 40%; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; padding-top: 5px;">
+                    		<img src="{{barcode}}" style="width: 180px; height: 100px;">
+                    	</td>
+                    	<td style="width: 60%;padding-bottom: 5px; padding-left: 5px; padding-right: 5px; padding-top: 5px;">
+                    		<p><span style="font-size:6;"><b>Penerima:</b></span><br>
+                                <span style="font-size:4;"><b>{{data.nama_penerima}}<br>
+                                    {{data.alamat_penerima|title|add:','}} <br> {{data.desa_penerima|title|add:','}} {{data.kecamatan_penerima|title|add:','}}
+                                    {{data.kota_penerima|title|add:','}} {{data.provinsi_penerima|title|add:','}} {{data.kode_pos_penerima|title}} 
+                                    {% comment %}
+                                    <br> {{data.alamat_penerima|title}}
+                                    {% endcomment %}
+                                    <br>{{data.no_telp_penerima}}</b></span></p>
+                    	</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid black;">
+                    	<td style="width: 50%; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; padding-top: 5px;">
+                    		RESI:<br><br><span style="font-size:6;"><b>{{data.id_pengiriman}}</b></span>
+                    	</td>
+                    	<td style="text-align: right; width: 50%; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; padding-top: 5px;">
+                    		Tanggal Kirim: {{data.created_at}}
+                    	</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid black;">
+                    	<td style="width: 50%; border-right: 1px solid black; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; padding-top: 5px;">
+                    		Jenis Pengiriman: <b style="font-size: 12px;">{{data.layanan}}</b> <br>Berat: <b style="font-size: 12px;">{{data.berat}} Kg</b>
+                    	</td>
+                    	<td style="width: 50%; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; padding-top: 5px;">
+                    		Ongkir: Rp. {{data.total_tarif|intcomma}}
+                    	</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid black;">
+                    	<td style="width: 50%; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; padding-top: 5px;">
+                    		<table>
+                    			<tbody>
+                    				<tr>
+                    					<td style="border-bottom: 1px solid black; text-align: center; padding-bottom: 1px; padding-left: 1px; padding-right: 1px;">
+                    						Penerima:
+                    						<br>
+                    						<br>
+                    						<br>
+                    						<br>
+                    						<br>
+                    						(     Nama & TTD     )
+                    					</td>
+                    				</tr>
+                    				<tr>
+                    					<td style="padding-bottom: 1px; padding-left: 1px; padding-right: 1px; padding-top: 2px;">
+                    						Delivery Instruction: <br>
+                    						Harap Tetap mengikuti protokol<br>
+                    						Kesehatan saat menerima paket.
+                    					</td>
+                    				</tr>
+                    			</tbody>
+                    		</table>
+                    	</td>
+                    	<td id="qr_print" style="border-left: 1px solid black; text-align: center; width: 50%; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; padding-top: 5px;">
+                    		<img src="{{qrcode}}" style="width: 150px; height: 150px">
+                    	</td>
+                    </tr>
+
+                    <tr>
+                    	<td colspan="2" style="padding-bottom: 5px; padding-left: 5px; padding-right: 5px; padding-top: 5px;">
+                    		CATATAN:
+                    	</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- End Logo dan Pengirim -->
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="page-break">
+            <!-- Logo dan Pengirim -->
+            <table>
+                <tbody>
+                    <tr style="border-bottom: 1px solid black;">
+                        <td style="border-right: 1px solid black; width: 40%; padding-bottom: 2px; padding-left: 2px; padding-right: 2px; padding-top: 2px;">
+                            <center>
+                                <img src="https://ekspedisi.bithouse.id/static/frontend/img/baligo.png" style="width: auto; height: 50px;">
+                            </center>
+                        </td>
+                        <td style="width: 60%; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; padding-top: 5px;">
+                            <p><span style="font-size:5;">Pengirim:</span><br>
+                                {{data.nama_pengirim}}<br>
+                                {{data.alamat_pengirim|title|add:','}} <br> {{data.desa_pengirim|title|add:','}} {{data.kecamatan_pengirim|title|add:','}}
+                                {{data.kota_pengirim|title|add:','}} {{data.provinsi_pengirim|title|add:','}} {{data.kode_pos_pengirim|title}} 
+                                {% comment %}
+                                <br> {{data.alamat_pengirim|title}}
+                                {% endcomment %}
+                                <br> {{data.no_telp_pengirim}}</p>
+                        </td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid black;">
+                        <td style="width: 40%; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; padding-top: 5px;">
+                            <img src="{{barcode}}" style="width: 180px; height: 100px;">
+                        </td>
+                        <td style="width: 60%;padding-bottom: 5px; padding-left: 5px; padding-right: 5px; padding-top: 5px;">
+                            <p><span style="font-size:6;"><b>Penerima:</b></span><br>
+                                <span style="font-size:4;"><b>{{data.nama_penerima}}<br>
+                                    {{data.alamat_penerima|title|add:','}} <br> {{data.desa_penerima|title|add:','}} {{data.kecamatan_penerima|title|add:','}}
+                                    {{data.kota_penerima|title|add:','}} {{data.provinsi_penerima|title|add:','}} {{data.kode_pos_penerima|title}} 
+                                    {% comment %}
+                                    <br> {{data.alamat_penerima|title}}
+                                    {% endcomment %}
+                                    <br>{{data.no_telp_penerima}}</b></span></p>
+                        </td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid black;">
+                        <td style="width: 50%; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; padding-top: 5px;">
+                            RESI:<br><br><span style="font-size:6;"><b>{{data.id_pengiriman}}</b></span>
+                        </td>
+                        <td style="text-align: right; width: 50%; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; padding-top: 5px;">
+                            Tanggal Kirim: {{data.created_at}}
+                        </td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid black;">
+                        <td style="width: 50%; border-right: 1px solid black; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; padding-top: 5px;">
+                            Jenis Pengiriman: <b style="font-size: 12px;">{{data.layanan}}</b> <br>Berat: <b style="font-size: 12px;">{{data.berat}} Kg</b>
+                        </td>
+                        <td style="width: 50%; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; padding-top: 5px;">
+                            Ongkir: Rp. {{data.total_tarif|intcomma}}
+                        </td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid black;">
+                        <td style="width: 50%; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; padding-top: 5px;">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <td style="border-bottom: 1px solid black; text-align: center; padding-bottom: 1px; padding-left: 1px; padding-right: 1px;">
+                                            Penerima:
+                                            <br>
+                                            <br>
+                                            <br>
+                                            <br>
+                                            <br>
+                                            (     Nama & TTD     )
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding-bottom: 1px; padding-left: 1px; padding-right: 1px; padding-top: 2px;">
+                                            Delivery Instruction: <br>
+                                            Harap Tetap mengikuti protokol<br>
+                                            Kesehatan saat menerima paket.
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                        <td id="qr_print" style="border-left: 1px solid black; text-align: center; width: 50%; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; padding-top: 5px;">
+                            <img src="{{qrcode}}" style="width: 150px; height: 150px">
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="2" style="padding-bottom: 5px; padding-left: 5px; padding-right: 5px; padding-top: 5px;">
+                            CATATAN:
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- End Logo dan Pengirim -->
+        </div>
+    {% endif %}
+    <script type="text/javascript" src="{% static 'assets/plugins/qrcode/qrcode.js' %}"></script>
+    <script type="text/javascript" src="{% static 'assets/custom_js/unduh_billing_pengiriman.js' %}"></script>
+    <script>
+    	// $(document).ready(function() {
+    	// 	makeCodeQR('hehehheehhe');
+    	// });
+	</script>
+</body>
+
+</html>

@@ -1,0 +1,168 @@
+{% extends '../base.html' %}
+{% load static %}
+{% load custom_filter %}
+{% load humanize %}
+
+{% block title_name %}
+ <title>Dashboard Detail | BaliGo Ekspedisi</title>
+{% endblock %}
+
+
+{% block file_css %}
+<!-- Daterange picker -->
+<link rel="stylesheet" href="{% static 'assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+<link rel="stylesheet" href="{% static 'assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+<link rel="stylesheet" href="{% static 'assets/plugins/daterangepicker/daterangepicker.css' %}">
+<!-- summernote -->
+<link rel="stylesheet" href="{% static 'assets/plugins/summernote/summernote-bs4.css' %}">
+<link rel="stylesheet" href="{% static 'assets/plugins/sweetalert2/sweetalert2.min.css' %}">
+<style>
+  #preview,
+  #preview-sampai{
+     width:100%;
+     height: auto;
+     margin:0px auto;
+  }
+  #table-history_length{
+    display: none !important;
+  }
+</style>
+{% endblock %}
+
+{% block nav_link %}
+  <a class="nav-link breadcrumb_mobile" href="{% url 'kurir_dashboard' %}">
+    <i class="fas fa-chevron-left"></i>&nbsp;&nbsp;{{ link_nav }}
+  </a>
+{% endblock nav_link %}
+
+
+{% block content %}
+<!-- /.modal -->
+<div class="modal fade" id="modal-scanner">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title" id="title_modal"><i class="fas fa-qrcode"></i>&nbsp;&nbsp;Scan Resi TTD</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body" id="scanner-body">
+				<video id="preview" style="height: 170px;overflow: hidden;object-fit: cover;"></video>
+			</div>
+      {% comment %}
+      <div class="play-pause-btn-mobile" style="top:15px; right:15px">
+        <button type="button" class="btn btn-default btn-switch-terima" data-camera="0">
+          <i class="fas fa-history"></i>
+        </button>
+      </div>
+      {% endcomment %}
+			<div class="modal-footer justify-content-between">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
+				
+			</div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<div class="card">
+  <!-- /.card-header -->
+  <div class="card-body">
+    <!-- ANY MESSAGE GOES HERE -->
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <!-- END MESSAGE -->
+    <!-- ISI DATA TABLE LIST GUDANG -->
+    <div class="text-center mb-3">
+      <h5 class="text-muted"><strong>Data {{ title }} Anda</strong></h5>
+    </div>
+    {% if data_log and data_log|length %}
+      <table id="table-history" class="table table-bordered table-stripped">
+        <thead>
+          <tr>
+            <th>Resi</th>
+            <th>Tanggal</th>
+            <th>Total Tarif</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for data in data_log %}
+            <tr class="text-center">
+              {% if data.id_order %}
+              <td>
+                {% url 'kurir_order_detail_view' data.id as order_detail %}
+								<a href="{{ order_detail }}">{{ data.id_order }}</a>
+              </td>
+              {% else %}
+              <td>
+                {% url 'kurir_pengiriman_detail_view' data.id as kirim_detail %}
+								<a href="{{ kirim_detail }}">{{ data.id_pengiriman }}</a>
+              </td>
+              {% endif %}
+              <td>{{ data.created_at|date:'d-m-Y H:i:s' }}</td>
+              <td>Rp. {{ data.total_tarif|intcomma }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+    <div class="text-center">
+      TIDAK ADA DATA
+    </div>
+    {% endif %}
+
+
+  </div>
+  <!-- /.card-body -->
+</div>
+{% endblock %}
+
+{% block file_js %}
+<!-- DataTables -->
+<script src="{% static 'assets/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+<!-- ChartJS -->
+<script src="{% static 'custom_js/instascan.min.js' %}"></script>
+<script src="{% static 'assets/plugins/sweetalert2/sweetalert2.min.js' %}"></script>
+<script>
+  $(function(){
+    $('#table-history thead th').each( function () {
+      var title = $(this).text();
+      $(this).html(`<p style="margin:5px">${title}</p><input type="text" placeholder="Cari Data.."/>` );
+    });
+
+    $('#table-history').DataTable({
+      "paging":   true,
+      "ordering": false,
+      "info":     false,
+      initComplete: function () {
+          // Apply the search
+          this.api().columns().every( function () {
+              var that = this;
+              $( 'input', this.header() ).on( 'keyup change clear', function () {
+                  if ( that.search() !== this.value ) {
+                      that
+                          .search( this.value )
+                          .draw();
+                  }
+              } );
+          } );
+      }
+    });
+  });
+</script>
+{% endblock file_js %}

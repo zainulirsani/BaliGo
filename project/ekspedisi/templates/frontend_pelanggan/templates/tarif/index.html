@@ -1,0 +1,581 @@
+{% extends '../base.html' %}
+{% load static %}
+{% block title_name %}
+<title>Cek Tarif | BaliGo Ekspedisi</title>
+{% endblock %}
+{% block file_css %}
+<!-- SweetAlert2 -->
+<link rel="stylesheet" href="{% static 'assets/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css' %}">
+<!-- Font Awesome -->
+<link rel="stylesheet" href="{% static 'assets/plugins/fontawesome-free/css/all.min.css' %}">
+<!-- Select2 -->
+<link rel="stylesheet" href="{% static 'assets/plugins/select2/css/select2.min.css' %}">
+<link rel="stylesheet" href="{% static 'assets/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
+<link href="{% static 'frontend/css/tarif.css' %}" rel="stylesheet">
+{% endblock %}
+{% block slider %}
+{% endblock %}
+{% block content %}
+<div class="container" style="margin-top: 100px; margin-bottom: 50px;">
+    <div class="row shadow" style="background-image: url({% static 'frontend/images/banners/track.webp'%}); background-size: 380px auto; background-repeat: no-repeat; background-position: right bottom;" id="backdrop_tarif">
+        <div class="col-md-4">
+            <div class="card_slider" style="transform: translateY(600px); animation: 1.2s slideIn ease-in-out forwards 1s;">
+                <div class="products_slider">
+                    <div class="product active" product-id="1" >
+                        <div class="thumbnail_slider"><img src="{% static 'frontend/img/features/search.png' %}" /></div>
+                        <h1 class="title_slider">Cek Tarif</h1>
+                        <p class="description_slider">Hey, dengan fitur ini anda mampu melihat daftar harga paket yang akan anda kirim, berikut beberapa layanan pengiriman kami, Klik Next ya!.</p>
+                    </div>
+                    <div class="product" product-id="2" >
+                        <div class="thumbnail_slider"><img src="{% static 'frontend/img/features/house.png' %}" /></div>
+                        <h1 class="title_slider">Reguler</h1>
+                        <p class="description_slider">Layanan pengiriman standar yang menjangkau ke seluruh wilayah Indonesia, dengan perkiraan waktu penyampaian kiriman 1-7 hari kerja, tergantung pada daerah yang menjadi tujuan pengiriman.</p>
+                    </div>
+                    <div class="product" product-id="3" >
+                        <div class="thumbnail_slider"><img src="{% static 'frontend/img/features/smartphone.png' %}" /></div>
+                        <h1 class="title_slider">YES <br>(Yakin Esok Sampai)</h1>
+                        <p class="description_slider">Layanan pengiriman premium dengan target kiriman sampai di tujuan pada keesokan harinya termasuk pada hari Minggu dan libur nasional.</p>
+                    </div>
+                    <div class="product" product-id="4" >
+                        <div class="thumbnail_slider"><img src="{% static 'frontend/img/features/archive.png' %}" /></div>
+                        <h1 class="title_slider">Trucking</h1>
+                        <p class="description_slider">Layanan pengiriman untuk barang dengan jumlah/berat besar terutama di atas 10 kg, dengan harga kompetitif yang memanfaatkan moda transportasi armada truk melalui darat dan laut.</p>
+                    </div>
+                    <div class="product" product-id="5">
+                        <div class="thumbnail_slider"><img src="{% static 'frontend/img/features/stopwatch.png' %}" /></div>
+                        <h1 class="title_slider">Same Day</h1>
+                        <p class="description_slider">Sameday Service merupakan layanan yang mampu mendukung kelancaran usaha pembisnis online dan pelaku UKM.</p>
+                    </div>
+                </div>
+                <div class="footer_slider"><a class="btn_slider" id="prev" href="#" ripple="" ripple-color="#666666">Prev</a><a class="btn_slider" id="next" href="#" ripple="" ripple-color="#666666">Next</a></div>
+            </div>
+        </div>
+        <div class="col-md-8" style="margin-top: 20px;">
+            <form action="" method="post" class="registration-form" id="formCekTarif" data-url_gudang="{% url 'gudang'%}" data-url_outlet="{% url 'toko'%}" data-url_tarif_kilometer="{% url 'tarif_kilometer' %}" data-url_tarif_gudang="{% url 'tarif_gudang'%}" data-url_tarif_layanan="{% url 'layanan_list'%}" data-url_tarif_berat="{% url 'tarif_berat'%}" data-nama_customer="{% if request.user.first_name != '' %}{{user.first_name}}{%else%}{{user.email}}{%endif%}" data-url_pengemasan="{% url 'pengemasan_select2' %}">
+                {% csrf_token %}
+                <div class="form-group row">
+                    <div class="col-sm-12">
+                        <input type="text" class="form-control input_field" id="inputAsal" name="alamat_asal" placeholder="Alamat Asal (Desa/Kelurahan, Kec., Kota/Kab., Provinsi)" required>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-12">
+                        <input type="text" class="form-control input_field" id="inputTujuan" name="alamat_tujuan" placeholder=" Alamat Tujuan (Desa/Kelurahan, Kec., Kota/Kab., Provinsi)" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="inputPengemasan">Pengemasan</label>
+                        <select class="input_field" id="inputPengemasan" name="pengemasan" style="transform: translateX(-600px); animation: 1.2s slideIn_x ease-in-out forwards 1s;">
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="inputBerat">BERAT</label>
+                        <input type="number" step="0.01" class="form-control input_field" id="inputBerat" name="berat" placeholder="Kilogram" required>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-12">
+                        <button id="tombol_cek" class="btn_cek_tarif" style="transform: translateX(-600px); animation: 1.2s slideIn_x ease-in-out forwards 1s;">CEK TARIF</button>
+                    </div>
+                </div>
+        </div>
+    </div>
+</div>
+<!-- Modal Loading -->
+<div class="modal fade" id="loadMe" tabindex="-1" role="dialog" aria-labelledby="loadMeLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <div class="loader"></div>
+                <div clas="loader-txt">
+                    <p>Please Wait. <br><br><small>Loading ...</small></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END Modal Loading -->
+<!-- /.modal -->
+<div class="modal fade" id="modal_tampil_hasil_tarif">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="title_modal">List Tarif</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div style="align-content: center;">
+                    <table class="table table-hover table-responsive">
+                        <thead>
+                            <tr>
+                                <th scope="col">No</th>
+                                <th scope="col">Jenis Pengiriman</th>
+                                <th scope="col">Harga</th>
+                                <th scope="col">Estimasi Waktu</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabel_hasil">
+                            <tr>
+                                <th scope="row">1</th>
+                                <td>Kosong</td>
+                                <td>Kosong</td>
+                                <td>Kosong</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-between" style="float: right;">
+                <button type="button" class="primary-btn float-right" data-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+{% endblock %}
+{% block file_js %}
+<!-- SweetAlert2 -->
+<script src="{% static 'assets/plugins/sweetalert2/sweetalert2.min.js' %}"></script>
+<!-- Select2 -->
+<script src="{% static 'assets/plugins/select2/js/select2.full.min.js' %}"></script>
+<script src="{% static 'frontend/js/slider_tarif.js' %}"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+
+    var html_loader = '<tr><td colspan="5"><div class="loader text-center"><div class="loader-inner"><div class="lds-roller mb-3"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div><h4 class="text-uppercase font-weight-bold">Silakan tunggu</h4></div></div></td></tr>';
+    var row_kosong = '<tr><th scope="row">1</th><td>Kosong</td><td>Kosong</td><td>Kosong</td><td>Kosong</td></tr>';
+    $("#formCekTarif")[0].reset();
+
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        onOpen: notificationOpenAction,
+        onClose: notificationCloseAction,
+    });
+
+    function notificationOpenAction(){
+        console.log('notif opened');
+        document.getElementsByClassName('mobile-nav-toggle')[0].style.display = 'none';
+    }
+
+    function notificationCloseAction(){
+        console.log('notif closed');
+        document.getElementsByClassName('mobile-nav-toggle')[0].style.display = 'block';
+    }
+
+    function tampilkan_pesan(pesan, type) {
+        Toast.fire({
+            icon: type,
+            title: pesan
+        })
+    }
+
+    $('#inputPengemasan').select2({
+        allowClear: true,
+        ajax: {
+            url: $("#formCekTarif").data('url_pengemasan'),
+            dataType: "json",
+            type: "GET",
+            delay: 250,
+            cache: false,
+            data: function(params) {
+                return {
+                    q: params.term,
+                    page: params.page || 1,
+                }
+            },
+            processResults: function(data, params) {
+                var page = params.page || 1;
+                return {
+                    results: $.map(data.results, function(item) {
+                        return {
+                            id: item.id,
+                            text: item.text
+                        }
+                    }),
+                    pagination: {
+                        more: data.total_count >= (page * 10)
+                    }
+                };
+            },
+        },
+        theme: 'bootstrap4',
+        placeholder: 'Kosongkan jika tidak ingin dikemas lagi',
+        language: "id"
+    });
+
+    function numberWithCommas(x) {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+    function process_str(msg) {
+        var out = msg.replace("_", " ");
+        var splitStr = out.toLowerCase().split(' ');
+        for (var i = 0; i < splitStr.length; i++) {
+            // You do not need to check if i is larger than splitStr length, as your for does that for you
+            // Assign it back to the array
+            splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);
+        }
+        // Directly return the joined string
+        return splitStr.join(' ');
+    }
+
+    function validation(id_input_field) {
+        var inpObj = document.getElementById(id_input_field);
+        if (!inpObj.checkValidity()) {
+            tampilkan_pesan(process_str(inpObj.name) + ' <= ' + inpObj.validationMessage, 'error');
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function hitung_jarak(lat1, lon1, lat2, lon2) {
+        var R = 6371; // Radius of the earth in km
+        var dLat = deg2rad(lat2 - lat1); // deg2rad below
+        var dLon = deg2rad(lon2 - lon1);
+        console.log('DLAT', dLat, 'DLONG', dLon);
+        var a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        var d = R * c;
+        return d //return km
+        // return d * 1000; //return meter
+    }
+
+    function deg2rad(deg) {
+        return deg * (Math.PI / 180);
+    }
+
+    function str2int(data) {
+        if (data == '') {
+            return 0;
+        } else {
+            return isNaN(parseInt(data)) ? 0 : parseInt(data);
+        }
+    }
+
+
+    async function get_coordinate(alamat_asal, alamat_tujuan) {
+        console.log("ASAL", alamat_asal, "TUJUAN", alamat_tujuan, "HEY")
+
+        var t_arr = alamat_asal.split(',');
+        var r_arr = alamat_tujuan.split(',');
+
+        let response_1 = await fetch('https://api.openrouteservice.org/geocode/search?api_key=5b3ce3597851110001cf62486f09c07e222343b09d62cf8daadf701d&text=' + t_arr[1].trim() + ',' + t_arr[2].trim() + ',' + t_arr[3].trim() + '&size=1&country=IDN');
+        // let response_1 = await fetch('https://api.openrouteservice.org/geocode/search?api_key=5b3ce3597851110001cf62486f09c07e222343b09d62cf8daadf701d&text=' + alamat_asal + '&size=1&country=IDN');
+
+        let response_2 = await fetch('https://api.openrouteservice.org/geocode/search?api_key=5b3ce3597851110001cf62486f09c07e222343b09d62cf8daadf701d&text=' + r_arr[1].trim() + ',' + r_arr[2].trim() + ',' + r_arr[3].trim() + '&size=1&country=IDN');
+        // let response_2 = await fetch('https://api.openrouteservice.org/geocode/search?api_key=5b3ce3597851110001cf62486f09c07e222343b09d62cf8daadf701d&text=' + alamat_tujuan + '&size=1&country=IDN');
+
+        /*
+        let response_1 = await fetch('https://api.openrouteservice.org/geocode/search?api_key=5b3ce3597851110001cf62486f09c07e222343b09d62cf8daadf701d&text=' + alamat_asal + '&size=1&country=IDN');
+
+        let response_2 = await fetch('https://api.openrouteservice.org/geocode/search?api_key=5b3ce3597851110001cf62486f09c07e222343b09d62cf8daadf701d&text=' + alamat_tujuan + '&size=1&country=IDN');
+        */
+        
+        let data_asal = await response_1.json();
+        let data_tujuan = await response_2.json();
+
+        console.log("LOC PENGIRIM", data_asal.features[0].geometry.coordinates, "LOC PENERIMA", data_tujuan.features[0].geometry.coordinates);
+        return {
+            asal: { koordinat: data_asal.features[0].geometry.coordinates, provinsi: data_asal.features[0].properties.region },
+            tujuan: { koordinat: data_tujuan.features[0].geometry.coordinates, provinsi: data_tujuan.features[0].properties.region }
+        };
+    }
+
+    async function hitung_tarif(obj_asal, obj_tujuan, berat) {
+        var api_key = '5b3ce3597851110001cf62486f09c07e222343b09d62cf8daadf701d';
+        var url_outlet = $("#formCekTarif").data('url_outlet');
+        var url_gudang = $("#formCekTarif").data('url_gudang');
+        var url_tarif_kilometer = $("#formCekTarif").data('url_tarif_kilometer');
+        var url_tarif_gudang = $("#formCekTarif").data('url_tarif_gudang');
+        var url_tarif_layanan = $("#formCekTarif").data('url_tarif_layanan');
+        var url_tarif_berat = $("#formCekTarif").data('url_tarif_berat');
+        var nama_customer = $("#formCekTarif").data('nama_customer');
+        var url_pengemasan = $("#formCekTarif").data('url_pengemasan');
+        var total_tarif_km = 0;
+        var html_hasil = '';
+
+        if (nama_customer == '') {
+            nama_customer = 'Customer Anonim';
+        }
+
+        // =========================================== Mendapatkan DATA OUTLET ===================================================
+        let response_outlet_1 = await fetch(url_outlet + obj_asal.koordinat[1] + '/' + obj_asal.koordinat[0] + '/'); //mencari outlet terdekat dengan asal
+        let response_outlet_2 = await fetch(url_outlet + obj_tujuan.koordinat[1] + '/' + obj_tujuan.koordinat[0] + '/'); //mencari outlet terdekat dengan tujuan
+
+        let data_outlet_1 = await response_outlet_1.json();
+        let data_outlet_2 = await response_outlet_2.json();
+
+        var outlet_1 = data_outlet_1.data.titik_lokasi;
+        var outlet_2 = data_outlet_2.data.titik_lokasi;
+
+        var lokasi_outlet_1 = outlet_1.split(","); //lat, long
+        var lokasi_outlet_2 = outlet_2.split(",");
+
+        // =========================================== Mendapatkan DATA GUDANG ===================================================
+        let response_gudang_1 = await fetch(url_gudang + lokasi_outlet_1[0] + '/' + lokasi_outlet_1[1] + '/');
+        let response_gudang_2 = await fetch(url_gudang + lokasi_outlet_2[0] + '/' + lokasi_outlet_2[1] + '/');
+
+        let data_gudang_1 = await response_gudang_1.json();
+        let data_gudang_2 = await response_gudang_2.json();
+        //console.log(data_gudang_1, data_gudang_2);
+
+        var lokasi_gudang_1 = data_gudang_1.data.titik_lokasi.split(","); //lat, long
+        var lokasi_gudang_2 = data_gudang_2.data.titik_lokasi.split(",");
+
+        console.log("LOKASI OUTLET 1", lokasi_outlet_1);
+        console.log("LOKASI OUTLET 2", lokasi_outlet_2);
+        console.log("LOKASI GUDANG 1", lokasi_gudang_1);
+        console.log("LOKASI GUDANG 2", lokasi_gudang_2);
+
+
+        // =========================================== Mendapatkan DATA JARAK ===================================================
+        //var jarak_1 = hitung_jarak(obj_asal.koordinat[1], obj_asal.koordinat[0], lokasi_outlet_1[0], lokasi_outlet_1[1]);
+        //var jarak_2 = hitung_jarak(obj_tujuan.koordinat[1], obj_tujuan.koordinat[0], lokasi_outlet_2[0], lokasi_outlet_2[1]);
+        // =========================================== Mendapatkan TARIF KILOMETER ==============================================
+        /*
+        var jarak_total = jarak_1 + jarak_2; //jarak total sudah ketemu tinggal hitung harganya lewat API
+        console.log('Jarak Total: ');
+        console.log(jarak_total);
+
+        let response_tarif_km = await fetch(url_tarif_kilometer + jarak_total + '/harga/');
+        var tarif_km = await response_tarif_km.json();
+        var total_tarif_km = tarif_km.harga;
+        console.log(tarif_km);
+        console.log('Tarif KM: ');
+        console.log(total_tarif_km);
+        */
+
+        // GUSTU TEST
+        /*
+        var url_api_penerima = "https://api.openrouteservice.org/v2/directions/driving-car?api_key=5b3ce3597851110001cf62486f09c07e222343b09d62cf8daadf701d&start=" + obj_tujuan.koordinat[0] + "," + obj_tujuan.koordinat[1] + "&end=" + lokasi_gudang_2[1] + "," + lokasi_gudang_2[0];
+        var url_api_pengirim = "https://api.openrouteservice.org/v2/directions/driving-car?api_key=5b3ce3597851110001cf62486f09c07e222343b09d62cf8daadf701d&start=" + obj_asal.koordinat[0] + "," + obj_asal.koordinat[1] + "&end=" + lokasi_gudang_1[1] + "," + lokasi_gudang_1[0];
+        */
+
+        var url_api_outlet_1_gudang_1 = "https://api.openrouteservice.org/v2/directions/driving-car?api_key=" + api_key + "&start=" + lokasi_outlet_1[1] + "," + lokasi_outlet_1[0] + "&end=" + lokasi_gudang_1[1] + "," + lokasi_gudang_1[0];
+        var url_api_gudang_1_gudang_2 = "https://api.openrouteservice.org/v2/directions/driving-car?api_key=" + api_key + "&start=" + lokasi_gudang_1[1] + "," + lokasi_gudang_1[0] + "&end=" + lokasi_gudang_2[1] + "," + lokasi_gudang_2[0];
+        var url_api_gudang_2_outlet_2 = "https://api.openrouteservice.org/v2/directions/driving-car?api_key=" + api_key + "&start=" + lokasi_gudang_2[1] + "," + lokasi_gudang_2[0] + "&end=" + lokasi_outlet_2[1] + "," + lokasi_outlet_2[0];
+        var url_api_outlet_2_loc_penerima = "https://api.openrouteservice.org/v2/directions/driving-car?api_key=" + api_key + "&start=" + lokasi_outlet_2[1] + "," + lokasi_outlet_2[0] + "&end=" + obj_tujuan.koordinat[0] + "," + obj_tujuan.koordinat[1];
+
+        // =========================================== Mendapatkan TARIF GUDANG ==============================================
+        var total_tarif_gd = 0;
+        let response_tarif_gd = await fetch(url_tarif_gudang + data_gudang_1.data.id + '/' + data_gudang_2.data.id + '/');
+        var tarif_gd = await response_tarif_gd.json();
+        if (tarif_gd.data){
+            total_tarif_gd = str2int(tarif_gd.data.tarif);
+        }else{
+            total_tarif_gd = 0;
+        }
+        
+        console.log(tarif_gd.data);
+        console.log('Tarif Gudang: ');
+        console.log(total_tarif_gd);
+
+        // =========================================== Mendapatkan TARIF berat ==============================================
+        if (berat == '') {
+            berat = 0;
+        }
+
+        try {
+            var beratCekOns = parseFloat("0" +parseFloat(berat).toFixed(1).slice(-2));
+            console.log("BERAT ONS", beratCekOns)
+            if(beratCekOns >= 0.1)
+                berat = Math.floor(parseFloat(berat)) + 1;
+            else 
+                berat = (parseInt(berat).toFixed(0))
+        } catch(error){
+            console.log(error);
+            berat = Math.round(parseFloat(berat));
+        }
+
+        console.log("BERAT", berat)
+        let response_tarif_vl = await fetch(url_tarif_berat + berat + '/harga/');
+        var tarif_vl = await response_tarif_vl.json();
+        var total_tarif_vl = tarif_vl.harga;
+        console.log('Tarif Berat: ');
+        console.log(total_tarif_vl);
+
+        // =========================================== Mendapatkan TARIF LAYANAN ==============================================
+        let response_tarif_ly = await fetch(url_tarif_layanan);
+        var tarif_ly = await response_tarif_ly.json();
+
+        // =========================================== Mendapatkan TARIF Pengemasan ==============================================
+        var total_tarif_pg = 0;
+        if (document.getElementById('inputPengemasan').value != '') {
+            let response_tarif_pg = await fetch(url_pengemasan + document.getElementById('inputPengemasan').value);
+            var tarif_pg = await response_tarif_pg.json();
+            total_tarif_pg = str2int(tarif_pg.data.tarif);
+            
+        } else {
+            total_tarif_pg = 0;
+        }
+
+        console.log('Tarif Pengemasan: ');
+        console.log(total_tarif_pg);
+        // ==================================== MENGHITUNG TARIF TOTAL TIAP LAYANAN ===========================================
+        try{
+            var outlet_1_gudang_1 = await fetch(url_api_outlet_1_gudang_1)
+            outlet_1_gudang_1 = await outlet_1_gudang_1.json();
+            var jarak_outlet_1_gudang_1 = outlet_1_gudang_1.features[0].properties.summary.distance;
+        }catch(error){
+            try {
+                var jarak_outlet_1_gudang_1 = hitung_jarak(lokasi_outlet_1[0], lokasi_outlet_1[1], lokasi_gudang_1[0], lokasi_gudang_1[1]);
+            } catch(error){
+                var jarak_outlet_1_gudang_1 = 0
+            }
+        }
+        console.log("JARAK OUTLET 1 GUDANG 1", jarak_outlet_1_gudang_1);
+
+        try{
+            var gudang_1_gudang_2 = await fetch(url_api_gudang_1_gudang_2)
+            gudang_1_gudang_2 = await gudang_1_gudang_2.json();
+            var jarak_gudang_1_gudang_2 = gudang_1_gudang_2.features[0].properties.summary.distance;
+        }catch(error){
+            try {
+                var jarak_gudang_1_gudang_2 = hitung_jarak(lokasi_gudang_2[0], lokasi_gudang_2[1], lokasi_gudang_1[0], lokasi_gudang_1[1]);
+            } catch(error){
+                var jarak_gudang_1_gudang_2 = 0
+            }
+        }
+        console.log("JARAK GUDANG 1 GUDANG 2", jarak_gudang_1_gudang_2);
+
+        try{
+            var gudang_2_outlet_2 = await fetch(url_api_gudang_2_outlet_2)
+            gudang_2_outlet_2 = await gudang_2_outlet_2.json();
+            var jarak_gudang_2_outlet_2 = gudang_2_outlet_2.features[0].properties.summary.distance;
+        }catch(error){
+            try {
+                var jarak_gudang_2_outlet_2 = hitung_jarak(lokasi_gudang_2[0], lokasi_gudang_2[1], lokasi_outlet_2[0], lokasi_outlet_2[1]);
+            } catch(error){
+                var jarak_gudang_2_outlet_2 = 0
+            }
+        }
+        console.log("JARAK GUDANG 2 OUTLET 2", jarak_gudang_2_outlet_2);
+
+        try{
+            var outlet_2_penerima = await fetch(url_api_outlet_2_loc_penerima)
+            outlet_2_penerima = await outlet_2_penerima.json();
+            var jarak_outlet_2_penerima = outlet_2_penerima.features[0].properties.summary.distance;
+        }catch(error){
+            try {
+                var jarak_outlet_2_penerima = hitung_jarak(lokasi_outlet_2[0], lokasi_outlet_2[1], obj_tujuan.koordinat[1], obj_tujuan.koordinat[0]);
+            } catch(error){
+                var jarak_outlet_2_penerima = 0
+            }
+        }
+        console.log("JARAK OUTLET 2 DAN PENERIMA", jarak_outlet_2_penerima);
+        
+        jarak_outlet_1_gudang_1 = typeof(jarak_outlet_1_gudang_1) !== "undefined" && !isNaN(jarak_outlet_1_gudang_1) ? jarak_outlet_1_gudang_1 : 0;
+        jarak_gudang_1_gudang_2 = typeof(jarak_gudang_1_gudang_2) !== "undefined" && !isNaN(jarak_gudang_1_gudang_2) ? jarak_gudang_1_gudang_2 : 0;
+        jarak_gudang_2_outlet_2 = typeof(jarak_gudang_2_outlet_2) !== "undefined" && !isNaN(jarak_gudang_2_outlet_2) ? jarak_gudang_2_outlet_2 : 0;
+        jarak_outlet_2_penerima = typeof(jarak_outlet_2_penerima) !== "undefined" && !isNaN(jarak_outlet_2_penerima) ? jarak_outlet_2_penerima : 0;
+
+
+        jarak_total = (jarak_outlet_1_gudang_1 + jarak_gudang_1_gudang_2 + jarak_gudang_2_outlet_2 + jarak_outlet_2_penerima) / 1000;
+        console.log("JARAK TOTAL", jarak_total);
+
+        let response_tarif_km = await fetch(url_tarif_kilometer + jarak_total + '/harga/')
+        let response_tarif_km_json = await response_tarif_km.json();
+        total_tarif_km = response_tarif_km_json.harga;
+        console.log('Tarif KM: ');
+        console.log(total_tarif_km);
+
+        /*
+        console.log("TARIF LY", tarif_ly);
+        }*/
+
+        for (var i = 0; i < tarif_ly.data.length; i++) {
+            var total_tarif = "-"
+            var tarif_estimasi = tarif_ly.data[i].estimasi ? tarif_ly.data[i].estimasi + " Hari" : "Belum tersedia";
+            if(tarif_ly.data[i].harga){
+                total_tarif = str2int(tarif_ly.data[i].harga) + total_tarif_km + total_tarif_gd + total_tarif_vl + total_tarif_pg;
+                total_tarif = numberWithCommas(total_tarif) ? numberWithCommas(total_tarif) : 0
+            }
+
+            html_hasil += '<tr><th scope="row">' + (i + 1) + '</th><td>' + tarif_ly.data[i].nama_layanan + '</td><td>' + total_tarif + '</td><td>' + tarif_estimasi + '</td></tr>';
+        }
+        
+
+        return {'html':html_hasil};
+        // END GUSTU TEST
+    }
+
+    $("#tombol_cek").click(function(e) {
+        e.preventDefault();
+        if (validation('inputAsal') && validation('inputTujuan') && validation('inputBerat')) {
+            $("#loadMe").modal({
+                backdrop: "static", //remove ability to close modal with click
+                keyboard: false, //remove option to close with keyboard
+                show: true //Display loader!
+            });
+            var data_asal = document.getElementById("inputAsal").value;
+            var data_tujuan = document.getElementById("inputTujuan").value;
+            var data_berat = document.getElementById("inputBerat").value;
+            let asal;
+            let tujuan;
+            let html_result;
+
+            // GET COORDINATE FROM ADDRESS
+            get_coordinate(data_asal, data_tujuan).then(function(data) {
+                asal = data.asal;
+                tujuan = data.tujuan;
+            }).then(function(){
+                hitung_tarif(asal, tujuan, data_berat)
+                .then(function(data){
+                    html_result = data.html;
+                }).then(function() {
+                    console.log(html_result);
+                    // SHOWING PRICES
+                    $("#loadMe").modal("hide");
+                    document.getElementById("tabel_hasil").innerHTML = html_result;
+                    $('#modal_tampil_hasil_tarif').modal('show');
+                }).catch((error) => {
+                    if(error){
+                        $("#loadMe").modal("hide");
+                        setTimeout(tampilkan_pesan('&emsp;Tidak dapat menemukan lokasi, <br> silahkan coba kembali', 'error'), 800);
+                    }
+                });
+
+            }).catch((error) => {
+                if(error){
+                    $("#loadMe").modal("hide");
+                    setTimeout(tampilkan_pesan('&emsp;Tidak dapat menemukan lokasi, <br> silahkan coba kembali', 'error'), 800);
+                }
+            });
+
+        } else {
+
+        }
+
+    });
+});
+</script>
+{% endblock %}

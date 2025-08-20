@@ -1,0 +1,183 @@
+{% extends '../base.html' %}
+{% load static %}
+{% block title_name %}
+<title>Kontak | BaliGo Ekspedisi</title>
+{% endblock %}
+{% block file_css %}
+<!-- SweetAlert2 -->
+<link rel="stylesheet" href="{% static 'assets/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css' %}">
+<link href="{% static 'frontend/css/kontak.css' %}" rel="stylesheet">
+{% endblock %}
+{% block slider %}
+{% endblock %}
+{% block content %}
+<!-- ======= Contact Section ======= -->
+<section id="contact" class="contact" style="margin-top: 100px;">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h1>Kontak Kami</h1>
+                <p>Punya pertanyaan seputar layanan kami? bisa datangi kantor kami atau hubungi kami pada form dibawah ini.</p>
+            </div>
+        </div>
+        <div class="row" data-aos="fade-in" style="margin-bottom: 30px;">
+            <div class="col-lg-5 d-flex align-items-stretch" style="margin-top: 1rem !important; transform: translateX(1300px); animation: 1.2s slideIn_x ease-in-out forwards 1s;">
+                <div class="info">
+                    <div class="address">
+                        <i class="icofont-google-map"></i>
+                        <h4>Alamat:</h4>
+                        <p>{{data.alamat}}</p>
+                    </div>
+                    <div class="email">
+                        <i class="icofont-envelope"></i>
+                        <h4>Email:</h4>
+                        <p>{{data.email}}</p>
+                    </div>
+                    <div class="phone">
+                        <i class="icofont-phone"></i>
+                        <h4>No.Hp:</h4>
+                        <p>{{data.no_tlp}}</p>
+                    </div>
+                    <div style="max-width: 100%; height: 290px; overflow:hidden; position: relative">
+                        <iframe scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?width=100%25&amp;height=600&amp;hl=en&amp;q=Jl.%20Tukad%20Batanghari%20No.%201C,%20Renon,%20Dauh%20Puri%20Klod,%20Kec.%20Denpasar%20Bar.,%20Kota%20Denpasar,%20Bali%2080234+(Samitra%20Ekspedisi)&amp;t=&amp;z=14&amp;ie=UTF8&amp;iwloc=B&amp;output=embed" frameborder="0" style="border:0; width: 100%; height: 100%;
+                        border-radius: 15px;
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        bottom: 0;
+                        right: 0;" allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-7 mt-5 mt-lg-0 d-flex align-items-stretch" style="transform: translateX(-1300px); animation: 1.2s slideIn_x ease-in-out forwards 1s;">
+                <form id="createKontakForm" method="post" data-url="{% url 'customer_kontak' %}" class="php-email-form">
+                    {% csrf_token %}
+                    {% for field in form %}
+                    {% if field.name != 'email'%}
+                    {% if field.name == 'nama' %}
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="{{ field.name }}">{{ field.label }}</label>
+                            {{ field }}
+                            <div class="validate"></div>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="{{ field.name }}">Email</label>
+                            <input type="email" name="email" class="form-control" placeholder="Masukan Email" required="" maxlength="100" id="id_email">
+                            <div class="validate"></div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="form-group">
+                        <label for="{{ field.name }}">{{ field.label }}</label>
+                        {{ field }}
+                        <div class="validate"></div>
+                    </div>
+                    {% endif %}
+                    {% endif %}
+                    {% endfor %}
+                    <div class="text-center"><button type="button" id="createButton">Kirim Pesan</button></div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section><!-- End Contact Section -->
+<!-- Modal Loading -->
+<div class="modal fade" id="loadMe" tabindex="-1" role="dialog" aria-labelledby="loadMeLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <div class="loader"></div>
+                <div clas="loader-txt">
+                    <p>Please Wait. <br><br><small>Loading ...</small></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END Modal Loading -->
+{% endblock %}
+{% block file_js %}
+<!-- SweetAlert2 -->
+<script src="{% static 'assets/plugins/sweetalert2/sweetalert2.min.js' %}"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+    $("#createKontakForm")[0].reset();
+
+    $('#id_no_hp').on('input', function() {
+        $(this).val($(this).val().replace(/[^0-9]/g, ''));
+    });
+
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000
+    });
+
+    function tampilkan_pesan(pesan, type) {
+        Toast.fire({
+            icon: type,
+            title: pesan
+        })
+    }
+
+    function validation(id_input_field) {
+        var inpObj = document.getElementById(id_input_field);
+        if (!inpObj.checkValidity()) {
+            tampilkan_pesan(' ' + inpObj.placeholder, 'error');
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+
+
+    $("#createButton").click(function(e) {
+
+        e.preventDefault();
+
+        if (validation('id_nama') && validation('id_email') && validation('id_no_hp') && validation('id_judul') && validation('id_pesan')) {
+            $("#loadMe").modal({
+                backdrop: "static", //remove ability to close modal with click
+                keyboard: false, //remove option to close with keyboard
+                show: true //Display loader!
+            });
+            $("#createButton").attr("disabled", true);
+            var serializeData = $("#createKontakForm")[0];
+            serializeData = new FormData(serializeData);
+
+            $.ajax({
+                url: $("#createKontakForm").data('url'),
+                data: serializeData,
+                type: 'post',
+                cache: false,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    setTimeout(function() {
+                        $("#loadMe").modal("hide");
+                        $("#createKontakForm")[0].reset();
+                        tampilkan_pesan(response.msg, response.type);
+                    }, 1000);
+                },
+                error: function(xhr, status, error) {
+                    var error_response = xhr.responseJSON;
+                    setTimeout(function() {
+                        $("#loadMe").modal("hide");
+                        $("#createKontakForm")[0].reset();
+                        tampilkan_pesan(error_response.msg, error_response.type);
+                    }, 1000);
+                },
+                done: function() {
+                    $("#createButton").attr("disabled", false);
+                    $("#loadMe").modal("hide");
+                }
+            })
+        }
+
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,184 @@
+{% extends '../base.html' %}
+{% load static %}
+{% block title_name %}
+<title>Reset Password | BaliGo Ekspedisi</title>
+{% endblock %}
+{% block file_css %}
+<link href="{% static 'frontend/css/about.css' %}" rel="stylesheet">
+<link href="{% static 'frontend/css/register.css' %}" rel="stylesheet">
+{% endblock %}
+{% block slider %}
+{% endblock %}
+{% block content %}
+<section id="about1" class="about about-1 pb-0">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12" id="form_login" style="width: 100%; height: auto;">
+                <div class="contact-panel contact-panel-2" style="background-image: url({% static 'frontend/gif/login.gif'%}); background-size: 230px auto; background-repeat: no-repeat; background-position: left 10px top 10px;; height: auto; background-color: #ffffff; border: 2px;">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h1 style="text-align: right;">Reset Password</h1>
+                            <p style="text-align: right; margin-bottom: 0px;">Silahkan isi password baru anda.</p>
+                            <hr class="new1" width="40%" style="float: right;">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <form id="formResetPassword" class="registration-form" data-url="{% url 'customer_reset_password' %}" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="id" value="{{user_id}}">
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label>Email</label>
+                                        <input type="email" name="email" class="form-control" placeholder="Masukkan Email Anda" required="" maxlength="50" id="id_email" value="{{user_email}}" readonly="">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label>Password</label>
+                                        <input type="password" name="password1" class="form-control" placeholder="Masukan password baru" required="" id="password1">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label>Konfirmasi password</label>
+                                        <input type="password" name="password2" class="form-control" placeholder="Masukan password kembali" required="" id="password2">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <div id="divCheckPasswordMatch"></div>
+                                    </div>
+                                </div>
+                                <button id="reset_password" class="primary-btn float-right" style="transform: translateX(-600px); animation: 1.2s slideIn_x ease-in-out forwards 1s;">Reset Password</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /.col-lg-6 -->
+        </div><!-- /.row -->
+    </div><!-- /.container -->
+</section><!-- /.About 1 -->
+<br>
+<br>
+<br>
+{% endblock %}
+{% block file_js %}
+<script type="text/javascript">
+$(document).ready(function() {
+
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function tampilkan_pesan(pesan, type) {
+        Toast.fire({
+            icon: type,
+            title: pesan
+        });
+    }
+
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000
+    });
+
+    $("#password2").keyup(checkPasswordMatch);
+    $("#password1").keyup(checkPasswordMatch);
+
+    function checkPasswordMatch() {
+        var password = $("#password1").val();
+        var confirmPassword = $("#password2").val();
+        if (password != '' && confirmPassword == '') {
+            $("#divCheckPasswordMatch").html("<p class=\"text-warning\">Silahkan input konfirmasi password juga!</p>");
+            return false;
+        } else if (password == '' && confirmPassword == '') {
+            $("#divCheckPasswordMatch").html("<p class=\"text-warning\">Silahkan input password baru anda!</p>");
+            return false;
+        } else {
+            if (password != confirmPassword) {
+                $("#divCheckPasswordMatch").html("<p class=\"text-danger\">Kata sandi tidak sesuai!</p>");
+                return false;
+
+            } else {
+                $("#divCheckPasswordMatch").html("<p class=\"text-success\">Kata sandi sesuai</p>");
+                return true;
+
+            }
+        }
+
+    }
+
+    $("#reset_password").click(function(e) {
+        e.preventDefault();
+        var password = $("#password1").val();
+        var confirmPassword = $("#password2").val();
+        if ((password == '' || confirmPassword == '') && checkPasswordMatch() == false) {
+            setTimeout(function() {
+                tampilkan_pesan('Silahkan masukan kata sandi baru anda', 'error');
+            }, 1000);
+        } else {
+            $("#reset_password").prop("disabled", true);
+            var serializeData = $("#formResetPassword")[0];
+            serializeData = new FormData(serializeData);
+            $.ajax({
+                url: $("#formResetPassword").data('url'),
+                data: serializeData,
+                type: 'post',
+                cache: false,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    setTimeout(function() {
+                        tampilkan_pesan(response.msg, response.type);
+                    }, 1000);
+                    $("#formResetPassword")[0].reset();
+                    $("#reset_password").prop("disabled", true);
+                    window.setTimeout(function() {
+                        window.location.href = response.url;
+                    }, 5000);
+
+                },
+                error: function(xhr, status, error) {
+                    // $('#modal_satuan').modal('hide');
+                    var error_response = xhr.responseJSON;
+                    setTimeout(function() {
+
+                        tampilkan_pesan(error_response.msg, error_response.type);
+                    }, 1000)
+                    $("#reset_password").prop("disabled", false);
+                    window.setTimeout(function() {
+                        window.location.href = error_response.url;
+                    }, 5000);
+
+                },
+            })
+
+        }
+    })
+
+});
+</script>
+{% endblock %}

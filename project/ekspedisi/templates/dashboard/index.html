@@ -1,0 +1,344 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title_name %}
+ <title>Dashboard | BaliGo Ekspedisi</title>
+{% endblock %}
+
+
+{% block file_css %}
+<!-- Daterange picker -->
+<link rel="stylesheet" href="{% static 'assets/plugins/daterangepicker/daterangepicker.css' %}">
+<!-- summernote -->
+<link rel="stylesheet" href="{% static 'assets/plugins/summernote/summernote-bs4.css' %}">
+{% endblock %}
+
+{% block content_header %}
+<div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <div class="px-2">
+          <h4 class="m-0 text-dark">Selamat Datang, <strong>{{ request.user|title }}</strong></h4>
+        </div>
+      </div><!-- /.col -->
+	    <div class="col-sm-6">
+	    	<ol class="breadcrumb float-sm-right">
+	    		<li class="breadcrumb-item"><a href="#">Home</a></li>
+	    		<li class="breadcrumb-item active">Dashboard</li>
+	    	</ol>
+	    </div><!-- /.col -->
+	</div><!-- /.row -->
+
+  {% if request.user and request.user.is_staff %}
+  {% comment %}
+  <div class="row mb-0">
+    <div class="col-12">
+        <div class="px-2 d-inline-block">
+          <div class="d-inline-block">
+            <select id="search-by" class="form-control select2" name="search-by">
+              <option value="" selected disabled>Filter Data Berdasarkan</option>
+              <option value="outlet">Outlet</option>
+              <option value="gudang">Gudang</option>
+            </select>
+          </div>
+        </div>
+        <div class="loader float-right px-2" hidden>
+          <img src="{% static 'assets/dist/img/loader.gif' %}" class="img img-responsive" style="max-width: 30px;">
+        </div>
+        <div class="filter-selected d-inline-block"></div>
+    </div>
+    {% if request.GET.search %}
+    <div class="col-12 mt-2">
+      <div class="px-2 row align-items-center">
+        <div class="d-inline-block px-2">
+          <a href="{% url 'dashboard' %}" class="btn btn-xs btn-danger text-white px-2"><i class="fa fa-times"></i></a> 
+        </div>
+        <div class="d-inline-block px-2">
+          <h6 class="text-muted mb-0">Filter Saat ini : ({{ request.GET.type|title }}) {{ request.GET.search }}</h6>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+  {% endcomment %}
+  {% endif %}
+
+</div><!-- /.container-fluid -->
+{% endblock %}
+
+{% block content %}
+{% with superuser=request.user.is_superuser role_user=request.user.role active_user=request.user.is_active%}
+<section class="content">
+	<div class="container-fluid">
+		<div class="row">
+          {% if role_user and role_user != 'adm_gudang' or superuser %}
+          <div class="col-lg-4 col-6">
+            <!-- small box -->
+            <div class="small-box bg-info">
+              <div class="inner">
+                <h3>{{total.pelanggan}}</h3>
+
+                <p>Total Pelanggan</p>
+              </div>
+              <div class="icon">
+                <i class="ion ion-person-add"></i>
+              </div>
+              {% if active_user and superuser or role_user == 'adm_outlet'%}
+              <a href="{% url 'pelanggan'%}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+              {% endif %}
+            </div>
+          </div>
+          {% endif %}
+          <!-- ./col -->
+          {% if role_user and role_user != 'adm_gudang' or superuser %}
+          <div class="col-lg-4 col-6">
+            <!-- small box -->
+            <div class="small-box bg-success">
+              <div class="inner">
+                <h3>{{total.kurir}}</h3>
+
+                <p>Total Kurir</p>
+              </div>
+              <div class="icon">
+                <i class="fas fa-people-carry"></i>
+              </div>
+              {% if active_user and superuser or role_user == 'adm_outlet' or role_user == 'adm_gudang'%}
+              <a href="{% url 'kurir'%}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+              {% endif %}
+            </div>
+          </div>
+          {% else %}
+          <div class="col-lg-6 col-6">
+            <!-- small box -->
+            <div class="small-box bg-success">
+              <div class="inner">
+                <h3>{{total.kurir}}</h3>
+
+                <p>Total Kurir</p>
+              </div>
+              <div class="icon">
+                <i class="fas fa-people-carry"></i>
+              </div>
+              {% if active_user and superuser or role_user == 'adm_outlet' or role_user == 'adm_gudang'%}
+              <a href="{% url 'kurir'%}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+              {% endif %}
+            </div>
+          </div>
+          {% endif %}
+          <!-- ./col -->
+
+          {% if role_user and role_user != 'adm_gudang' or superuser %}
+          <div class="col-lg-4 col-6">
+            <!-- small box -->
+            <div class="small-box bg-warning">
+              <div class="inner">
+                <h3>{{total.kendaraan}}</h3>
+
+                <p>Total Kendaraan</p>
+              </div>
+              <div class="icon">
+                <i class="fas fa-truck"></i>
+              </div>
+              {% if active_user and superuser or role_user == 'adm_outlet' or role_user == 'adm_gudang'%}
+              <a href="{% url 'kendaraan' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+              {% endif %}
+            </div>
+          </div>
+          <!-- ./col -->
+          {% else %}
+          <div class="col-lg-6 col-6">
+            <!-- small box -->
+            <div class="small-box bg-warning">
+              <div class="inner">
+                <h3>{{total.kendaraan}}</h3>
+
+                <p>Total Kendaraan</p>
+              </div>
+              <div class="icon">
+                <i class="fas fa-truck"></i>
+              </div>
+              {% if active_user and superuser or role_user == 'adm_outlet' or role_user == 'adm_gudang'%}
+              <a href="{% url 'kendaraan' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+              {% endif %}
+            </div>
+          </div>
+          {% endif %}
+
+        </div>
+
+
+        <div class="row">
+
+        	<!-- ./col -->
+          <div class="col-lg-6 col-6">
+            <!-- small box -->
+            <div class="small-box bg-danger">
+              <div class="inner">
+                <h3>{{total.pengiriman}}</h3>
+
+                <p>Total Proses Pengiriman</p>
+              </div>
+              <div class="icon">
+                <i class="fas fa-boxes"></i>
+              </div>
+              {% if active_user and superuser or role_user == 'adm_outlet' or role_user == 'adm_gudang' %}
+              <a href="{% url 'pengiriman' %}?status_pengiriman=0" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="col-lg-6 col-6">
+            <!-- small box -->
+            <div class="small-box bg-info">
+              <div class="inner">
+                <h3>{{total.pengiriman_selesai}}</h3>
+
+                <p>Total Proses Pengiriman Selesai</p>
+              </div>
+              <div class="icon">
+                <i class="fas fa-box-open"></i>
+              </div>
+              {% if active_user and superuser or role_user == 'adm_outlet' or role_user == 'adm_gudang' %}
+              <a href="{% url 'pengiriman' %}?status_pengiriman=1" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+              {% endif %}
+            </div>
+          </div>
+          
+        </div>
+	</div>
+</section>
+{% endwith %}
+{% endblock %}
+
+
+
+
+{% block file_js %}
+<!-- ChartJS -->
+<script src="{% static 'assets/plugins/chart.js/Chart.min.js' %}"></script>
+<!-- Sparkline -->
+<script src="{% static 'assets/plugins/sparklines/sparkline.js' %}"></script>
+<!-- JQVMap -->
+<script src="{% static 'assets/plugins/jqvmap/jquery.vmap.min.js' %}"></script>
+<script src="{% static 'assets/plugins/jqvmap/maps/jquery.vmap.usa.js' %}"></script>
+<!-- jQuery Knob Chart -->
+<script src="{% static 'assets/plugins/jquery-knob/jquery.knob.min.js' %}"></script>
+<!-- daterangepicker -->
+<script src="{% static 'assets/plugins/moment/moment.min.js' %}"></script>
+<script src="{% static 'assets/plugins/daterangepicker/daterangepicker.js' %}"></script>
+<!-- Tempusdominus Bootstrap 4 -->
+<script src="{% static 'assets/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js' %}"></script>
+<!-- Summernote -->
+<script src="{% static 'assets/plugins/summernote/summernote-bs4.min.js' %}"></script>
+<!-- overlayScrollbars -->
+<script src="{% static 'assets/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js' %}"></script>
+<!-- AdminLTE dashboard demo (This is only for demo purposes) -->
+<script>
+  $(function(){
+    $(document).on('change', '#search-by', function(){
+      var value = this.value ? this.value : '';
+      if(value){
+        $('.filter-selected').html('');
+        $('.loader').prop('hidden', true)
+        try{
+          $('.loader').prop('hidden', false);
+          setTimeout(function(){
+            if(value.trim() == 'outlet'){
+              $.ajax({
+                url : '/admin/api/toko',
+                type : 'GET',
+                success : function(res){
+                  if(res && res.length){
+                    var selectList = document.createElement("select");
+                    selectList.id = "selectOutlet";
+                    selectList.className = "form-control";
+                    selectList.name = "search-value";
+                    var default_option = document.createElement("option");
+                    default_option.value = '';
+                    default_option.text = 'Pilih Outlet';
+                    default_option.selected = true;
+                    default_option.disabled = true;
+                    selectList.appendChild(default_option);
+
+                    for( var i = 0; i<res.length; i++){
+                      var nama_toko = res[i]['nama_toko'] ? res[i]['nama_toko'] : 'unknown';
+                      var option = document.createElement("option");
+                      option.value = nama_toko;
+                      option.text = nama_toko;
+                      selectList.appendChild(option);
+                    }
+                    $('.filter-selected').append(selectList);
+                  }
+                },
+                error : function(xhr){
+                  console.log('Error Occured', xhr);
+                  document.getElementById('search-by').selectedIndex = '0';
+                  Swal.fire('Oops','Terjadi kesalahan, silahkan ulangi kembali','error');
+                },
+                complete : function(){
+                  {# Go back to default state when error #}
+                  try{
+                    $('.loader').prop('hidden', true);
+                  } catch(error) { $('.loader').prop('hidden', true); }
+                }
+              });
+            }
+            else if(value.trim() == 'gudang'){
+              $.ajax({
+                url : '/admin/api/gudang',
+                type : 'GET',
+                success : function(res){
+                  if(res && res.length){
+                    var selectList = document.createElement("select");
+                    selectList.id = "selectGudang";
+                    selectList.className = "form-control";
+                    selectList.name = "search-value";
+                    var default_option = document.createElement("option");
+                    default_option.value = '';
+                    default_option.text = 'Pilih Gudang';
+                    default_option.selected = true;
+                    default_option.disabled = true;
+                    selectList.appendChild(default_option);
+
+                    for( var i = 0; i<res.length; i++){
+                      var nama_toko = res[i]['nama_gudang'] ? res[i]['nama_gudang'] : 'unknown';
+                      var option = document.createElement("option");
+                      option.value = nama_toko;
+                      option.text = nama_toko;
+                      selectList.appendChild(option);
+                    }
+                    $('.filter-selected').append(selectList);
+                  }
+                },
+                error : function(xhr){
+                  console.log('Error Occured', xhr);
+                  document.getElementById('search-by').selectedIndex = '0';
+                  Swal.fire('Oops','Terjadi kesalahan, silahkan ulangi kembali','error');
+                },
+                complete : function(){
+                  {# Go back to default state when error #}
+                  try{
+                    $('.loader').prop('hidden', true);
+                  } catch(error) { $('.loader').prop('hidden', true); }
+                }
+              })
+            }
+          }, 1000)
+        } catch(error){
+          $('.loader').prop('hidden', true);
+          document.getElementById('search-by').selectedIndex = '0';
+        }
+      }
+    });
+  });
+
+  $(document).on('change','#selectOutlet',function(){
+    window.location.href = window.location.href.split('?')[0] + '?search=' + this.value + '&type=outlet';
+  });
+
+  $(document).on('change','#selectGudang',function(){
+    window.location.href = window.location.href.split('?')[0] + '?search=' + this.value + '&type=gudang';
+  })
+</script>
+
+{% endblock %}

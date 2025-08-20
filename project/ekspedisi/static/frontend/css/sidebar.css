@@ -1,0 +1,328 @@
+/*--------------------
+    Sidebar
+----------------------*/
+.sidebar {
+  position: relative;
+  margin-right: 20px;
+  z-index: 2;
+}
+
+.widget {
+  position: relative;
+  background-color: #ff2626;
+  padding: 40px;
+  margin-bottom: 40px;
+  border-radius: 5px;
+}
+
+.widget:last-child {
+  margin-bottom: 0;
+}
+
+.widget .widget__title {
+  font-size: 20px;
+  letter-spacing: 0.5px;
+  line-height: 1;
+  font-weight: 700;
+  margin-bottom: 30px;
+}
+
+.widget-search .widget__form-search {
+  position: relative;
+}
+
+.widget-search .widget__form-search .form-control {
+  background-color: #fff;
+}
+
+.widget-search .widget__form-search button {
+  position: absolute;
+  top: 0;
+  right: 15px;
+  width: auto;
+  color: #333333;
+}
+
+.widget-search .widget__form-search button:hover {
+  color: #49b44b;
+}
+
+.widget-categories ul {
+  background-color: #fff;
+  border-radius: 3px;
+}
+
+.widget-categories ul li a {
+  position: relative;
+  display: block;
+  padding: 0 20px;
+  color: #121c45;
+  line-height: 48px;
+  font-size: 16px;
+  font-weight: 700;
+  text-transform: capitalize;
+  border-bottom: 2px solid #f4f4f4;
+  -webkit-transition: all 0.3s linear;
+  -moz-transition: all 0.3s linear;
+  -ms-transition: all 0.3s linear;
+  -o-transition: all 0.3s linear;
+  transition: all 0.3s linear;
+}
+
+.widget-categories ul li a.active,
+.widget-categories ul li a:hover {
+  background-color: #49b44b;
+  color: #ffffff;
+}
+
+.widget-categories ul li:last-child a {
+  border-bottom: none;
+}
+
+.widget-tags ul {
+  display: flex;
+  display: -webkit-flex;
+  flex-wrap: wrap;
+}
+
+.widget-tags ul li a {
+  display: block;
+  font-size: 14px;
+  color: #9b9b9b;
+  line-height: 1;
+  text-transform: capitalize;
+  padding: 7px 9px;
+  border: 1px solid #ededed;
+  margin: 0 10px 10px 0;
+  -webkit-transition: all 0.4s ease;
+  -moz-transition: all 0.4s ease;
+  -ms-transition: all 0.4s ease;
+  -o-transition: all 0.4s ease;
+  transition: all 0.4s ease;
+}
+
+.widget-tags ul li a:hover {
+  background-color: #49b44b;
+  border-color: #49b44b;
+  color: #ffffff;
+}
+
+/*widget products*/
+.widget-poducts .widget-product-item {
+  display: flex;
+  margin-bottom: 30px;
+}
+
+.widget-poducts .widget-product-item:last-of-type {
+  margin-bottom: 0;
+}
+
+.widget-poducts .widget-product-item .widget__product-title {
+  font-size: 14px;
+  line-height: 23px;
+  margin-bottom: 0;
+  padding-top: 6px;
+}
+
+.widget-poducts .widget-product-item .widget__product-title a {
+  color: #282828;
+}
+
+.widget-poducts .widget-product-item:hover .widget__product-title a {
+  color: #49b44b
+}
+
+.widget-poducts .widget-product-item .widget__product-img {
+  margin-right: 20px;
+  width: 60px;
+  min-width: 60px;
+  height: 60px;
+  overflow: hidden;
+  border-radius: 50%;
+}
+
+.widget-poducts .widget-product-item .widget__product-img img {
+  width: 100%;
+  height: 100%;
+}
+
+.widget-poducts .widget-product-item .widget__product-price {
+  font-family: "Poppins", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/*widget posts*/
+.widget-posts .widget-post-item {
+  margin-bottom: 26px;
+}
+
+.widget-posts .widget-post-item:last-of-type {
+  margin-bottom: 0;
+}
+
+.widget-posts .widget-post-item .widget__post-title {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  margin-bottom: 0;
+}
+
+.widget-posts .widget-post-item .widget__post-title a {
+  color: #121c45;
+}
+
+.widget-posts .widget-post-item:hover .widget__post-title a {
+  color: #49b44b
+}
+
+.widget-posts .widget-post-item .widget__post-img {
+  margin-bottom: 19px;
+}
+
+.widget-posts .widget-post-item .widget__post-date {
+  line-height: 1;
+  font-size: 13px;
+  display: inline-block;
+  margin-bottom: 6px;
+}
+
+.widget-posts .widget-post-item .widget__post-cat {
+  margin-right: 20px;
+  margin-bottom: 7px;
+  line-height: 1;
+}
+
+.widget-posts .widget-post-item .widget__post-cat a {
+  position: relative;
+  font-size: 13px;
+  color: #49b44b
+  padding-right: 7px;
+}
+
+.widget-posts .widget-post-item .widget__post-cat a:hover {
+  color: #121c45;
+}
+
+.widget-posts .widget-post-item .widget__post-cat a:after {
+  content: ",";
+  position: absolute;
+  top: 0;
+  right: 2px;
+  color: #49b44b
+}
+
+.widget-posts .widget-post-item .widget__post-cat a:last-child {
+  padding: 0;
+}
+
+/* Widget Download */
+.widget-download {
+  overflow: hidden;
+  box-shadow: 0px 5px 83px 0px rgba(40, 40, 40, 0.08);
+}
+
+.widget-download::after {
+  content: "";
+  font-family: "icomoon";
+  position: absolute;
+  bottom: -278px;
+  right: -120px;
+  font-size: 350px;
+  color: #fff;
+  line-height: 1;
+  z-index: 1;
+  opacity: 0.1;
+}
+
+.widget-download .btn {
+  display: -webkit-flex;
+  display: flex;
+  align-items: center;
+  padding: 0 30px;
+  height: 64px;
+  position: relative;
+  z-index: 2;
+}
+
+.widget-download .btn:hover {
+  background-color: #ffffff;
+  border-color: #ffffff;
+  color: #49b44b
+}
+
+.widget-download .btn img {
+  width: 22px;
+  height: 24px;
+  margin-right: 10px;
+}
+
+.widget-help {
+  overflow: hidden;
+}
+
+.widget-help .widget__content h5 {
+  color: #ffffff;
+  font-weight: 500;
+  font-size: 25px;
+  line-height: 34px;
+  margin-bottom: 27px;
+}
+
+.widget-help .widget__content p {
+  color: #ffffff;
+  font-size: 14px;
+  line-height: 24px;
+  margin-bottom: 34px;
+}
+
+.widget-help .widget__content .btn {
+  height: 50px;
+  line-height: 48px;
+}
+
+/* Large Size Screens */
+@media only screen and (min-width: 992px) and (max-width: 1200px) {
+  .sidebar {
+    margin-right: 0;
+  }
+
+  .widget {
+    padding: 20px;
+    margin-bottom: 30px;
+  }
+
+  .widget-categories ul {
+    padding: 15px 20px;
+  }
+}
+
+/* Tablets and  Small Screens */
+@media only screen and (min-width: 576px) and (max-width: 767px) {
+  .widget {
+    padding: 25px;
+  }
+
+  .widget .widget__title {
+    margin-bottom: 25px;
+  }
+
+  .widget-categories ul {
+    padding: 20px 30px;
+  }
+}
+
+/* Mobile Phones and tablets */
+@media only screen and (min-width: 320px) and (max-width: 575px) {
+  .widget {
+    padding: 15px;
+  }
+
+  .widget .widget__title {
+    margin-bottom: 20px;
+  }
+
+  .widget-categories ul {
+    padding: 15px 25px;
+  }
+}

@@ -1,0 +1,269 @@
+{% extends '../base.html' %}
+{% load static %}
+{% block title_name %}
+<title>Register | BaliGo Ekspedisi</title>
+{% endblock %}
+{% block file_css %}
+<link href="{% static 'frontend/css/profile.css' %}" rel="stylesheet">
+{% endblock %}
+{% block slider %}
+{% endblock %}
+{% block content %}
+<section class="contact" style="margin-top: 60px;">
+    <div class="container">
+        <div class="row shadow">
+            <!-- Photo and name user -->
+            <div class="col-md-4 round animate_gradient">
+                <div class="row" style="margin-top: 20px;">
+                    <div class="col-md-12">
+                        <!-- Photo -->
+                        <div class="text-center">
+                            <img class="profile-user-img img-fluid img-circle" src="{% static 'frontend/img/user/1.png'%}" alt="User profile picture" width="160" height="160">
+                        </div>
+                    </div>
+                </div>
+                <div class="row" style="margin-top: 10px;">
+                    <div class="col-md-12">
+                        <div class="text-center">
+                            {{data.email}}
+                        </div>
+                        <div class="text-center" style="text-transform: uppercase; color: white;">
+                            <h3> Hello, {{data.name}}<h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Data User -->
+            <div class="col-md-8 mt-3">
+                <div class="row">
+                    <div class="col-md-12">
+                        {% if messages %}
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+                <form id="register-form" data-url_pelanggan="{% url 'pelanggan' %}" data-url_provinsi="{% url 'list_provinsi' %}" action="{% url 'customer_profile'%}" method="post" style="max-width: 100%;">
+                    {% csrf_token %}
+                    <input type="hidden" name="id" id="id_customer" value="{{data.id}}">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="id_username">Username</label>
+                            <input class="form-control" type="text" name="username" disabled="" id="id_username" value="{{data.username}}">
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="id_email">E-Mail</label>
+                            <input class="form-control" type="text" name="email" id="id_email" disabled="" value="{{data.email}}">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="id_nama">Nama</label>
+                            <input class="form-control" type="text" required name="name" id="id_nama" value="{{data.name}}">
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="id_no_telp">No. Hp</label>
+                            <input class="form-control" type="text" required name="no_hp" id="id_no_telp" value="{{data.no_hp}}">
+                        </div>
+                    </div>
+                    <div class="form-row form-group">
+                        <div class="col-md-12">
+                            <label for="id_alamat">Alamat</label>
+                            <textarea class="form-control" required name="alamat" rows="3" id="id_alamat">{{data.alamat}}</textarea>
+                            <input type="hidden" id="provinsi_id" value="{{ data.provinsi }}">
+                            <input type="hidden" id="kota_id" value="{{ data.kota }}">
+                            <input type="hidden" id="kecamatan_id" value="{{ data.kecamatan }}">
+                            <input type="hidden" id="desa_id" value="{{ data.desa }}">
+                            <input type="hidden" id="kode-pos_id" value="{{ data.kode_pos }}">
+
+
+                            <div class="form-group">
+                                <select name="provinsi" id="id-provinsi" required class="form-control">
+                                    <option value="" selected disabled>Provinsi</option>
+                                </select>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-6">
+                                    <select name="kota" id="id-kota" class="form-control">
+                                        <option value="">Kota</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-6">
+                                    <select name="kecamatan" id="id-kecamatan" class="form-control">
+                                        <option value="">Kecamatan</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-6">
+                                    <select name="desa" id="id-desa" class="form-control">
+                                        <option value="">Desa</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-6">
+                                    <select name="kode_pos" id="id-kode_pos" class="form-control">
+                                        <option value="">Kode POS</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="form-row form-group">
+                        <div class="col-md-4">
+                            <label for="id_password">Password</label>
+                        </div>
+                        <div class="col-md-8">
+                            <input class="form-control" type="password" name="password" id="id_password" placeholder="Kosongkan Jika Tidak Ingin Mengubah Password">
+                        </div>
+                    </div>
+                    <div class="form-row form-group">
+                        <div class="col-md-4">
+                            <label for="re_password">Konfirmasi Password</label>
+                        </div>
+                        <div class="col-md-8">
+                            <input class="form-control" type="password" name="re_password" id="re_password" placeholder="Kosongkan Jika Tidak Ingin Mengubah Password">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button class="btn_ubah animate_gradient" type="submit" id="buttonUpdate">SIMPAN PERUBAHAN</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% block file_js %}
+<script type="text/javascript">
+// Disable input alphabet just allowed numeric input
+$(document).ready(function() {
+    $('#id_no_telp').on('input', function() {
+        $(this).val($(this).val().replace(/[^0-9]/g, ''));
+    });
+
+    // disable_button_when_not_changes();
+
+    function disable_button_when_not_changes() {
+        let input_1 = document.getElementById("id_nama");
+        let input_2 = document.getElementById("id_no_telp");
+        let input_3 = document.getElementById("id_alamat");
+        let input_4 = document.getElementById("id_password");
+        let input_5 = document.getElementById("re_password");
+
+        let button = document.getElementById("buttonUpdate");
+        button.disabled = true;
+        input_1.addEventListener("keyup", stateHandle);
+        input_2.addEventListener("keyup", stateHandle);
+        input_3.addEventListener("keyup", stateHandle);
+        input_4.addEventListener("keyup", stateHandle);
+        input_5.addEventListener("keyup", stateHandle);
+
+        function stateHandle() {
+            if (
+                document.getElementById("id_nama").value == '{{data.name}}' &&
+                document.getElementById("id_no_telp").value == '{{data.no_hp}}' &&
+                document.getElementById("id_alamat").value == '{{data.alamat}}' &&
+                document.getElementById("id_password").value == '' &&
+                document.getElementById("re_password").value == ''
+            ) {
+                button.disabled = true;
+            } else {
+                button.disabled = false;
+            }
+        }
+    }
+
+    // function infoPelanggan(){
+    //     var id_pelanggan = $('#id_customer').val();
+    //     $.ajax({
+    //         url: $("#register-form").data('url_pelanggan') + 'detail/',
+    //         data: {
+    //             csrfmiddlewaretoken: getCookie('csrftoken'),
+    //             id: id_pelanggan
+    //         },
+    //         type: 'get',
+    //         success: function(response) {
+    //             $_provinsi = null;
+    //             try {
+    //                 $('#id-provinsi').val(null).trigger('change');
+    //                 $('#id-kota').val(null).trigger('change');
+    //                 $('#id-kecamatan').val(null).trigger('change');
+    //                 $('#id-desa').val(null).trigger('change');
+    //                 $('#id-kode_pos').val(null).trigger('change');
+                    
+    //                 $_provinsi = response.data.hasOwnProperty('detail_pelanggan') ? response.data.detail_pelanggan.provinsi : 0;
+    //                 if($_provinsi){
+    //                     setTimeout(function(){
+    //                         $('#id-provinsi').val($_provinsi).trigger('change');
+    //                     },200)
+    //                     setTimeout(function(){
+    //                         $('#id-kota').val('').trigger('change');
+    //                         $('#id-kecamatan').val('').trigger('change');
+    //                         $('#id-desa').val('').trigger('change');
+    //                         $('#id-kode_pos').val('').trigger('change');
+    //                     },400);
+    //                 }
+
+    //                 try {
+    //                     $_kota = response.data.hasOwnProperty('detail_pelanggan') ? response.data.detail_pelanggan.kota : 0;
+    //                     if($_kota){
+    //                         setTimeout(function(){
+    //                             $('#id-kota').val($_kota).trigger('change');
+    //                         },450);
+    //                     }
+    //                     setTimeout(function(){
+    //                         $('#id-kecamatan').val('').trigger('change');
+    //                         $('#id-desa').val('').trigger('change');
+    //                         $('#id-kode_pos').val('').trigger('change');
+    //                     },650)
+    //                 } catch(error){}
+
+    //                 try {
+    //                     $_kecamatan = response.data.hasOwnProperty('detail_pelanggan') ? response.data.detail_pelanggan.kecamatan : 0;
+    //                     if($_kecamatan){
+    //                         setTimeout(function(){
+    //                             $('#id-kecamatan').val($_kecamatan).trigger('change');
+    //                         },700);
+    //                     }
+    //                     setTimeout(function(){
+    //                         $('#id-desa').val('').trigger('change');
+    //                         $('#id-kode_pos').val('').trigger('change');
+    //                     },900)
+    //                 } catch(error){}
+
+    //                 try {
+    //                     $_desa = response.data.hasOwnProperty('detail_pelanggan') ? response.data.detail_pelanggan.desa : 0;
+    //                     if($_desa){
+    //                         setTimeout(function(){
+    //                             $('#id-desa').val($_desa).trigger('change');
+    //                         },950);
+    //                     }
+    //                     setTimeout(function(){
+    //                         $('#id-kode_pos').val('').trigger('change');
+    //                     },1150)
+    //                 } catch(error){}
+
+    //                 try {
+    //                     $_kodepos = response.data.hasOwnProperty('detail_pelanggan') ? response.data.detail_pelanggan.kode_pos : 0;
+    //                     if($_kodepos){
+    //                         setTimeout(function(){
+    //                             $('#id-kode_pos').val($_kodepos).trigger('change');
+    //                         },1200);
+    //                     }
+    //                 } catch(error){}
+    //             } catch(error){}
+    //         }
+    //     });
+    // }
+    // infoPelanggan();
+});
+</script>
+<script src="{% static 'custom_js/pelanggan_detailinfo.js' %}"></script>
+{% endblock %}

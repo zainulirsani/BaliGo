@@ -1,0 +1,215 @@
+/*-----------------------
+     fancybox 
+------------------------*/
+.fancybox-item {
+  position: relative;
+  margin-bottom: 30px;
+}
+
+.fancybox-item .fancybox__icon {
+  font-size: 45px;
+  line-height: 1;
+  color: #ff2626;
+  margin-bottom: 20px;
+  -webkit-transition: transform 0.3s ease;
+  -moz-transition: transform 0.3s ease;
+  -ms-transition: transform 0.3s ease;
+  -o-transition: transform 0.3s ease;
+  transition: transform 0.3s ease;
+}
+
+.fancybox-item .fancybox__icon i {
+  line-height: 1;
+}
+
+.fancybox-item .fancybox__title {
+  font-size: 17px;
+  line-height: 25px;
+  margin-bottom: 17px;
+  -webkit-transition: all 0.3s ease;
+  -moz-transition: all 0.3s ease;
+  -ms-transition: all 0.3s ease;
+  -o-transition: all 0.3s ease;
+  transition: all 0.3s ease;
+}
+
+.fancybox-item .fancybox__desc {
+  color: #747972;
+  font-size: 14px;
+  line-height: 24px;
+  margin-bottom: 0;
+}
+
+.fancybox-item:hover .fancybox__icon {
+  -webkit-animation: slideTopDown 1s infinite alternate;
+  -moz-animation: slideTopDown 1s infinite alternate;
+  -ms-animation: slideTopDown 1s infinite alternate;
+  -o-animation: slideTopDown 1s infinite alternate;
+  animation: slideTopDown 1s infinite alternate;
+}
+
+.fancybox-item:hover .fancybox__title {
+  color: #49b44b;
+}
+
+.fancybox-layout1 .fancybox-item {
+  margin-bottom: 60px;
+}
+
+.fancybox-layout2.row {
+  margin-left: -10px;
+  margin-right: -10px;
+}
+
+.fancybox-layout2.row>[class*=col-] {
+  padding-right: 10px;
+  padding-left: 10px;
+}
+
+.fancybox-layout2 .fancybox-item {
+  background-color: #f9f9f9;
+  border: 1px solid #eaeaea;
+  border-radius: 4px;
+  padding: 30px 5px 26px 25px;
+  margin-bottom: 20px;
+}
+
+.fancybox-layout2 .fancybox-item .fancybox__title {
+  font-size: 16px;
+  margin-bottom: 0;
+}
+
+.fancybox-layout2 .fancybox-item .fancybox__icon {
+  font-size: 45px;
+  margin-bottom: 18px;
+}
+
+.slider+.fancybox-layout3 {
+  margin-top: -50px;
+  z-index: 3;
+}
+
+.fancybox-layout3 .fancybox-boxes-wrap {
+  box-shadow: 0 5px 83px 0 rgba(40, 40, 40, 0.12);
+  border-radius: 5px;
+  background-color: #fff;
+}
+
+.fancybox-layout3 .fancybox-item {
+  padding: 38px 24px 40px 30px !important;
+  border-right: 2px solid #eaeaea;
+  margin-bottom: 0;
+  position: relative;
+  z-index: 10;
+}
+
+.fancybox-layout3 .fancybox-item:last-child {
+  border-right: none;
+}
+
+.fancybox-layout4 .fancybox-item {
+  padding: 30px 10px 30px 25px;
+  border: 1px solid rgb(81, 93, 106);
+  border-radius: 3px;
+}
+
+.fancybox-layout4 .fancybox-item .fancybox__title {
+  color: #ff2626;
+}
+
+.fancybox-carousel {
+  padding-bottom: 240px;
+}
+
+.fancybox-carousel .carousel-arrows .owl-nav .owl-prev,
+.fancybox-carousel .carousel-arrows .owl-nav .owl-next {
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+  border-radius: 50%;
+  border: 2px solid rgb(60, 53, 53);
+}
+
+.fancybox-carousel .carousel-arrows .owl-nav .owl-next:before {
+  content: "";
+  font-size: 10px;
+}
+
+.fancybox-carousel .carousel-arrows .owl-nav .owl-prev:before {
+  content: "";
+  font-size: 10px;
+}
+
+.fancybox-carousel+.request-quote-tabs {
+  margin-top: -160px;
+}
+
+@media only screen and (min-width: 1040px) {
+  .carousel-arrows .owl-nav .owl-next {
+    right: -70px;
+  }
+
+  .carousel-arrows .owl-nav .owl-prev {
+    left: -70px;
+  }
+}
+
+@media only screen and (min-width: 990px) and (max-width: 1040px) {
+  .fancybox-carousel .carousel-arrows .owl-nav .owl-next {
+    right: -40px;
+  }
+
+  .fancybox-carousel .carousel-arrows .owl-nav .owl-prev {
+    left: -40px;
+  }
+}
+
+/* Medium Size Screens */
+@media only screen and (min-width: 768px) and (max-width: 991px) {
+  .fancybox-carousel .carousel-arrows .owl-nav .owl-next {
+    right: -50px;
+  }
+
+  .fancybox-carousel .carousel-arrows .owl-nav .owl-prev {
+    left: -50px;
+  }
+
+  .fancybox-item .fancybox__icon {
+    margin-bottom: 10px;
+  }
+
+  .fancybox-item .fancybox__title {
+    margin-bottom: 12px;
+  }
+}
+
+/* Mobile Phones and tablets */
+@media only screen and (min-width: 320px) and (max-width: 767px) {
+
+  .fancybox-item,
+  .fancybox-layout1 .fancybox-item {
+    margin-bottom: 30px;
+  }
+
+  .fancybox-item .fancybox__icon {
+    font-size: 35px;
+    margin-bottom: 5px;
+  }
+
+  .fancybox-item .fancybox__title {
+    font-size: 16px;
+    margin-bottom: 5px !important;
+  }
+
+  .fancybox-layout2 .fancybox-item .fancybox__icon {
+    margin-bottom: 7px;
+  }
+
+  .fancybox-carousel .carousel-arrows .owl-nav .owl-next {
+    right: -50px;
+  }
+
+  .fancybox-carousel .carousel-arrows .owl-nav .owl-prev {
+    left: -50px;
+  }
+}

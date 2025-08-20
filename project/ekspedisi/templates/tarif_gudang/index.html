@@ -1,0 +1,481 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title_name %}
+<title>Tarif Gudang | BaliGo Ekspedisi</title>
+{% endblock %}
+{% block file_css %}
+<!-- DataTables -->
+<link rel="stylesheet" href="{% static 'assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+<link rel="stylesheet" href="{% static 'assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+<!-- SweetAlert2 -->
+<link rel="stylesheet" href="{% static 'assets/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css' %}">
+<!-- Select2 -->
+<link rel="stylesheet" href="{% static 'assets/plugins/select2/css/select2.min.css' %}">
+<link rel="stylesheet" href="{% static 'assets/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
+<style type="text/css">
+@media (max-width: 768px) {
+    #dari_gudang_th {
+        font-size: small;
+    }
+
+    #ke_gudang_th {
+        font-size: small;
+    }
+
+    .buttontext {
+        width: 95px;
+        overflow: hidden;
+        white-space: nowrap;
+        display: block;
+        text-overflow: ellipsis;
+    }
+}
+</style>
+{% endblock %}
+{% block content_header %}
+<div class="container-fluid">
+    <div class="row mb-2">
+        <div class="col-sm-6">
+            <h1 class="m-0 text-dark">Tarif Gudang</h1>
+        </div><!-- /.col -->
+        <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                <li class="breadcrumb-item active">Tarif Gudang</li>
+            </ol>
+        </div><!-- /.col -->
+    </div><!-- /.row -->
+</div><!-- /.container-fluid -->
+{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Data Tarif Gudang</h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-block bg-gradient-primary" id="createTarifGudang">
+                <span class="buttontext"><i class="fa fa-plus"></i>&nbsp; Tambah Tarif Gudang</span>
+            </button>
+        </div>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+        <table id="tarif_gudang" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>ID</th>
+                    <th id="dari_gudang_th">Dari Gudang</th>
+                    <th id="ke_gudang_th">Ke Gudang</th>
+                    <th>Tarif</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th>No</th>
+                    <th>ID</th>
+                    <th>Dari Gudang</th>
+                    <th>Ke Gudang</th>
+                    <th>Tarif</th>
+                    <th>Action</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <!-- /.card-body -->
+</div>
+<!-- /.modal -->
+<div class="modal fade" id="modal_tarif_gudang">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="title_modal">Detail Data Tarif Gudang</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="createTarifGudangForm" method="post" data-url="{% url 'tarif_gudang' %}" data-url_api_gudang="{% url 'gudang_select2' %}">
+                    {% csrf_token %}
+                    {% for field in form %}
+                    {% if not field.name == 'id_tarif_gudang' %}
+                    <div class="form-group row">
+                        <label for="{{ field.name }}" class="col-sm-2 col-form-label">{{ field.label }}</label>
+                        <div class="col-sm-10">
+                            {{ field }}
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                    <input type="hidden" name="id_tarif_gudang" id="id_tarif">
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
+                <button type="button" class="btn btn-primary" id="updateButton">Update</button>
+                <button type="button" class="btn btn-primary" id="createButton">Simpan</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+{% endblock %}
+{% block file_js %}
+<!-- Bootstrap 4 -->
+<script src="{% static 'assets/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<!-- DataTables -->
+<script src="{% static 'assets/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+<!-- SweetAlert2 -->
+<script src="{% static 'assets/plugins/sweetalert2/sweetalert2.min.js' %}"></script>
+<!-- Select2 -->
+<script src="{% static 'assets/plugins/select2/js/select2.full.min.js' %}"></script>
+<!-- jquery-mask -->
+<script src="{% static 'assets/plugins/jquery-mask/jquery.mask.js' %}"></script>
+<script>
+$(document).ready(function() {
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    var url_edit = '';
+
+    $('.tarif').mask('000.000.000', {
+        reverse: true
+    });
+
+    function remove_last_3_char(data) {
+        var newStr = data.substring(0, data.length - 3);
+        return newStr;
+    }
+
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function disable_button_when_not_changes(response) {
+        let input_1 = document.getElementById("inputTarif");
+        let button = document.getElementById("updateButton");
+        button.disabled = true;
+        input_1.addEventListener("keyup", stateHandle);
+        $("#inputFromGudang").on("change", stateHandle);
+        $("#inputToGudang").on("change", stateHandle);
+
+        function stateHandle() {
+            if (
+                ((($('.tarif').cleanVal() == remove_last_3_char(response.data.tarif)) || ($('.tarif').cleanVal() == '')) &&
+                    ((document.getElementById("inputFromGudang").value == response.data.from_gudang) || (document.getElementById("inputFromGudang").value == '')) &&
+                    ((document.getElementById("inputToGudang").value == response.data.to_gudang) || (document.getElementById("inputToGudang").value == ''))) || document.getElementById("inputFromGudang").value == '' || document.getElementById("inputToGudang").value == '' || document.getElementById("inputTarif").value == ''
+            ) {
+                button.disabled = true;
+            } else {
+                button.disabled = false;
+            }
+        }
+    }
+
+    $('#inputFromGudang').select2({
+        allowClear: true,
+        ajax: {
+            url: $("#createTarifGudangForm").data('url_api_gudang'),
+            dataType: "json",
+            type: "GET",
+            delay: 250,
+            cache: false,
+            data: function(params) {
+                return {
+                    q: params.term,
+                    page: params.page || 1,
+                }
+            },
+            processResults: function(data, params) {
+                var page = params.page || 1;
+                return {
+                    results: $.map(data.results, function(item) { return { id: item.id, text: item.text } }),
+                    pagination: {
+                        more: data.total_count >= (page * 10)
+                    }
+                };
+            },
+        },
+        theme: 'bootstrap4',
+        placeholder: 'Pilih Gudang Awal',
+        language: "id"
+    });
+
+    $('#inputToGudang').select2({
+        allowClear: true,
+        ajax: {
+            url: $("#createTarifGudangForm").data('url_api_gudang'),
+            dataType: "json",
+            type: "GET",
+            delay: 250,
+            cache: false,
+            data: function(params) {
+                return {
+                    q: params.term,
+                    page: params.page || 1,
+                }
+            },
+            processResults: function(data, params) {
+                var page = params.page || 1;
+                return {
+                    results: $.map(data.results, function(item) { return { id: item.id, text: item.text } }),
+                    pagination: {
+                        more: data.total_count >= (page * 10)
+                    }
+                };
+            },
+        },
+        theme: 'bootstrap4',
+        placeholder: 'Pilih Gudang Akhir',
+        language: "id"
+    });
+
+    function tampilkan_pesan(pesan, type) {
+        Toast.fire({
+            icon: type,
+            title: pesan
+        });
+    }
+
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000
+    });
+
+    var table = $('#tarif_gudang').DataTable({
+        "columns": [{
+                "width": "6%"
+            }, {
+                "width": "20%"
+            }, {
+                "width": "20%"
+            },
+            null,
+            null, {
+                "width": "16%"
+            },
+        ],
+        "paging": true,
+        "lengthChange": false,
+        "searching": true,
+        "ordering": true,
+        "info": true,
+        "autoWidth": false,
+        "responsive": true,
+        "processing": true,
+        "serverside": true,
+        "ajax": {
+            "url": $("#createTarifGudangForm").data('url'),
+            "type": "get"
+        }
+    });
+
+    //CREATE DATA (SHOW FORM)
+    $("#createTarifGudang").click(function(e) {
+        e.preventDefault();
+        $("#createTarifGudangForm")[0].reset();
+        $('#inputFromGudang').val(null).trigger('change');
+        $('#inputToGudang').val(null).trigger('change');
+        $("#createButton").prop("disabled", false);
+        document.getElementById("updateButton").style.display = "none";
+        document.getElementById("createButton").style.display = "block";
+        document.getElementById("title_modal").innerHTML = "Tambah Data Tarif Gudang";
+
+        $('#modal_tarif_gudang').modal('show');
+    });
+
+
+    // CREATE DATA ACTION
+    $("#createButton").click(function(e) {
+        if (!$("#createTarifGudangForm").valid()) return;
+
+        e.preventDefault();
+        $("#createButton").prop("disabled", true);
+        document.getElementById("inputTarif").value = $('.tarif').cleanVal();
+        var serializeData = $("#createTarifGudangForm")[0];
+        serializeData = new FormData(serializeData);
+
+        $.ajax({
+            url: $("#createTarifGudangForm").data('url'),
+            data: serializeData,
+            type: 'post',
+            cache: false,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                $('#modal_tarif_gudang').modal('hide');
+                setTimeout(function() {
+                    table.ajax.reload();
+                    tampilkan_pesan(response.msg, response.type);
+                }, 1000);
+                $("#createButton").prop("disabled", false);
+            },
+            error: function(xhr, status, error) {
+                // $('#modal_tarif_gudang').modal('hide');
+                setTimeout(function() {
+                    var error_response = xhr.responseJSON;
+                    tampilkan_pesan(error_response.msg, error_response.type);
+                }, 1000)
+                $("#createButton").prop("disabled", false);
+                // $("#createTarifGudangForm")[0].reset();
+            },
+        });
+    });
+
+    //BAGIAN DELETE
+    $('body').on('click', '.deleteTarifGudang', function() {
+        var id_tarif_gudang = $(this).data("id");
+        var from_gudang = $(this).data("from_gudang");
+        Swal.fire({
+            title: 'Anda yakin?',
+            text: "Yakin menghapus Tarif Dari Gudang : " + from_gudang + "!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!',
+        }).then((result) => {
+            if (result.value) {
+                $.ajax({
+                    url: id_tarif_gudang + '/delete/',
+                    data: {
+                        csrfmiddlewaretoken: getCookie('csrfToken'),
+                        id: id_tarif_gudang
+                    },
+                    type: 'post',
+                    dataType: 'json',
+                    success: function(response) {
+                        tampilkan_pesan(response.msg, response.type);
+                        table.ajax.reload();
+                    },
+                    error: function(xhr, status, error) {
+                        var error_response = xhr.responseJSON;
+                        tampilkan_pesan(error_response.msg, error_response.type);
+                    }
+                });
+
+            }
+        })
+    });
+
+
+    //EDIT DATA SHOW
+    $('body').on('click', '.editTarifGudang', function(event) {
+        event.preventDefault();
+        $("#createTarifGudangForm")[0].reset();
+        $("#updateButton").prop("disabled", false);
+        var id_tarif_gudang = $(this).data("id");
+        var inputFromGudangSelect = $('#inputFromGudang');
+        var inputToGudangSelect = $('#inputToGudang');
+        url_edit = id_tarif_gudang + "/update/";
+        $.ajax({
+            url: id_tarif_gudang + '/detail/',
+            type: 'get',
+            success: function(response) {
+                console.log(response);
+                disable_button_when_not_changes(response);
+                // document.getElementById("inputFromGudang").value = response.data.from_gudang;
+                var option_from = new Option(response.from_gudang.nama_gudang, response.from_gudang.id, true, true);
+                inputFromGudangSelect.append(option_from).trigger('change');
+                // document.getElementById("inputToGudang").value = response.data.to_gudang;
+                var option_to = new Option(response.to_gudang.nama_gudang, response.to_gudang.id, true, true);
+                inputToGudangSelect.append(option_to).trigger('change');
+                document.getElementById("inputTarif").value = $('.tarif').masked(remove_last_3_char(response.data.tarif));
+                // document.getElementById("inputTarif").value = response.data.tarif;
+                document.getElementById("id_tarif").value = response.data.id_tarif_gudang;
+
+                document.getElementById("inputFromGudang").disabled = false;
+                document.getElementById("inputToGudang").disabled = false;
+                document.getElementById("inputTarif").disabled = false;
+
+
+                document.getElementById("updateButton").style.display = "block";
+                document.getElementById("createButton").style.display = "none";
+                document.getElementById("title_modal").innerHTML = "Edit Data Tarif Gudang";
+
+                $('#modal_tarif_gudang').modal('show');
+            }
+        })
+
+    });
+
+
+    // Update action
+    $("#updateButton").click(function(e) {
+        e.preventDefault();
+        $("#updateButton").prop("disabled", true);
+        document.getElementById("inputTarif").value = $('.tarif').cleanVal();
+        var serializeData = $("#createTarifGudangForm").serialize();
+
+        $.ajax({
+            url: url_edit,
+            data: serializeData,
+            type: 'post',
+            cache: false,
+            success: function(response) {
+                table.ajax.reload();
+                $('#modal_tarif_gudang').modal('hide');
+                tampilkan_pesan(response.msg, response.type);
+                $("#createTarifGudangForm")[0].reset();
+        		$("#updateButton").prop("disabled", false);
+
+            },
+            error: function(xhr, status, error) {
+                var error_response = xhr.responseJSON;
+        		$("#updateButton").prop("disabled", false);
+
+                tampilkan_pesan(error_response.msg, error_response.type);
+            },
+        })
+
+
+    });
+
+
+    $('#modal_tarif_gudang').on('hide.bs.modal', function() {
+        setTimeout(function() {
+            var validator = $("#createTarifGudangForm").validate();
+            validator.resetForm();
+
+        })
+    });
+
+
+
+
+});
+</script>
+{% endblock %}

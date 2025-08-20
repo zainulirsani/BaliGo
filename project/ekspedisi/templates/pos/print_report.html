@@ -1,0 +1,126 @@
+{% load static %}
+{% load humanize %}
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>POS Print</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body style="align-content: center;">
+	<div class="container" style="margin: 5px; align-content: center;">
+
+		<div class="row">
+			<table>
+				<tr>
+					<th style="text-align: left;">
+						<img src="https://ekspedisi.bithouse.id/static/frontend/img/baligo.png" style="width: 120px; height: auto;">
+					</th>
+					<th style="text-align: center;">
+						<div style="font-size: 16px;">EKSPEDISI BALIGO</div>
+						<div style="font-size: 9px;">TRANSAKSI PENGIRIMAN</div>
+					</th>
+					<th style="text-align: right;">
+						<b>Tanggal :</b> {{ tanggal_print | date:"d/m/Y" }}
+					</th>
+				</tr>
+			</table>
+			<hr>
+		</div>
+
+		<div class="row">
+
+			<table>
+				<tbody>
+					<tr>
+						<td>Pelanggan</td>
+						<td style="width: 10px;">:</td>
+						<td style="text-align: left;">{{ pengiriman.nama_pengirim|default:"-" }}</td>
+						<td colspan="6"></td>
+					</tr>
+					<tr>
+						<td>Alamat</td>
+						<td style="width: 10px;">:</td>
+						<td style="text-align: left;">{{pengiriman.alamat_pengirim|default:"-"}}</td>
+						<td colspan="6"></td>
+					</tr>
+					<tr>
+						<td>No.Hp</td>
+						<td style="width: 10px;">:</td>
+						<td style="text-align: left;">{{pengiriman.no_pengirim|default:"-"}}</td>
+						<td colspan="6"></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		
+		<div class="row">
+			<div class="col-md-12">
+				<div class="table-responsive">
+					<table style="border: 1px solid black; border-collapse: collapse;">
+						<thead>
+							<tr class="text-center">
+								<th style="text-align: left; font-size: 12px; padding-top: 4px;">No</th>
+								<th style="text-align: left; font-size: 12px; padding-top: 4px;">Tanggal</th>
+								<th style="text-align: left; font-size: 12px; padding-top: 4px;">No. Transaksi</th>
+								<th style="text-align: left; font-size: 12px; padding-top: 4px;">No. Resi</th>
+								<th style="text-align: left; font-size: 12px; padding-top: 4px;">Nominal Transaksi</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% if data_pos %}
+								{% for data in data_pos %}
+								<tr>
+									<td style="text-align: left; padding-top: 4px;">{{ forloop.counter }}</td>
+									<td style="text-align: left; padding-top: 4px;">{{ data.created_at|date:"Y-m-d" }}</td>
+									<td style="text-align: left; padding-top: 4px;">{{ data.no_transaksi }}</td>
+									<td style="text-align: left; padding-top: 4px;">{{ data.id_pengiriman.id_pengiriman }}</td>
+									<!-- <td style="text-align: left; padding-top: 4px;">Rp. {{ data.total_tagihan|intcomma }}</td> -->
+									<td style="text-align: left; padding-top: 4px;">Rp. {{ data.id_pengiriman.total_tarif|intcomma }}</td>
+								</tr>
+								{% endfor %}
+							{% else %}
+								<tr>
+									<td colspan="5">Tidak ada data</td>
+								</tr>
+							{% endif %}
+						</tbody>
+						<tbody>
+							{% if data_pos %}
+							<br>
+							<tr>
+								<td colspan="4" style="text-align: center; padding-top: 4px; font-size: 16px;">
+									<b>Total Nominal Transaksi</b>
+								</td>
+								<td style="text-align: left; padding-top: 4px;"><h1>Rp. {{ total_all|intcomma }}</h1></td>
+							</tr>
+							{% endif %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<br>
+			<table>
+				<tbody>
+					<tr>
+						<td colspan="3"></td>
+						<td style="text-align: right;">Denpasar, {{ tanggal_print | date:"D d M Y"}}</td>
+					</tr>
+					<tr>
+						<td colspan="3"></td>
+						<td><br><br><br></td>
+					</tr>
+					<tr>
+						<td colspan="3"></td>
+						<td style="text-align: right;"> Ekspedisi BaliGo</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+	</div>
+</body>
+</html>

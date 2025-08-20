@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>404 | BaliGo Ekspedisi</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz:200,400'><link rel="stylesheet" href="{% static 'assets/dist/css/style_404.css' %}">
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<div class="page-wrapper">
+  <div class="circles-layer">
+    <div class="circle -white"></div>
+    <div class="circle -red"></div>
+    <div class="circle -white"></div>
+    <div class="circle -red"></div>
+  </div>
+  <div class="numbers-layer">
+    <div class="number">4</div>
+    <div class="number">4</div>
+    <div class="number">4</div>
+    <div class="number">4</div>
+    <div class="number">4</div>
+    <div class="number">4</div>
+    <div class="number">4</div>
+    <div class="number">4</div>
+    <div class="number -with-shadow">0</div>
+    <div class="number -with-shadow">0</div>
+    <div class="number -with-shadow">0</div>
+    <div class="number -with-shadow">0</div>
+  </div>
+  <div class="oops-message">
+    <div class="test">Opps... looks like You got lost</div><a class="button" onclick="goBack()">Go Back</a>
+  </div>
+</div>
+<!-- partial -->
+<script>
+function goBack() {
+  window.history.back();
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,542 @@
+{% load static %}
+{% load custom_filter %}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  {% block title_name %}
+  {% endblock title_name %}
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="{% static 'frontend/img/baligo-sidebar-collapse.png' %}">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="{% static 'assets/plugins/fontawesome-free/css/all.min.css' %}">
+  <!-- Ionicons -->
+  <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+  <!-- Tempusdominus Bbootstrap 4 -->
+  <link rel="stylesheet" href="{% static 'assets/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css' %}">
+  <!-- iCheck -->
+  <link rel="stylesheet" href="{% static 'assets/plugins/icheck-bootstrap/icheck-bootstrap.min.css' %}">
+  <!-- JQVMap -->
+  <link rel="stylesheet" href="{% static 'assets/plugins/jqvmap/jqvmap.min.css' %}">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="{% static 'assets/dist/css/adminlte.min.css' %}">
+  <link rel="stylesheet" href="{% static 'assets/dist/css/style.css' %}">
+
+  <!-- overlayScrollbars -->
+  <link rel="stylesheet" href="{% static 'assets/plugins/overlayScrollbars/css/OverlayScrollbars.min.css' %}">
+   <!-- SweetAlert2 -->
+  <link rel="stylesheet" href="{% static 'assets/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css' %}">
+  <style>
+    .brand-link .collapse-brand{
+      display: none !important;
+    }
+
+    body.sidebar-collapse .brand-link .collapse-brand{
+      display: block !important;
+      margin-left: .5rem;
+    }
+
+    body.sidebar-collapse .brand-link .normal-brand{
+      display: none !important;
+    }
+
+    body.sidebar-collapse .main-sidebar:hover{
+      background: #fff !important;
+    }
+
+    body.sidebar-collapse .main-sidebar:hover .brand-link .collapse-brand{
+      display: none !important;
+    }
+
+    body.sidebar-collapse .main-sidebar:hover .brand-link .normal-brand{
+      display: block !important;
+    }
+    
+    {# .btn-primary, .btn-info{
+      color: #fff;
+      background-color: #dc3545;
+      border-color: #dc3545;
+    }
+
+    .btn-danger{
+      background-color: #f8f9fa;
+      border-color: #ddd;
+      color: #444
+    } #}
+  </style>
+  {% block file_css %}
+          
+  {% endblock file_css %}
+  
+  <!-- Google Font: Source Sans Pro -->
+  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+</head>
+
+{% block custom_body %}
+<body class="hold-transition sidebar-mini layout-fixed">
+{% endblock custom_body %}
+
+{% block wrapper %}
+<div class="wrapper">
+
+  <!-- Navbar -->
+  <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+    <!-- Left navbar links -->
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i>{{ request.user|cek_posisi|safe }}</a>
+      </li>
+      
+    </ul>
+
+    <!-- Right navbar links -->
+    <ul class="navbar-nav ml-auto">
+      <!-- Notifications Dropdown Menu -->
+      <li class="nav-item dropdown">
+        <a class="nav-link" data-toggle="dropdown" href="#">
+          <i class="fas fa-user-cog"></i>&emsp;Akun Saya
+        </a>
+        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+          <span class="dropdown-item dropdown-header">Pengaturan</span>
+          <div class="dropdown-divider"></div>
+          <a href="{% url 'profile' %}" class="dropdown-item">
+            <i class="fas fa-users mr-2"></i> Profile User
+          </a>
+          {% comment %}
+          <div class="dropdown-divider"></div>
+          <a href="#" class="dropdown-item">
+            <i class="fas fa-envelope mr-2"></i> Pesan
+          </a>
+          {% endcomment %}
+          {% url 'logout' as logout_url %}
+          <div class="dropdown-divider"></div>
+          <button class="dropdown-item logout_btn">
+            <i class="fas fa-sign-out-alt mr-2"></i> Logout
+          </button>
+      </li>
+    </ul>
+  </nav>
+  <!-- /.navbar -->
+
+  <!-- Main Sidebar Container -->
+  <aside class="main-sidebar sidebar-light elevation-2">
+    <!-- Brand Logo -->
+    <a href="/" class="brand-link text-center bg-white">
+      {% comment %}
+      <img src="{% static 'assets/dist/img/logo.png' %}" alt="Logo" class="brand-image img-circle elevation-3"
+           style="opacity: .8">
+      <span class="brand-text font-weight-light"><b><span style="color: #55cb39">SA</span><span style="color: #399df2">MITRA</span></b> Ekspedisi</span>
+      {% endcomment %}
+
+      <img src="{% static 'frontend/img/baligo-sidebar-collapse.png' %}" alt="Logo" class="img-brand collapse-brand float-none brand-image"
+           style="opacity: .8;max-height: 50px">
+      <span class="brand-text font-weight-light"><b><span style="color: #55cb39">
+        <img style="max-height: 50px" class="brand-image normal-brand float-none" src="{% static 'frontend/img/baligo.png' %}" alt="logo ekspedisi">
+      </span>
+    </a>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <!-- Sidebar user panel (optional) -->
+      <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+        <div class="image">
+          <img src="{% static 'assets/dist/img/user2-160x160.jpg' %}" class="img-circle elevation-2' %}" alt="User Image">
+        </div>
+        <div class="info">
+          {% with request.user.username as name %}
+          <a href="#" class="d-block">{{ name }}</a>          
+          {% endwith %}
+        </div>
+      </div>
+      {% with superuser=request.user.is_superuser role_user=request.user.role active_user=request.user.is_active%}
+
+      <!-- Sidebar Menu -->
+      <nav class="mt-2">
+        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+          <!-- Add icons to the links using the .nav-icon class
+               with font-awesome or any other icon font library -->
+          {% url 'dashboard' as url %}
+          <li class="nav-item">
+            <a href="{% url 'dashboard' %}" class="nav-link {% if request.path == url %} active {% endif %}">
+              <i class="nav-icon fas fa-tachometer-alt"></i>
+              <p>
+                Dashboard
+              </p>
+            </a>
+          </li>
+          {% if active_user and superuser %}
+          {% url 'order_pickup' as url %}
+          <li class="nav-item">
+            <a href="{% url 'order_pickup' %}" class="nav-link {% if url in request.path %}active{% endif %}">
+              <i class="nav-icon fas fa-truck-pickup"></i>
+              <p>
+                Order Pick Up
+              </p>
+            </a>
+          </li>
+          {% endif %}
+
+          {% if active_user and role_user == 'adm_outlet' %}
+          {% url 'adm_outlet_order' as url %}
+          <li class="nav-item">
+            <a href="{% url 'adm_outlet_order' %}" class="nav-link {% if url in request.path %}active{% endif %}">
+              <i class="nav-icon fas fa-truck-pickup"></i>
+              <p>
+                Order Pick Up
+              </p>
+            </a>
+          </li>
+          {% endif %}
+
+          {% if active_user and superuser or role_user == 'adm_outlet' or role_user == 'adm_gudang' %}
+          {% url 'pengiriman' as url %}
+          <li class="nav-item">
+            <a href="{% url 'pengiriman' %}" class="nav-link {% if url in request.path %} active {% endif %}">
+              <i class="nav-icon fas fa-box-open"></i>
+              <p>
+                Pengiriman
+              </p>
+            </a>
+          </li>
+          {% endif %}
+
+          {% if active_user and superuser %}
+          {% url 'pos_list' as url_pos %}
+          <li class="nav-item">
+            <a href="{{ url_pos }}" class="nav-link {% if request.path == url_pos %} active {% endif %}">
+              <i class="nav-icon fas fa-money-bill-alt"></i>
+              <p>
+                Data Transaksi
+              </p>
+            </a>
+          </li>
+          {% endif %}
+
+          
+          
+          {% if active_user and superuser %}
+          <li class="nav-item has-treeview{% if 'tarif' in request.path %} menu-open {% elif 'extra' in request.path %} menu-open {% elif 'pengemasan' in request.path %} menu-open {% endif %}">
+            <a href="#" class="nav-link {% if 'tarif' in request.path %} active {% elif 'extra' in request.path %} active {% elif 'pengemasan' in request.path %} active {% endif %}">
+              <i class="nav-icon fas fa-dollar-sign"></i>
+              <p>
+                Tarif
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview" style="display: {% if 'tarif' in request.path %} block {% elif 'extra' in request.path %} block {% elif 'pengemasan' in request.path %} block {% else %} none {% endif %};">
+
+              <li class="nav-item">
+                {% url 'tarif_layanan' as url %}
+                <a href="{% url 'tarif_layanan' %}" class="nav-link {% if request.path == url %}active{% endif %}">
+                  <i class="nav-icon fas fa-cash-register"></i>
+                  <p>Tarif Layanan</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                {% url 'pengemasan' as url %}
+                <a href="{% url 'pengemasan' %}" class="nav-link {% if request.path == url %}active{% endif %}">
+                  <i class="nav-icon fas fa-box"></i>
+                  <p>
+                    Tarif Pengemasan
+                  </p>
+                </a>
+              </li>
+              <li class="nav-item">
+                {% url 'tarif_kilometer' as url %}
+                <a href="{% url 'tarif_kilometer' %}" class="nav-link {% if request.path == url %}active{% endif %}">
+                  <i class="nav-icon fas fa-map-marked-alt"></i>
+                  <p>Tarif Kilometer</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                {% url 'tarif_berat' as url %}
+                <a href="{% url 'tarif_berat' %}" class="nav-link {% if request.path == url %}active{% endif %}">
+                  <i class="nav-icon fas fa-weight"></i>
+                  <p>Tarif Berat</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                {% url 'tarif_gudang' as url %}
+                <a href="{% url 'tarif_gudang' %}" class="nav-link {% if request.path == url %}active{% endif %}">
+                  <i class="nav-icon fas fa-boxes"></i>
+                  <p>Tarif Gudang</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                {% url 'extra_cash' as url %}
+                <a href="{% url 'extra_cash' %}" class="nav-link {% if request.path == url %}active{% endif %}">
+                  <i class="nav-icon fas fa-wallet"></i>
+                  <p>Tarif Extra Cash</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+          {% endif %}
+
+
+          <!-- MASTER DATA -->
+          {% if active_user and superuser or role_user == 'adm_outlet' or role_user == 'adm_gudang' %}
+          {% url 'layanan' as url_layanan %}
+          <li class="nav-item has-treeview{% if request.path == url_layanan or 'personil' in request.path or 'kurir' in request.path or 'pelanggan' in request.path or 'kendaraan' in request.path or 'toko' in request.path or 'gudang' in request.path or 'satuan' in request.path or 'jenis_kiriman' in request.path %} menu-open {% endif %}">
+            <a href="#" class="nav-link {% if request.path == url_layanan or 'personil' in request.path or 'kurir' in request.path or 'pelanggan' in request.path or 'kendaraan' in request.path or 'toko' in request.path or 'gudang' in request.path or 'satuan' in request.path or 'jenis_kiriman' in request.path %} active {% endif %}">
+              <i class="nav-icon fas fa-server"></i>
+              <p>
+                MASTER DATA
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+
+            <ul class="nav nav-treeview" style="display: {% if request.path == url_layanan or 'personil' in request.path or 'kurir' in request.path or 'pelanggan' in request.path or 'kendaraan' in request.path or 'toko' in request.path or 'gudang' in request.path or 'satuan' in request.path or 'jenis_kiriman' in request.path %} block {% else %} none {% endif %};">
+              
+              {% if active_user and superuser %}
+
+                <li class="nav-item">
+                  {% url 'toko' as url %}
+                  <a href="{% url 'toko' %}" class="nav-link {% if request.path == url %}active{% endif %}">
+                    <i class="nav-icon fas fa-store"></i>
+                    <p>
+                      Outlet
+                    </p>
+                  </a>
+                </li>
+
+                <li class="nav-item">
+                  {% url 'gudang' as url %}
+                  <a href="{% url 'gudang' %}" class="nav-link {% if request.path == url %}active{% endif %}">
+                    <i class="nav-icon fas fa-warehouse"></i>
+                    <p>
+                      Gudang
+                    </p>
+                  </a>
+                </li>
+
+                <li class="nav-item">
+                  {% url 'layanan' as url %}
+                  <a href="{{ url }}" class="nav-link {% if request.path == url %}active{% endif %}">
+                    <i class="nav-icon fas fa-paper-plane"></i>
+                    <p>
+                      Layanan
+                    </p>
+                  </a>
+                </li>
+                
+                <li class="nav-item">
+                  {% url 'personil' as url %}
+                  <a href="{% url 'personil' %}" class="nav-link {% if request.path == url %} active {% endif %}">
+                    <i class="nav-icon fas fa-sign-in-alt"></i>
+                    <p>
+                      Personil
+                    </p>
+                  </a>
+                </li>
+
+                <li class="nav-item">
+                  {% url 'satuan' as url %}
+                  <a href="{% url 'satuan' %}" class="nav-link {% if request.path == url %}active{% endif %}">
+                    <i class="nav-icon fas fa-circle"></i>
+                    <p>
+                      Satuan
+                    </p>
+                  </a>
+                </li>
+
+                <li class="nav-item">
+                  {% url 'jenis_kiriman' as url %}
+                  <a href="{% url 'jenis_kiriman' %}" class="nav-link {% if request.path == url %}active{% endif %}">
+                    <i class="nav-icon fas fa-circle"></i>
+                    <p>
+                      Jenis Kiriman
+                    </p>
+                  </a>
+                </li>
+              {% endif %}
+
+              {% if active_user and superuser or role_user == 'adm_outlet' %}
+                
+
+                <li class="nav-item">
+                  {% url 'pelanggan' as url %}
+                  <a href="{% url 'pelanggan' %}" class="nav-link {% if request.path == url %}active{% endif %}">
+                    <i class="nav-icon fas fa-users"></i>
+                    <p>
+                      Pelanggan
+                    </p>
+                  </a>
+                </li>
+              {% endif %}
+
+              {% if active_user and superuser or role_user == 'adm_outlet' or role_user == 'adm_gudang'%}
+              <li class="nav-item">
+                  {% url 'kurir' as url %}
+                  <a href="{% url 'kurir' %}" class="nav-link {% if request.path == url %}active{% endif %}">
+                    <i class="nav-icon fas fa-shipping-fast"></i>
+                    <p>
+                      Kurir
+                    </p>
+                  </a>
+                </li>    
+                
+
+                <li class="nav-item">
+                  {% url 'kendaraan' as url %}
+                  <a href="{% url 'kendaraan' %}" class="nav-link {% if request.path == url %}active{% endif %}">
+                    <i class="nav-icon fas fa-truck-moving"></i>
+                    <p>
+                      Kendaraan
+                    </p>
+                  </a>
+                </li>
+              {% endif %}
+
+
+            </ul>
+          </li>
+          {% endif %}
+          <!-- END MASTER DATA -->
+
+          {% if active_user and superuser%}
+          {% url 'tentang' as url %}
+          <li class="nav-item">
+            <a href="{% url 'tentang' %}" class="nav-link {% if request.path == url %}active{% endif %}">
+              <i class="nav-icon fas fa-address-card"></i>
+              <p>
+                Tentang
+              </p>
+            </a>
+          </li>
+          {% endif %}
+
+          {% if active_user and superuser %}
+          {% url 'kontak' as url %}
+          <li class="nav-item">
+            <a href="{% url 'kontak' %}" class="nav-link {% if request.path == url %}active{% endif %}">
+              <i class="nav-icon fas fa-phone-square"></i>
+              <p>
+                Kontak
+              </p>
+            </a>
+          </li>
+          {% endif %}
+
+          {% if active_user and superuser %}
+          {% url 'pesan' as url %}
+          <li class="nav-item">
+            <a href="{% url 'pesan' %}" class="nav-link {% if request.path == url %}active{% endif %}">
+              <i class="nav-icon fas fa-comment-dots"></i>
+              <p>
+                Pesan Pelanggan
+              </p>
+            </a>
+          </li>
+          {% endif %}
+        </ul>
+      </nav>
+      {% endwith %}
+      <!-- /.sidebar-menu -->
+    </div>
+    <!-- /.sidebar -->
+  </aside>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+      {% block content_header %}
+        
+      {% endblock content_header %}
+    </div>
+    <!-- /.content-header -->
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <!-- ISI HALAMAN -->
+        {% block content %}
+          
+        {% endblock content %}
+      </div><!-- /.container-fluid -->
+      <form method="GET" action="{{logout_url}}" style="display: none;" id="logoutform">
+        <button id="button_log_out" type="submit"></button>
+      </form>
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+  <footer class="main-footer">
+    <strong>Copyright &copy; 2020 <a href="#">Samitra Ekspedisi</a>.</strong>
+    All rights reserved.
+    <div class="float-right d-none d-sm-inline-block">
+      <b>Version</b> 1.0
+    </div>
+  </footer>
+
+  <!-- Control Sidebar -->
+  <aside class="control-sidebar control-sidebar-dark">
+    <!-- Control sidebar content goes here -->
+  </aside>
+  <!-- /.control-sidebar -->
+</div>
+<!-- ./wrapper -->
+{% endblock wrapper %}
+
+<script>window.onerror = function(e){ console.log(e); }</script>
+<!-- jQuery -->
+<script src="{% static 'assets/plugins/jquery/jquery.min.js' %}"></script>
+<!-- jQuery UI 1.11.4 -->
+<script src="{% static 'assets/plugins/jquery-ui/jquery-ui.min.js' %}"></script>
+<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+<script>
+  $.widget.bridge('uibutton', $.ui.button)
+</script>
+<!-- Bootstrap 4 -->
+<script src="{% static 'assets/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<!-- AdminLTE App -->
+<script src="{% static 'assets/dist/js/adminlte.js' %}"></script>
+<script src="{% static 'assets/dist/js/jquery.validate.js' %}"></script>
+<script src="{% static 'assets/dist/js/jquery.imagereader.js' %}"></script>
+
+<!-- SweetAlert2 -->
+<script src="{% static 'assets/plugins/sweetalert2/sweetalert2.min.js' %}"></script>
+
+<script type="text/javascript">
+  $(function(){
+    $('.modal form').on('submit', function(e){
+      e.preventDefault();
+      return false;
+    });
+  });
+
+  $('body').on('click', '.logout_btn', function() {
+        var id_gudang = $(this).data("id");
+        var nama_gudang = $(this).data("nama");
+        Swal.fire({
+            title: 'LOGOUT',
+            text: "Anda yakin keluar dari sistem? ",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Iya, Keluar',
+            cancelButtonText: 'Tidak, Urungkan!',
+        }).then((result) => {
+            if (result.value) {
+              $('#logoutform').submit();
+            }
+        })
+    });
+</script>
+{% block file_js %}
+
+{% endblock file_js %}
+<script>
+  window.onerror = function(error) {
+    console.log(error);
+    console.log('Terjadi Error, tidak dapat memuat data yang dikirim. Cek script dan koneksi database atau server.');
+  };
+</script>
+<!-- AdminLTE for demo purposes -->
+<!-- <script src="{% static 'assets/dist/js/demo.js' %}"></script> -->
+</body>
+</html>

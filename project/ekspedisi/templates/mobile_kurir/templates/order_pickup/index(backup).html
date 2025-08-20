@@ -1,0 +1,261 @@
+{% extends '../base.html' %}
+{% load static %}
+
+{% block title_name %}
+ <title>Order Pickup | BaliGo Ekspedisi</title>
+{% endblock %}
+
+{% block file_css %}
+<!-- DataTables -->
+<link rel="stylesheet" href="{% static 'assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+<link rel="stylesheet" href="{% static 'assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+ <!-- SweetAlert2 -->
+<link rel="stylesheet" href="{% static 'assets/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css' %}">
+<style>
+	#preview{
+	   width:100%;
+	   height: auto;
+	   margin:0px auto;
+	}
+</style>
+{% endblock %}
+
+{% block breadcrumb_mobile %}
+	Order Pickup
+{% endblock breadcrumb_mobile %}
+
+{% block content %}
+<!-- /.modal -->
+<div class="modal fade" id="modal-scanner">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title" id="title_modal"><i class="fas fa-qrcode"></i>&nbsp;&nbsp;Scan Order</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body" id="scanner-body">
+				<video id="preview"></video>
+			</div>
+			<div class="modal-footer justify-content-between">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
+				
+			</div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<div class="card mb-4 card-title-sticky">
+	<div class="card-header">
+		<div class="card-tools">
+			<ul class="nav nav-pills ml-auto p-2">
+				<li class="nav-item"><a class="nav-link active" href="#tab_outlet" data-toggle="tab"><i class="nav-icon fas fa-store"></i>&emsp;Outlet</a></li>
+				<li class="nav-item"><a class="nav-link" href="#tab_gudang" data-toggle="tab"><i class="nav-icon fas fa-warehouse"></i>&emsp;Gudang</a></li>
+			</ul>
+		</div>
+	</div>
+	<div class="offset-lg-2 offset-md-2 col-lg-8 col-md-8">
+	<div class="input-group input-group-sm card-header">
+	  <div class="input-group-prepend">
+		<select class="form-control search-mobile">
+			<option>Resi</option>
+			<option>Nama Cust</option>
+			<option>No Telp</option>
+		</select>
+	  </div>
+	  <!-- /btn-group -->
+	  <input type="text" placeholder="Pencarian Data...." class="form-control">
+	  <a class="btn bg-secondary text-white btn-sm barcode-group no-border-radius"><i class="fas fa-search"></i></a>
+      <a class="btn btn-primary text-white btn-sm barcode-group"><i class="fas fa-qrcode"></i>&nbsp; Scan</a>
+	</div>
+	</div>
+</div>
+<div class="card">
+	<!-- /.card-header -->
+	<div class="card-body">
+		<div class="tab-content">
+			<div class="tab-pane active" id="tab_outlet">
+				<!-- ISI DATA TABLE LIST OUTLET/TOKO -->
+				<div class="card card-widget widget-user-2 shadow">
+				  <div class="quick-access-mobile">
+					<div class="btn-group">
+						<button type="button" class="btn btn-default btn-flat" data-toggle="dropdown"><i class="fas fa-ellipsis-h"></i>
+						  <span class="sr-only">Toggle Dropdown</span>
+						  <div class="dropdown-menu" role="menu">
+							<a class="dropdown-item" href="#">Arsip Order</a>
+						  </div>
+						</button>
+					</div>
+				  </div>
+				  <div class="widget-user-header bg-secondary">
+					<!-- /.widget-user-image -->
+					<h3 class="widget-user-username">ES-11000293 (RESI)</h3>
+					<h5 class="widget-user-desc"><i class="fas fa-user-circle"></i>&nbsp;&nbsp;Galih Erlangga</h5>
+					<h5 class="widget-user-desc"><i class="fas fa-phone-alt"></i>&nbsp;&nbsp;087860890177</h5>
+				  </div>
+				  <div class="card-footer p-0">
+					<ul class="nav flex-column">
+					  <li class="nav-item">
+						<span class="nav-link text-muted">
+						  <i class="fas fa-map-marker-alt"></i> Perumahan Pondok Kampial Permai, Blok. A 116, Nusa Dua, Kuta Selatan, Benoa, Bali
+						</span>
+					  </li>
+					</ul>
+				  </div>
+				  <div>
+					<div class="btn-wrapper">
+						<a class="btn btn-sm btn-block btn-danger text-white"><i class="fas fa-eye"></i>&nbsp;&nbsp;Lihat Detail Order</a>
+					</div>
+				  </div>
+				</div>
+				<hr>
+	  
+			</div>
+			<!-- /.tab-pane -->
+			<div class="tab-pane" id="tab_gudang">
+				<!-- ISI DATA TABLE LIST GUDANG -->
+				 <div class="text-center">TIDAK ADA DATA</div>
+			</div>
+			
+		</div>
+
+		
+	</div>
+	<!-- /.card-body -->
+</div>
+{% endblock %}
+
+{% block file_js %}
+<!-- Bootstrap 4 -->
+<!-- <script src="{% static 'assets/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script> -->
+<!-- DataTables -->
+<!-- <script src="{% static 'assets/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script> -->
+<!-- SweetAlert2 -->
+<script src="{% static 'assets/plugins/sweetalert2/sweetalert2.min.js' %}"></script>
+<script src="{% static 'custom_js/qr_scan.js' %}"></script>
+
+<script>
+	$(document).ready(function(){
+		var csrfToken = $("input[name=csrfmiddlewaretoken]").val();
+		var url_edit = '';
+
+		function tampilkan_pesan(pesan, type){
+			Toast.fire({
+			icon: type,
+			title: pesan
+		  });
+		}
+
+		function generate_token(){
+			var now = new Date();
+			timestamp = now.getFullYear().toString(); // 2011
+			timestamp += (now.getMonth < 12 ? '0' : '') + now.getMonth().toString();
+			timestamp += ((now.getDate < 30) ? '0' : '') + now.getDate().toString();
+			timestamp += ((now.getHours < 12) ? '0' : '') + now.getHours().toString();
+			timestamp += ((now.getMinutes < 60) ? '0' : '') + now.getMinutes().toString();
+			timestamp += ((now.getSeconds < 60) ? '0' : '') + now.getSeconds().toString();
+			return timestamp;
+		}
+
+		const Toast = Swal.mixin({
+		  toast: true,
+		  position: 'top-end',
+		  showConfirmButton: false,
+		  timer: 3000
+		});
+
+		var table_outlet = $('#outlet').DataTable({
+			"columns": [
+						{ "width": "6%" },
+						{ "width": "16%" },
+						null,
+						{ "width": "45%" },
+						{ "width": "16%" },
+					  ],
+		  "paging": true,
+		  "lengthChange": false,
+		  "searching": true,
+		  "ordering": true,
+		  "info": true,
+		  "autoWidth": false,
+		  "responsive": true,
+		  "processing" : true,
+		  "serverside" : true,
+		  "ajax" : {
+			"url" : $("#outlet").data('url'),
+			"type" : "get"
+		  }
+		});
+
+		var table_outlet = $('#gudang').DataTable({
+		   "columns": [
+				{ "width": "6%" },
+				{ "width": "16%" },
+				null,
+				{ "width": "45%" },
+				{ "width": "16%" },
+			],
+		  "paging": true,
+		  "lengthChange": false,
+		  "searching": true,
+		  "ordering": true,
+		  "info": true,
+		  "autoWidth": false,
+		  "responsive": true,
+		  "processing" : true,
+		  "serverside" : true,
+		  "ajax" : {
+			"url" : $("#gudang").data('url'),
+			"type" : "get"
+		  }
+		});
+
+
+		var scanner = {};
+		$('.barcode-group').on('click', function(){
+			scanner = new Instascan.Scanner({ video: document.getElementById('preview'), scanPeriod: 5, mirror: false });
+			scanner.addListener('scan',function(content){
+				$('#modal-scanner').modal('hide');
+				setTimeout(function(){
+					alert(content);
+				},500)
+				//window.location.href=content;
+			});
+			Instascan.Camera.getCameras().then(function (cameras){
+				if(cameras.length>0){
+					$('#modal-scanner').modal('show');
+					if(Object.keys(cameras).includes("1")){
+						scanner.start(cameras[1]);
+						return;
+					}
+					scanner.start(cameras[0]);
+				}else{
+					console.error('No cameras found.');
+					alert('No cameras found.');
+				}
+			}).catch(function(e){
+				console.error(e);
+				// alert(e);
+			});
+		});
+
+		$('#modal-scanner').on('hide.bs.modal', function(){
+			try {
+				scanner.stop()
+				.then(function(){
+					document.getElementById('#scanner-body').innerHTML = "<video id='preview'></video>";
+				})
+			} catch(message) {
+				console.log(message)
+			};
+		});
+	});
+</script>
+{% endblock %}

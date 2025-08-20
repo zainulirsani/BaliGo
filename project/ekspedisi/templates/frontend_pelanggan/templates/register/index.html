@@ -1,0 +1,220 @@
+{% extends '../base.html' %}
+{% load static %}
+{% block title_name %}
+<title>Register | BaliGo Ekspedisi</title>
+{% endblock %}
+{% block file_css %}
+<link href="{% static 'frontend/css/about.css' %}" rel="stylesheet">
+<link href="{% static 'frontend/css/register.css' %}" rel="stylesheet">
+{% endblock %}
+{% block slider %}
+{% endblock %}
+{% block content %}
+<section id="about1" class="about about-1 pb-0">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12 col-md-12 col-lg-5">
+                <section id="hero" style="width: auto; height: 350px; transform: translateY(600px); animation: 1.2s slideIn ease-in-out forwards 1s;">
+                    <div id="heroCarousel" class="carousel slide carousel-fade" data-ride="carousel">
+                        <ol class="carousel-indicators" id="hero-carousel-indicators"></ol>
+                        <div class="carousel-inner" role="listbox">
+                            <!-- Slide 1 -->
+                            <div class="carousel-item active" style="background-image: url({% static 'frontend/img/slide/slide-8.jpg'%})">
+                                <div class="carousel-container">
+                                    <div class="container">
+                                        <h5 class="animate__animated animate__fadeInDown" style="float: right; color: white;">Naikan Rating Bisnis Online Anda</h5>
+                                        <p class="animate__animated animate__fadeInUp" style="float: right;">Jasa pengiriman berbasis teknologi yang menyokong pertumbuhan bisnis E-commerce.</p>
+                                        <!-- <a href="#about" class="btn-get-started animate__animated animate__fadeInUp scrollto">Read More</a>-->
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Slide 2 -->
+                            <div class="carousel-item" style="background-image: url({% static 'frontend/img/slide/slide-7.jpg'%})">
+                                <div class="carousel-container">
+                                    <div class="container">
+                                        <h5 class="animate__animated animate__fadeInDown" style="color: white;">Layanan Pengemasan</h5>
+                                        <p class="animate__animated animate__fadeInUp">Kami menyediakan layanan pengemasan untuk paket kiriman anda sehingga paket menjadi lebih aman di perjalanan</p>
+                                        <!-- <a href="#about" class="btn-get-started animate__animated animate__fadeInUp scrollto">Read More</a> -->
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Slide 3 -->
+                            <div class="carousel-item" style="background-image: url({% static 'frontend/img/slide/slide-6.jpg'%})">
+                                <div class="carousel-container">
+                                    <div class="container text-center">
+                                        <h5 style="color: white;">Lacak Paketmu</h5>
+                                        <p style="float: right;">Menyediakan fitur pelacakan secara realtime, lacak dan amati paket anda menjadi lebih mudah</p>
+                                        <!-- <a href="#about" class="btn-get-started animate__animated animate__fadeInUp scrollto">Read More</a> -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div><!-- /.col-lg-5 -->
+            <div class="col-sm-12 col-md-12 col-lg-7" id="form_login" style="width: 100%; height: auto;">
+                <div class="contact-panel contact-panel-2" style="background-image: url({% static 'frontend/gif/register.gif'%}); background-size: 180px auto; background-repeat: no-repeat; background-position: left 10px top 10px;; height: auto; background-color: #fbfbfb; border: 2px;">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h1 style="text-align: right;">Registrasi</h1>
+                            <p style="text-align: right; margin-bottom: 0px;">Untuk pengguna baru</p>
+                            <hr class="new1" width="40%" style="float: right;">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            {% if messages %}
+                            {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <a class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true" style="cursor: pointer;">&times;</span>
+                                </a>
+                            </div>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <form id="register-form" data-url_provinsi="{% url 'list_provinsi' %}" action="{%url 'customer_register'%}" method="post" class="registration-form">
+                                {% csrf_token %}
+                                {% for field in form %}
+                                {% if not field.name == 'no_personil' and not field.name == 'role' and not field.name == 'penempatan_toko' and not field.name == 'penempatan_gudang' and not field.name == 'photo' and not field.name == 'email' and not field.name == 'register_sebagai' and not field.name == 're_password'%}
+                                {% if field.name == 'first_name' %}
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        {{ field }}
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <input type="email" name="email" class="form-control" placeholder="Masukkan Email Anda" required="" maxlength="50" id="id_email">
+                                    </div>
+                                </div>
+                                {% elif field.name == 'alamat' %}
+                                    {{ field }}
+                                    <div class="form-group">
+                                        <select name="provinsi" id="id-provinsi" required class="form-control">
+                                            <option value="" selected disabled>Pilih Provinsi</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-6">
+                                            <select name="kota" id="id-kota" class="form-control">
+                                                <option value="">Pilih Kota</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group col-6">
+                                            <select name="kecamatan" id="id-kecamatan" class="form-control">
+                                                <option value="">Pilih Kecamatan</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group col-6">
+                                            <select name="desa" id="id-desa" class="form-control">
+                                                <option value="">Pilih Desa</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group col-6">
+                                            <select name="kode_pos" id="id-kode_pos" class="form-control">
+                                                <option value="">Pilih Kode POS</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                {% elif field.name == 'username'%}
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        {{ field }}
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <select name="register_sebagai" class="form-control" placeholder="Pilih Registrasi" required="" id="id_register_sebagai">
+                                            <option value="personal">Personal</option>
+                                            <option value="goverment">Goverment</option>
+                                            <option value="company">Company</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                {% elif field.name == 'password' %}
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        {{ field }}
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <input type="password" name="re_password" required="" id="re_password" class="form-control" placeholder="Masukkan ulang password" maxlength="100">
+                                    </div>
+                                </div>
+                                {% else %}
+                                {{ field }}
+                                {% endif %}
+                                {% endif %}
+                                {% endfor %}
+                                <button id="submit_btn" type="submit" style="transform: translateX(-600px); animation: 1.2s slideIn_x ease-in-out forwards 1s;">Daftar</button>
+                            </form>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div><!-- /.col-lg-6 -->
+        </div><!-- /.row -->
+    </div><!-- /.container -->
+</section><!-- /.About 1 -->
+<br>
+<br>
+<br>
+{% endblock %}
+{% block file_js %}
+<script type="text/javascript">
+// $(document).ready(function() {
+//     // Disable input alphabet just allowed numeric input
+//     $('#id_no_telp').on('input', function() {
+//         $(this).val($(this).val().replace(/[^0-9]/g, ''));
+//     });
+
+//     document.getElementById('id_first_name').value = '{{data.first_name}}';
+//     document.getElementById('id_email').value = '{{data.email}}';
+//     document.getElementById('id_no_telp').value = '{{data.no_telp}}';
+//     document.getElementById('id_alamat').innerHTML = '{{data.alamat}}';
+//     document.getElementById('id_username').value = '{{data.username}}';
+//     document.getElementById('id_register_sebagai').value = '{{data.register_sebagai}}';
+// });
+
+$(document).ready(function() {
+
+    $('#id_no_telp').on('input', function() {
+        $(this).val($(this).val().replace(/[^0-9]/g, ''));
+    });
+
+    document.getElementById('id_first_name').value = '{{data.first_name}}';
+    document.getElementById('id_email').value = '{{data.email}}';
+    document.getElementById('id_no_telp').value = '{{data.no_telp}}';
+    document.getElementById('id_alamat').innerHTML = '{{data.alamat}}';
+    document.getElementById('id_username').value = '{{data.username}}';
+    document.getElementById('id_register_sebagai').value = '{{data.register_sebagai}}';
+    document.getElementById('id-provinsi').value = '{{data.provinsi}}';
+    document.getElementById('id-kota').value = '{{data.kota}}';
+    document.getElementById('id-kecamatan').value = '{{data.kecamatan}}';
+    document.getElementById('id-desa').value = '{{data.desa}}';
+    document.getElementById('id-kode_pos').value = '{{data.kode_pos}}';
+
+    function displayWindowSize() {
+        // Get width and height of the window excluding scrollbars
+        var w = document.documentElement.clientWidth;
+        var h = document.documentElement.clientHeight;
+        if (w <= 957 && h <= 719) {
+            $("#hero").css("height", 250);
+        } else {
+            $("#hero").css("height", $("#form_login").height() - 25);
+        }
+
+        // Display result inside a div element
+        console.log("Width: " + w + ", " + "Height: " + h);
+    }
+
+    // Attaching the event listener function to window's resize event
+    window.addEventListener("resize", displayWindowSize);
+
+    // Calling the function for the first time
+    displayWindowSize();
+
+});
+</script>
+<script src="{% static 'custom_js/pelanggan_detailinfo.js' %}"></script>
+{% endblock %}

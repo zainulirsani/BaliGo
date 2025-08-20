@@ -1,0 +1,104 @@
+{% extends '../base.html' %}
+{% load static %}
+{% block title_name %}
+<title>Login | BaliGo Ekspedisi</title>
+{% endblock %}
+{% block file_css %}
+<link href="{% static 'frontend/css/about.css' %}" rel="stylesheet">
+<link href="{% static 'frontend/css/login.css' %}" rel="stylesheet">
+{% endblock %}
+{% block slider %}
+{% endblock %}
+{% block content %}
+<section id="about1" class="about about-1 pb-0">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12 col-md-12 col-lg-5">
+                <section id="hero" style="width: auto; height: 400px; transform: translateY(600px); animation: 1.2s slideIn ease-in-out forwards 1s;">
+                    <div id="heroCarousel" class="carousel slide carousel-fade" data-ride="carousel">
+                        <ol class="carousel-indicators" id="hero-carousel-indicators"></ol>
+                        <div class="carousel-inner" role="listbox">
+                            <!-- Slide 1 -->
+                            <div class="carousel-item active" style="background-image: url({% static 'frontend/img/slide/slide-8.jpg'%})">
+                                <div class="carousel-container">
+                                    <div class="container">
+                                        <h5 class="animate__animated animate__fadeInDown" style="float: left; color: white;">Naikan Rating Bisnis Online Anda</h5>
+                                        <p class="animate__animated animate__fadeInUp" style="float: left;">Jasa pengiriman berbasis teknologi yang menyokong pertumbuhan bisnis E-commerce.</p>
+                                        <!-- <a href="#about" class="btn-get-started animate__animated animate__fadeInUp scrollto">Read More</a>-->
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Slide 2 -->
+                            <div class="carousel-item" style="background-image: url({% static 'frontend/img/slide/slide-7.jpg'%})">
+                                <div class="carousel-container">
+                                    <div class="container">
+                                        <h5 class="animate__animated animate__fadeInDown" style="color: white;">Layanan Pengemasan</h5>
+                                        <p class="animate__animated animate__fadeInUp">Kami menyediakan layanan pengemasan untuk paket kiriman anda sehingga paket menjadi lebih aman di perjalanan</p>
+                                        <!-- <a href="#about" class="btn-get-started animate__animated animate__fadeInUp scrollto">Read More</a> -->
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Slide 3 -->
+                            <div class="carousel-item" style="background-image: url({% static 'frontend/img/slide/slide-6.jpg'%})">
+                                <div class="carousel-container">
+                                    <div class="container text-center">
+                                        <h5 class="animate__animated animate__fadeInDown" style="color: white;">Lacak Paketmu</h5>
+                                        <p class="animate__animated animate__fadeInUp" style="float: right;">Menyediakan fitur pelacakan secara realtime, lacak dan amati paket anda menjadi lebih mudah</p>
+                                        <!-- <a href="#about" class="btn-get-started animate__animated animate__fadeInUp scrollto">Read More</a> -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div><!-- /.col-lg-5 -->
+            <div class="col-sm-12 col-md-12 col-lg-7" id="form_login" style="height: 400px;">
+                <div class="contact-panel contact-panel-2" style="background-image: url({% static 'frontend/gif/login.gif'%}); background-size: 400px auto; background-repeat: no-repeat; background-position: right; height: 400px;">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h1>Silahkan Login</h1>
+                            <p>Untuk memulai sesi anda</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <form action="{%url 'customer_login'%}" method="post" class="registration-form">
+                                {% csrf_token %}
+                                <input type="text" name="username" id="username" placeholder="Masukan Username" required="" style="animation: username_move 2s;" />
+                                <input type="password" name="password" id="password" placeholder="Masukan Password" required="" style="animation: password_move 2s;" />
+                                <button type="submit" id="login_btn" style="transform: translateX(-600px); animation: 1.2s slideIn_x ease-in-out forwards 1s;">Login</button>
+                                <a href="{% url 'customer_reset_v1' %}">Lupa password?</a>
+                            </form>
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            {% if messages %}
+                            {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <a class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </a>
+                            </div>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /.col-lg-6 -->
+        </div><!-- /.row -->
+    </div><!-- /.container -->
+</section><!-- /.About 1 -->
+<br>
+<br>
+<br>
+{% endblock %}
+{% block file_js %}
+<script type="text/javascript">
+$(document).ready(function() {
+    $("#hero").css("height", $("#form_login").height());
+});
+</script>
+{% endblock %}

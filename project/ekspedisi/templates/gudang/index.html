@@ -1,0 +1,1054 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title_name %}
+<title>Gudang | BaliGo Ekspedisi</title>
+{% endblock %}
+{% block file_css %}
+<!-- DataTables -->
+<link rel="stylesheet" href="{% static 'assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+<link rel="stylesheet" href="{% static 'assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+<!-- SweetAlert2 -->
+<link rel="stylesheet" href="{% static 'assets/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css' %}">
+<!-- Load Leaflet from CDN -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+<!-- Load Esri Leaflet from CDN -->
+<script src="https://unpkg.com/esri-leaflet@2.5.0/dist/esri-leaflet.js" integrity="sha512-ucw7Grpc+iEQZa711gcjgMBnmd9qju1CICsRaryvX7HJklK0pGl/prxKvtHwpgm5ZHdvAil7YPxI1oWPOWK3UQ==" crossorigin=""></script>
+<!-- Load Esri Leaflet Geocoder from CDN -->
+<link rel="stylesheet" href="https://unpkg.com/esri-leaflet-geocoder@2.3.3/dist/esri-leaflet-geocoder.css" integrity="sha512-IM3Hs+feyi40yZhDH6kV8vQMg4Fh20s9OzInIIAc4nx7aMYMfo+IenRUekoYsHZqGkREUgx0VvlEsgm7nCDW9g==" crossorigin="">
+<script src="https://unpkg.com/esri-leaflet-geocoder@2.3.3/dist/esri-leaflet-geocoder.js" integrity="sha512-HrFUyCEtIpxZloTgEKKMq4RFYhxjJkCiF5sDxuAokklOeZ68U2NPfh4MFtyIVWlsKtVbK5GD2/JzFyAfvT5ejA==" crossorigin=""></script>
+<link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+<!-- Ion Slider -->
+<link rel="stylesheet" href="{% static 'assets/plugins/ion-rangeslider/css/ion.rangeSlider.min.css' %}">
+<!-- bootstrap slider -->
+<link rel="stylesheet" href="{% static 'assets/plugins/bootstrap-slider/css/bootstrap-slider.min.css' %}">
+<!-- Select2 -->
+<link rel="stylesheet" href="{% static 'assets/plugins/select2/css/select2.min.css' %}">
+<link rel="stylesheet" href="{% static 'assets/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
+<style type="text/css">
+.map_size {
+    width: 100%;
+    height: 350px;
+}
+
+#advanced_map {
+    width: 100%;
+    height: 350px;
+}
+
+.leaflet-top,
+.leaflet-bottom {
+    z-index: 400;
+}
+</style>
+{% endblock %}
+{% block content_header %}
+<div class="container-fluid">
+    <div class="row mb-2">
+        <div class="col-sm-6">
+            <h1 class="m-0 text-dark">Gudang</h1>
+        </div><!-- /.col -->
+        <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                <li class="breadcrumb-item active">Gudang</li>
+            </ol>
+        </div><!-- /.col -->
+    </div><!-- /.row -->
+</div><!-- /.container-fluid -->
+{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Data Gudang</h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-block bg-gradient-primary" id="createGudang">
+                <i class="fa fa-plus"></i>&nbsp; Tambah Gudang
+            </button>
+        </div>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+        <table id="gudang" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Nama Gudang</th>
+                    <th>ID</th>
+                    <th>Alamat</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th>No</th>
+                    <th>Nama Gudang</th>
+                    <th>ID</th>
+                    <th>Alamat</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <!-- /.card-body -->
+</div>
+<!-- /.modal -->
+<div class="modal fade" id="modal_gudang">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="title_modal">Detail Data Gudang</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="createGudangForm" method="post" data-url="{% url 'gudang' %}" data-url_provinsi="{% url 'list_provinsi' %}">
+                    {% csrf_token %}
+                    {% for field in form %}
+                    <div class="form-group row">
+                        <label for="{{ field.name }}" class="col-sm-2 col-form-label">{{ field.label }}</label>
+                        <div class="col-sm-10">
+                            {{ field }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <input type="hidden" name="id" id="id">
+                </form>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="panel">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <i class="ti-location-arrow"></i> Maps
+                                </h4>
+                                <span class="pull-right">
+                                    <i class="fa fa-fw ti-angle-up clickable"></i>
+                                    <i class="fa fa-fw ti-close removepanel clickable"></i>
+                                </span>
+                            </div>
+                            <div class="panel-body" style="padding:10px !important;">
+                                <div id="advanced_map" class="gmap"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card card-primary">
+                            <div class="card-header">
+                                <h3 class="card-title">Info</h3>
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
+                                    </button>
+                                </div>
+                                <!-- /.card-tools -->
+                            </div>
+                            <!-- /.card-header -->
+                            <div class="card-body" style="display: block;">
+                                Jika lokasi/alamt pencarian diluar pulau bali, silahkan zoom out maps lalu ketik kembali nama tempat / alamat pada kolom pencarian (klik ikon Pencarian pada peta).
+                            </div>
+                            <!-- /.card-body -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
+                <button type="button" class="btn btn-primary" id="updateButton">Simpan</button>
+                <button type="button" class="btn btn-primary" id="createButton">Simpan</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+{% endblock %}
+{% block file_js %}
+<!-- Bootstrap 4 -->
+<script src="{% static 'assets/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<!-- DataTables -->
+<script src="{% static 'assets/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+<!-- Ion Slider -->
+<script src="{% static 'assets/plugins/ion-rangeslider/js/ion.rangeSlider.min.js' %}"></script>
+<!-- Bootstrap slider -->
+<script src="{% static 'assets/plugins/bootstrap-slider/bootstrap-slider.min.js' %}"></script>
+<!-- SweetAlert2 -->
+<script src="{% static 'assets/plugins/sweetalert2/sweetalert2.min.js' %}"></script>
+<!-- Select2 -->
+<script src="{% static 'assets/plugins/select2/js/select2.full.min.js' %}"></script>
+<!-- Leaflet OpenStretMaps -->
+<!-- <script type="text/javascript" src="{% static 'assets/plugins/leaflet/js/leaflet-src.js' %}"></script> -->
+<script>
+$(document).ready(function() {
+    var data_nama_gudang_edit = document.getElementById("inputNama").value;
+    var data_no_tlp_gudang_edit = document.getElementById("inputNoTlp").value;
+    var data_alamat_gudang_edit = document.getElementById("inputAlamat").value;
+    var data_titik_gudang_edit = document.getElementById("inputTitikLokasi").value;
+    var data_provinsi_gudang_edit = document.getElementById("inputProvinsiGudang").value;
+
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // ================================== Detail Alamat =================================
+    $('#inputProvinsiGudang').select2({
+        theme: 'bootstrap4',
+        placeholder: 'Pilih Provinsi',
+        language: "id"
+    });
+    $('#inputKotaGudang').select2({
+        theme: 'bootstrap4',
+        placeholder: 'Pilih Kota',
+        language: "id"
+    });
+    $('#inputKecamatanGudang').select2({
+        theme: 'bootstrap4',
+        placeholder: 'Pilih Kecamatan',
+        language: "id"
+    });
+    $('#inputDesaGudang').select2({
+        theme: 'bootstrap4',
+        placeholder: 'Pilih Desa',
+        language: "id"
+    });
+    $('#inputKodePosGudang').select2({
+        theme: 'bootstrap4',
+        placeholder: 'Pilih Kode Pos',
+        language: "id"
+    });
+
+
+    function show_kota_list(id_provinsi, id_kota_select, nama_kota) {
+        if (id_provinsi && id_kota_select && nama_kota) {
+            $.ajax({
+                type: "POST",
+                dataType: 'json',
+                contentType: "application/json",
+                url: $("#createGudangForm").data('url_provinsi') + id_provinsi + '/kota/',
+                data: {
+                    csrfmiddlewaretoken: getCookie('csrftoken'),
+                    provinsi_id: id_provinsi
+                },
+
+                success: function(response) {
+                    // console.log(response.data);
+                    $("select#inputKotaGudang").html(response.data);
+                    document.getElementById("inputKotaGudang").value = id_kota_select;
+                    document.getElementById("select2-inputKotaGudang" + "-container").innerHTML = nama_kota;
+                }
+            });
+        } else {
+            $('#inputKotaGudang').val(null).trigger('change');
+        }
+
+    }
+
+    function show_kecamatan_list(id_kota, id_kecamatan_select, nama_kecamatan) {
+        if (id_kota && id_kecamatan_select && nama_kecamatan) {
+            $.ajax({
+                type: "POST",
+                dataType: 'json',
+                contentType: "application/json",
+                url: $("#createGudangForm").data('url_provinsi') + id_kota + '/kecamatan/',
+                data: {
+                    csrfmiddlewaretoken: getCookie('csrftoken'),
+                    kota_id: id_kota
+                },
+
+                success: function(response) {
+                    // console.log(response.data);
+                    $("select#inputKecamatanGudang").html(response.data);
+                    document.getElementById("inputKecamatanGudang").value = id_kecamatan_select;
+                    document.getElementById("select2-inputKecamatanGudang" + "-container").innerHTML = nama_kecamatan;
+                }
+            });
+        } else {
+            $('#inputKecamatanGudang').val(null).trigger('change');
+        }
+
+    }
+
+    function show_desa_list(id_kecamatan, id_desa_select, nama_desa) {
+        if (id_kecamatan && id_desa_select && nama_desa) {
+            $.ajax({
+                type: "POST",
+                dataType: 'json',
+                contentType: "application/json",
+                url: $("#createGudangForm").data('url_provinsi') + id_kecamatan + '/desa/',
+                data: {
+                    csrfmiddlewaretoken: getCookie('csrftoken'),
+                    kecamatan_id: id_kecamatan
+                },
+
+                success: function(response) {
+                    // console.log(response.data);
+                    $("select#inputDesaGudang").html(response.data);
+                    document.getElementById("inputDesaGudang").value = id_desa_select;
+                    document.getElementById("select2-inputDesaGudang" + "-container").innerHTML = nama_desa;
+                }
+            });
+        } else {
+            $('#inputDesaGudang').val(null).trigger('change');
+        }
+
+    }
+
+    function show_kode_pos_list(id_provinces, id_kota, id_kecamatan, id_desa, id_kode_pos_select, kode_pos) {
+        if (id_provinces && id_kota && id_kecamatan && id_desa && id_kode_pos_select && kode_pos) {
+            $.ajax({
+                type: "POST",
+                dataType: 'json',
+                contentType: "application/json",
+                url: $("#createGudangForm").data('url_provinsi') + id_provinces + '/' + id_kota + '/' + id_kecamatan + '/' + id_desa + '/kode/',
+                data: {
+                    csrfmiddlewaretoken: getCookie('csrftoken'),
+                    provinsi_id: id_provinces,
+                    kota_id: id_kota,
+                    kecamatan_id: id_kecamatan,
+                    desa_id: id_desa
+                },
+
+                success: function(response) {
+                    // console.log(response.data);
+                    $("select#inputKodePosGudang").html(response.data);
+                    document.getElementById("inputKodePosGudang").value = id_kode_pos_select;
+                    document.getElementById("select2-inputKodePosGudang" + "-container").innerHTML = kode_pos;
+                }
+            });
+        } else {
+            $('#inputKodePosGudang').val(null).trigger('change');
+        }
+
+    }
+
+
+    function show_provinsi_list() {
+
+        $.ajax({
+            type: "POST",
+            url: $("#createGudangForm").data('url_provinsi'),
+            success: function(response) {
+                $("select#inputProvinsiGudang").html(response.data);
+            }
+        });
+    }
+
+    show_provinsi_list();
+
+    $("#inputProvinsiGudang").change(function() {
+        var id_provinces = $(this).val();
+        // disable_button_when_not_changes();
+        $.ajax({
+            type: "POST",
+            dataType: 'json',
+            contentType: "application/json",
+            url: $("#createGudangForm").data('url_provinsi') + id_provinces + '/kota/',
+            data: {
+                csrfmiddlewaretoken: getCookie('csrftoken'),
+                provinsi_id: id_provinces
+            },
+
+            success: function(response) {
+                // console.log(response.data);
+                $("select#inputKotaGudang").html(response.data);
+                getAjaxKota_gudang();
+            }
+        });
+    });
+
+
+    $("#inputKotaGudang").change(getAjaxKota_gudang);
+
+    function getAjaxKota_gudang() {
+        var id_kota = $("#inputKotaGudang").val();
+
+        $.ajax({
+            type: "POST",
+            dataType: 'json',
+            contentType: "application/json",
+            url: $("#createGudangForm").data('url_provinsi') + id_kota + '/kecamatan/',
+            data: {
+                csrfmiddlewaretoken: getCookie('csrftoken'),
+                kota_id: id_kota
+            },
+            success: function(response) {
+                $("select#inputKecamatanGudang").html(response.data);
+                getAjaxKecamatan_gudang();
+            }
+        });
+    }
+
+    $("#inputKecamatanGudang").change(getAjaxKecamatan_gudang);
+
+    function getAjaxKecamatan_gudang() {
+        var id_kecamatan = $("#inputKecamatanGudang").val();
+
+        $.ajax({
+            type: "POST",
+            dataType: 'json',
+            contentType: "application/json",
+            url: $("#createGudangForm").data('url_provinsi') + id_kecamatan + '/desa/',
+            data: {
+                csrfmiddlewaretoken: getCookie('csrftoken'),
+                kecamatan_id: id_kecamatan
+            },
+            success: function(response) {
+                $("select#inputDesaGudang").html(response.data);
+                getAjaxDesa_gudang();
+            }
+        });
+    }
+
+    $("#inputDesaGudang").change(getAjaxDesa_gudang);
+
+    function getAjaxDesa_gudang() {
+        var id_provinces = $("#inputProvinsiGudang").val();
+        var id_kota = $("#inputKotaGudang").val();
+        var id_kecamatan = $("#inputKecamatanGudang").val();
+        var id_desa = $("#inputDesaGudang").val();
+        $.ajax({
+            type: "POST",
+            dataType: 'json',
+            contentType: "application/json",
+            url: $("#createGudangForm").data('url_provinsi') + id_provinces + '/' + id_kota + '/' + id_kecamatan + '/' + id_desa + '/kode/',
+            data: {
+                csrfmiddlewaretoken: getCookie('csrftoken'),
+                provinsi_id: id_provinces,
+                kota_id: id_kota,
+                kecamatan_id: id_kecamatan,
+                desa_id: id_desa
+            },
+            success: function(response) {
+                $("select#inputKodePosGudang").html(response.data);
+            }
+        });
+    }
+
+
+
+    // ================================== END Detail Alamat =================================
+    var lat = 0;
+    var lon = 0;
+    var gambar_radius = {};
+    var radius_default = 250;
+    var mymap = L.map('advanced_map').setView([-8.652415520702286, 115.21718502044679], 13);
+
+    $('#inputNoTlp').on('input', function() {
+        $(this).val($(this).val().replace(/[^0-9]/g, ''));
+    });
+
+    $('#radius').ionRangeSlider({
+        min: 0,
+        max: 500,
+        type: 'single',
+        step: 1,
+        from: radius_default,
+        postfix: ' m',
+        prettify: false,
+        hasGrid: true,
+        onChange: function(data) {
+            console.log(data.from);
+            if (lat != 0 && lon != 0) {
+
+                if (gambar_radius != undefined) {
+                    mymap.removeLayer(gambar_radius);
+                };
+                gambar_radius = L.circle([lat, lon], data.from).addTo(mymap);
+                document.getElementById("radius").value = data.from;
+            }
+
+        }
+    });
+
+    function set_data_edit(response) {
+        data_nama_gudang_edit = response.data.nama_gudang;
+        data_no_tlp_gudang_edit = response.data.no_tlp;
+        data_alamat_gudang_edit = response.data.alamat;
+        data_titik_gudang_edit = response.data.titik_lokasi;
+        data_provinsi_gudang_edit = response.data.id_provinsi_gudang;
+    }
+
+
+    function disable_button_when_not_changes() {
+        let input_1 = document.getElementById("inputNama");
+        let input_2 = document.getElementById("inputNoTlp");
+        let input_3 = document.getElementById("inputAlamat");
+        let input_4 = document.getElementById("inputTitikLokasi");
+        let input_5 = document.getElementById("inputProvinsiGudang");
+
+        let button = document.getElementById("updateButton");
+        button.disabled = true;
+        input_1.addEventListener("change", stateHandle);
+        input_2.addEventListener("change", stateHandle);
+        input_3.addEventListener("change", stateHandle);
+        input_4.addEventListener("change", stateHandle);
+        input_5.addEventListener("change", stateHandle);
+
+        function stateHandle() {
+            if (
+
+                document.getElementById("inputNama").value == data_nama_gudang_edit &&
+                document.getElementById("inputNoTlp").value == data_no_tlp_gudang_edit &&
+                document.getElementById("inputAlamat").value == data_alamat_gudang_edit &&
+                document.getElementById("inputTitikLokasi").value == data_titik_gudang_edit &&
+                document.getElementById("inputProvinsiGudang").value == data_provinsi_gudang_edit
+            ) {
+                button.disabled = true;
+            } else {
+                button.disabled = false;
+            }
+
+        }
+        stateHandle();
+    }
+
+    function tampilkan_pesan(pesan, type) {
+        Toast.fire({
+            icon: type,
+            title: pesan
+        });
+    }
+
+    function generate_token() {
+        var now = new Date();
+        timestamp = now.getFullYear().toString(); // 2011
+        timestamp += (now.getMonth < 12 ? '0' : '') + now.getMonth().toString();
+        timestamp += ((now.getDate < 30) ? '0' : '') + now.getDate().toString();
+        timestamp += ((now.getHours < 12) ? '0' : '') + now.getHours().toString();
+        timestamp += ((now.getMinutes < 60) ? '0' : '') + now.getMinutes().toString();
+        timestamp += ((now.getSeconds < 60) ? '0' : '') + now.getSeconds().toString();
+        return timestamp;
+    }
+
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000
+    });
+
+    var table = $('#gudang').DataTable({
+        "columns": [
+            { "width": "6%" },
+            null,
+            null,
+            null,
+            { "width": "10%" },
+            { "width": "18%" },
+        ],
+        "paging": true,
+        "lengthChange": false,
+        "searching": true,
+        "ordering": true,
+        "info": true,
+        "autoWidth": false,
+        "responsive": true,
+        "processing": true,
+        "serverside": true,
+        "ajax": {
+            "url": $("#createGudangForm").data('url'),
+            "type": "get"
+        },
+        "deferRender": true,
+    });
+
+    var my_token = '{{API_MAPS_VIEW}}';
+
+    //Basic map
+    // DOCUMENTATION https://esri.github.io/esri-leaflet/examples/search-map-service.html
+
+
+    L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v10/tiles/256/{z}/{x}/{y}?access_token={accessToken}', {
+        maxZoom: 18,
+        id: 'advanced_map',
+        accessToken: my_token
+    }).addTo(mymap);
+
+    var theMarker = {};
+
+    var arcgisOnline = L.esri.Geocoding.arcgisOnlineProvider();
+
+    L.esri.Geocoding.geosearch({
+        providers: [
+            arcgisOnline,
+            L.esri.Geocoding.mapServiceProvider({
+                label: 'States and Counties',
+                url: 'https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer',
+                layers: [2, 3],
+                searchFields: ['NAME', 'STATE_NAME']
+            })
+        ]
+    }).addTo(mymap);
+
+    mymap.on('click', function(e) {
+        lat = e.latlng.lat;
+        lon = e.latlng.lng;
+
+        console.log("You clicked the map at LAT: " + lat + " and LONG: " + lon);
+        //Clear existing marker, 
+
+        if (theMarker != undefined) {
+            mymap.removeLayer(theMarker);
+        };
+        if (gambar_radius != undefined) {
+            mymap.removeLayer(gambar_radius);
+        };
+
+        //Add a marker to show where you clicked.
+        theMarker = L.marker([lat, lon]).addTo(mymap);
+        gambar_radius = L.circle([lat, lon], radius_default).addTo(mymap);
+        document.getElementById("radius").value = radius_default;
+        document.getElementById("inputTitikLokasi").value = lat + "," + lon;
+
+    });
+
+    function validate_coordinate() {
+        var data = document.getElementById("inputTitikLokasi").value;
+        if (data) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    //DETAIL DATA
+    $('body').on('click', '.detailGudang', function(event) {
+        event.preventDefault();
+        var id_gudang = $(this).data("id");
+
+        $.ajax({
+            url: $("#createGudangForm").data('url') + 'detail/',
+            type: 'get',
+            dataType: 'json',
+            data: {
+                csrfmiddlewaretoken: getCookie('csrftoken'),
+                id: id_gudang
+            },
+            success: function(response) {
+                document.getElementById("id").value = response.data.id;
+                document.getElementById("inputId").value = response.data.id_gudang;
+                document.getElementById("inputNama").value = response.data.nama_gudang;
+                document.getElementById("inputNoTlp").value = response.data.no_tlp;
+                document.getElementById("inputAlamat").value = response.data.alamat;
+                document.getElementById("inputTitikLokasi").value = response.data.titik_lokasi;
+                document.getElementById("radius").value = response.data.radius;
+
+                if (theMarker) {
+                    mymap.removeLayer(theMarker);
+                }
+                if (gambar_radius) {
+                    mymap.removeLayer(gambar_radius);
+                }
+
+                try {
+                    var lokasi = response.data.titik_lokasi;
+                    var data_loc = lokasi.split(',');
+                    lat = data_loc[0];
+                    lon = data_loc[1];
+                    theMarker = L.marker([data_loc[0], data_loc[1]]).addTo(mymap);
+                    mymap.setView([data_loc[0], data_loc[1]], 13);
+
+                    setTimeout(function() { mymap.invalidateSize() }, 400);
+                } catch (err) {
+                    console.log('Data Lokasi Kosong!');
+                    setTimeout(function() { mymap.invalidateSize() }, 400);
+                }
+
+                try {
+                    var lokasi = response.data.titik_lokasi;
+                    var data_loc = lokasi.split(',');
+                    lat = data_loc[0];
+                    lon = data_loc[1];
+                    gambar_radius = L.circle([data_loc[0], data_loc[1]], response.data.radius).addTo(mymap);
+                } catch (err) {
+                    console.log(err);
+                }
+
+                document.getElementById("inputId").disabled = true;
+                document.getElementById("inputNama").disabled = true;
+                document.getElementById("inputNoTlp").disabled = true;
+                document.getElementById("inputAlamat").disabled = true;
+                document.getElementById("inputTitikLokasi").disabled = true;
+
+                document.getElementById("inputProvinsiGudang").value = response.data.id_provinsi_gudang;
+                document.getElementById("select2-inputProvinsiGudang-container").innerHTML = response.data.provinsi_gudang ? response.data.provinsi_gudang : 'Pilih Provinsi';
+
+                show_kota_list(response.data.id_provinsi_gudang, response.data.id_kota_gudang, response.data.kota_gudang);
+                show_kecamatan_list(response.data.id_kota_gudang, response.data.id_kecamatan_gudang, response.data.kecamatan_gudang);
+                show_desa_list(response.data.id_kecamatan_gudang, response.data.id_desa_gudang, response.data.desa_gudang);
+                show_kode_pos_list(response.data.id_provinsi_gudang, response.data.id_kota_gudang, response.data.id_kecamatan_gudang, response.data.id_desa_gudang, response.data.id_kode_pos_gudang, response.data.kode_pos_gudang);
+
+                document.getElementById("inputProvinsiGudang").disabled = true;
+                document.getElementById("inputKotaGudang").disabled = true;
+                document.getElementById("inputKecamatanGudang").disabled = true;
+                document.getElementById("inputDesaGudang").disabled = true;
+                document.getElementById("inputKodePosGudang").disabled = true;
+
+
+                document.getElementById("updateButton").style.display = "none";
+                document.getElementById("createButton").style.display = "none";
+                document.getElementById("title_modal").innerHTML = "Detail Data Gudang";
+
+                $('#modal_gudang').modal('show');
+            }
+        })
+
+    });
+
+    //CREATE DATA (SHOW FORM)
+    $("#createGudang").click(function(e) {
+        e.preventDefault();
+        $("#createButton").prop("disabled", false);
+        mymap.removeLayer(theMarker);
+        document.getElementById("inputId").value = generate_token();
+        lat = 0;
+        lon = 0;
+        if (gambar_radius) {
+            mymap.removeLayer(gambar_radius);
+        }
+        document.getElementById("id").value = "";
+        document.getElementById("inputNama").value = "";
+        document.getElementById("inputNoTlp").value = "";
+        document.getElementById("inputAlamat").value = "";
+        document.getElementById("inputTitikLokasi").value = "";
+        document.getElementById("radius").value = "";
+
+        document.getElementById("inputId").disabled = false;
+        document.getElementById("inputNama").disabled = false;
+        document.getElementById("inputNoTlp").disabled = false;
+        document.getElementById("inputAlamat").disabled = false;
+        document.getElementById("inputTitikLokasi").disabled = false;
+
+        document.getElementById("inputProvinsiGudang").disabled = false;
+        document.getElementById("inputKotaGudang").disabled = false;
+        document.getElementById("inputKecamatanGudang").disabled = false;
+        document.getElementById("inputDesaGudang").disabled = false;
+        document.getElementById("inputKodePosGudang").disabled = false;
+
+        $('#inputProvinsiGudang').val(null).trigger('change');
+        $('#inputKotaGudang').val(null).trigger('change');
+        $('#inputKecamatanGudang').val(null).trigger('change');
+        $('#inputDesaGudang').val(null).trigger('change');
+        $('#inputKodePosGudang').val(null).trigger('change');
+
+
+        document.getElementById("updateButton").style.display = "none";
+        document.getElementById("createButton").style.display = "block";
+        document.getElementById("title_modal").innerHTML = "Tambah Data Gudang";
+
+        $('#modal_gudang').modal('show');
+        setTimeout(function() { mymap.invalidateSize() }, 400);
+    });
+
+    // CREATE DATA ACTION
+    $("#createButton").click(function(e) {
+        e.preventDefault();
+        $("#createButton").prop("disabled", true);
+        if (!$("#createGudangForm").valid()) {
+            setTimeout(function(){
+                $("#createButton").prop("disabled", false);
+            },500)
+            return;
+        }
+        if (validate_coordinate() == true) {
+            var serializeData = $("#createGudangForm").serialize();
+            $.ajax({
+                url: $("#createGudangForm").data('url'),
+                data: serializeData,
+                type: 'post',
+                cache: false,
+                success: function(response) {
+                    table.ajax.reload();
+                    $('#modal_gudang').modal('hide');
+                    tampilkan_pesan(response.msg, response.type);
+                    $("#createGudangForm")[0].reset();
+                    $("#createButton").prop("disabled", false);
+
+                },
+                error: function(xhr, status, error) {
+                    var error_response = xhr.responseJSON;
+                    $("#createButton").prop("disabled", false);
+
+                    tampilkan_pesan(error_response.msg, error_response.type);
+                },
+            })
+
+            if (theMarker) {
+                mymap.removeLayer(theMarker);
+            }
+            document.getElementById("inputId").value = generate_token();
+            document.getElementById("inputTitikLokasi").value = "";
+        } else {
+            tampilkan_pesan('Titik Lokasi Belum Di tentukan!', 'error');
+            $("#createButton").prop("disabled", false);
+        }
+
+    });
+
+
+
+    //EDIT DATA SHOW
+    $('body').on('click', '.editGudang', function(event) {
+        event.preventDefault();
+
+        $("#updateButton").prop("disabled", false);
+        var id_gudang = $(this).data("id");
+
+        $.ajax({
+            url: $("#createGudangForm").data('url') + 'detail/',
+            type: 'get',
+            dataType: 'json',
+            data: {
+                csrfmiddlewaretoken: getCookie('csrftoken'),
+                id: id_gudang
+            },
+            success: function(response) {
+
+                document.getElementById("id").value = response.data.id;
+                document.getElementById("inputId").value = response.data.id_gudang;
+                document.getElementById("inputNama").value = response.data.nama_gudang;
+                document.getElementById("inputNoTlp").value = response.data.no_tlp;
+                document.getElementById("inputAlamat").value = response.data.alamat;
+                document.getElementById("inputTitikLokasi").value = response.data.titik_lokasi;
+                document.getElementById("radius").value = response.data.radius;
+
+                document.getElementById("inputProvinsiGudang").value = response.data.id_provinsi_gudang;
+                document.getElementById("select2-inputProvinsiGudang-container").innerHTML = response.data.provinsi_gudang ? response.data.provinsi_gudang : 'Pilih Provinsi';
+
+                show_kota_list(response.data.id_provinsi_gudang, response.data.id_kota_gudang, response.data.kota_gudang);
+                show_kecamatan_list(response.data.id_kota_gudang, response.data.id_kecamatan_gudang, response.data.kecamatan_gudang);
+                show_desa_list(response.data.id_kecamatan_gudang, response.data.id_desa_gudang, response.data.desa_gudang);
+                show_kode_pos_list(response.data.id_provinsi_gudang, response.data.id_kota_gudang, response.data.id_kecamatan_gudang, response.data.id_desa_gudang, response.data.id_kode_pos_gudang, response.data.kode_pos_gudang);
+                set_data_edit(response);
+                // disable_button_when_not_changes();
+                if (theMarker) {
+                    mymap.removeLayer(theMarker);
+                }
+
+                if (gambar_radius) {
+                    mymap.removeLayer(gambar_radius);
+                }
+
+                try {
+                    var lokasi = response.data.titik_lokasi;
+                    var data_loc = lokasi.split(',');
+                    lat = data_loc[0];
+                    lon = data_loc[1];
+                    theMarker = L.marker([data_loc[0], data_loc[1]]).addTo(mymap);
+                    mymap.setView([data_loc[0], data_loc[1]], 13);
+                    setTimeout(function() { mymap.invalidateSize() }, 400);
+                } catch (err) {
+                    console.log('Data Lokasi Kosong!');
+                    setTimeout(function() { mymap.invalidateSize() }, 400);
+                }
+
+                try {
+                    var lokasi = response.data.titik_lokasi;
+                    var data_loc = lokasi.split(',');
+                    lat = data_loc[0];
+                    lon = data_loc[1];
+                    gambar_radius = L.circle([data_loc[0], data_loc[1]], response.data.radius).addTo(mymap);
+                } catch (err) {
+                    console.log(err);
+                }
+
+                document.getElementById("inputId").disabled = false;
+                document.getElementById("inputNama").disabled = false;
+                document.getElementById("inputNoTlp").disabled = false;
+                document.getElementById("inputAlamat").disabled = false;
+                document.getElementById("inputTitikLokasi").disabled = false;
+
+                document.getElementById("inputProvinsiGudang").disabled = false;
+                document.getElementById("inputKotaGudang").disabled = false;
+                document.getElementById("inputKecamatanGudang").disabled = false;
+                document.getElementById("inputDesaGudang").disabled = false;
+                document.getElementById("inputKodePosGudang").disabled = false;
+
+                document.getElementById("updateButton").style.display = "block";
+                document.getElementById("createButton").style.display = "none";
+                document.getElementById("title_modal").innerHTML = "Edit Data Gudang";
+
+
+                $('#modal_gudang').modal('show');
+            },
+            error: function(xhr, status, error) {
+                var error_response = xhr.responseJSON;
+
+                tampilkan_pesan(error_response.msg, error_response.type);
+            },
+        })
+
+    });
+
+
+    // Update action
+    $("#updateButton").click(function(e) {
+        e.preventDefault();
+        $("#updateButton").prop("disabled", true);
+        var serializeData = $("#createGudangForm").serialize();
+
+        $.ajax({
+            url: $("#createGudangForm").data('url') + 'update/',
+            data: serializeData,
+            type: 'post',
+            cache: false,
+            success: function(response) {
+                table.ajax.reload();
+                $('#modal_gudang').modal('hide');
+                tampilkan_pesan(response.msg, response.type);
+                $("#createGudangForm")[0].reset();
+                $("#updateButton").prop("disabled", false);
+
+            },
+            error: function(xhr, status, error) {
+                var error_response = xhr.responseJSON;
+                $("#updateButton").prop("disabled", false);
+                tampilkan_pesan(error_response.msg, error_response.type);
+            },
+        })
+    });
+
+
+    //BAGIAN DELETE
+    $('body').on('click', '.deleteGudang', function() {
+        var id_gudang = $(this).data("id");
+        var nama_gudang = $(this).data("nama");
+        Swal.fire({
+            title: 'Anda yakin?',
+            text: "Yakin menghapus " + nama_gudang + "!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Tidak, Batalkan!',
+        }).then((result) => {
+            if (result.value) {
+                $.ajax({
+                    url: $("#createGudangForm").data('url') + 'delete/',
+                    data: {
+                        csrfmiddlewaretoken: getCookie('csrftoken'),
+                        id: id_gudang
+                    },
+                    type: 'post',
+                    dataType: 'json',
+                    success: function(response) {
+                        tampilkan_pesan(response.msg, response.type);
+                        table.ajax.reload();
+                    },
+                    error: function(xhr, status, error) {
+                        var error_response = xhr.responseJSON;
+                        tampilkan_pesan(error_response.msg, error_response.type);
+                    }
+                });
+
+            }
+        })
+    });
+
+    //BAGIAN ARSIP
+    $('body').on('click', '.arsipGudang', function() {
+        var id_gudang = $(this).data("id");
+        var nama_gudang = $(this).data("nama");
+        Swal.fire({
+            title: 'Anda yakin?',
+            text: "Yakin mengarsipkan " + nama_gudang + "!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, Arsipkan!',
+            cancelButtonText: 'Tidak, Batalkan!',
+        }).then((result) => {
+            if (result.value) {
+                $.ajax({
+                    url: $("#createGudangForm").data('url') + 'arsip/',
+                    data: {
+                        csrfmiddlewaretoken: getCookie('csrftoken'),
+                        id: id_gudang
+                    },
+                    type: 'post',
+                    dataType: 'json',
+                    success: function(response) {
+                        tampilkan_pesan(response.msg, response.type);
+                        table.ajax.reload();
+                    },
+                    error: function(xhr, status, error) {
+                        var error_response = xhr.responseJSON;
+                        tampilkan_pesan(error_response.msg, error_response.type);
+                    }
+                });
+
+            }
+        })
+    });
+
+    //BAGIAN UNARSIP
+    $('body').on('click', '.unarsipGudang', function() {
+        var id_gudang = $(this).data("id");
+        var nama_gudang = $(this).data("nama");
+        Swal.fire({
+            title: 'Anda yakin?',
+            text: "Yakin mengaktifkan " + nama_gudang + "!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, Aktifkan!',
+            cancelButtonText: 'Tidak, Batalkan!',
+        }).then((result) => {
+            if (result.value) {
+                $.ajax({
+                    url: $("#createGudangForm").data('url') + 'unarsip/',
+                    data: {
+                        csrfmiddlewaretoken: getCookie('csrftoken'),
+                        id: id_gudang
+                    },
+                    type: 'post',
+                    dataType: 'json',
+                    success: function(response) {
+                        tampilkan_pesan(response.msg, response.type);
+                        table.ajax.reload();
+                    },
+                    error: function(xhr, status, error) {
+                        var error_response = xhr.responseJSON;
+                        tampilkan_pesan(error_response.msg, error_response.type);
+                    }
+                });
+
+            }
+        })
+    });
+
+    $('#modal_gudang').on('hide.bs.modal', function() {
+        setTimeout(function() {
+            var validator = $("#createGudangForm").validate();
+            validator.resetForm();
+
+        })
+    });
+});
+</script>
+{% endblock %}

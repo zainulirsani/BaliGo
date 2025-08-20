@@ -1,0 +1,378 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title_name %}
+<title>Pesan Pelanggan | BaliGo Ekspedisi</title>
+{% endblock %}
+{% block file_css %}
+<!-- DataTables -->
+<link rel="stylesheet" href="{% static 'assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+<link rel="stylesheet" href="{% static 'assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+<!-- SweetAlert2 -->
+<link rel="stylesheet" href="{% static 'assets/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css' %}">
+<!-- Summernote css -->
+<link href="{% static 'assets/plugins/summernote/summernote-bs4.min.css' %}" rel="stylesheet" type="text/css" />
+{% endblock %}
+{% block content_header %}
+<div class="container-fluid">
+    <div class="row mb-2">
+        <div class="col-sm-6">
+            <h1 class="m-0 text-dark">Pesan</h1>
+        </div><!-- /.col -->
+        <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                <li class="breadcrumb-item active">Pesan</li>
+            </ol>
+        </div><!-- /.col -->
+    </div><!-- /.row -->
+</div><!-- /.container-fluid -->
+{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Data Pesan</h3>
+        <div class="card-tools">
+        </div>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+        <table id="tabel-pesan" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Nama Pengirim</th>
+                    <th>Email</th>
+                    <th>No. Hp</th>
+                    <th>Judul</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th>No</th>
+                    <th>Nama Pengirim</th>
+                    <th>Email</th>
+                    <th>No. Hp</th>
+                    <th>Judul</th>
+                    <th>Action</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <!-- /.card-body -->
+</div>
+<!-- /.modal -->
+<div class="modal fade" id="modal_pesan">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="title_modal">Balas Pesan</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="createPesanForm" method="post" data-url="{% url 'pesan' %}">
+                    {% csrf_token %}
+                    {% for field in form %}
+                    <div class="form-group row">
+                        <label for="{{ field.name }}" class="col-sm-2 col-form-label">{{ field.label }}</label>
+                        <div class="col-sm-10">
+                            {{ field }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </form>
+                <form id="createBalasanPesanForm" method="post" data-url="{% url 'pesan' %}">
+                    {% csrf_token %}
+                    {% for field in form_balasan %}
+                    {% if not field.name == 'pesan_pelanggan' %}
+                    <div class="form-group row">
+                        <label for="{{ field.name }}" class="col-sm-2 col-form-label">{{ field.label }}</label>
+                        <div class="col-sm-10">
+                            {{ field }}
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                    <input type="hidden" name="pesan_pelanggan" id="id_pesan_balasan">
+                </form>
+            </div>
+            <div class="col-md-12">
+                <div class="card card-widget">
+                    <div class="card-header">
+                        <div class="user-block">
+                            <img class="img-circle" src="{% static 'assets/dist/img/message_icon.svg'%}" alt="User Image">
+                            <span class="username"><a href="#">Balasan</a></span>
+                        </div>
+                    </div>
+                    <div class="card-footer card-comments" id="data_balasan"></div>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
+                <button type="button" class="btn btn-primary" id="createButton">Balas</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+{% endblock %}
+{% block file_js %}
+<!-- Bootstrap 4 -->
+<script src="{% static 'assets/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<!-- DataTables -->
+<script src="{% static 'assets/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+<!-- SweetAlert2 -->
+<script src="{% static 'assets/plugins/sweetalert2/sweetalert2.min.js' %}"></script>
+<!-- Summernote js -->
+<script src="{% static 'assets/plugins/summernote/summernote-bs4.min.js' %}"></script>
+<!--tinymce js-->
+<script src="{% static 'assets/plugins/tinymce/tinymce.min.js' %}"></script>
+<script>
+$(document).ready(function() {
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    var url_edit = '';
+
+    function tampilkan_pesan(pesan, type) {
+        Toast.fire({
+            icon: type,
+            title: pesan
+        });
+    }
+
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000
+    });
+
+    0 < $("#id_balasan").length && tinymce.init({
+        selector: "textarea#id_balasan",
+        height: 300,
+        plugins: ["advlist autolink link image lists charmap print preview hr anchor pagebreak spellchecker", "searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking", "save table contextmenu directionality emoticons template paste textcolor"],
+        toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | l      ink image | print preview media fullpage | forecolor backcolor emoticons",
+        style_formats: [{
+            title: "Bold text",
+            inline: "b"
+        }, {
+            title: "Red text",
+            inline: "span",
+            styles: {
+                color: "#ff0000"
+            }
+        }, {
+            title: "Red header",
+            block: "h1",
+            styles: {
+                color: "#ff0000"
+            }
+        }, {
+            title: "Example 1",
+            inline: "span",
+            classes: "example1"
+        }, {
+            title: "Example 2",
+            inline: "span",
+            classes: "example2"
+        }, {
+            title: "Table styles"
+        }, {
+            title: "Table row 1",
+            selector: "tr",
+            classes: "tablerow1"
+        }]
+    })
+
+    var table = $('#tabel-pesan').DataTable({
+        "columns": [{
+                "width": "6%"
+            },
+            {
+                "width": "20%"
+            },
+            {
+                "width": "16%"
+            },
+            null,
+            null, {
+                "width": "24%"
+            },
+        ],
+        "paging": true,
+        "lengthChange": false,
+        "searching": true,
+        "ordering": true,
+        "info": true,
+        "autoWidth": false,
+        "responsive": true,
+        "processing": true,
+        "serverside": true,
+        "ajax": {
+            "url": $("#createPesanForm").data('url'),
+            "type": "get"
+        }
+    });
+
+    function formatDate(date) {
+        var hours = date.getHours();
+        var minutes = date.getMinutes();
+        var seconds = date.getSeconds();
+        var ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12; // the hour '0' should be '12'
+        hours = hours < 10 ? '0'+hours : hours;
+        minutes = minutes < 10 ? '0'+minutes : minutes;
+        seconds = seconds < 10 ? '0'+seconds : seconds;
+        var strTime = hours + ':' + minutes + ':' + seconds + `-${ampm}`;
+        // return (date.getMonth()+1) + "/" + date.getDate() + "/" + date.getFullYear() + "  " + strTime;
+        return date.getFullYear() + "-" + ("0" + (date.getMonth()+1)).slice(-2) + "-" + date.getDate() + " " + strTime;
+    }
+
+    //Balas Pesan
+    $('body').on('click', '.balasPesan', function(event) {
+        event.preventDefault();
+        $("#createButton").prop("disabled", false);
+        var id_Pesan = $(this).data("id");
+        $("#createBalasanPesanForm")[0].reset();
+        $.ajax({
+            url: id_Pesan + '/balas/',
+            type: 'get',
+            success: function(response) {
+                document.getElementById("id_nama").value = response.data.nama;
+                document.getElementById("id_email").value = response.data.email;
+                document.getElementById("id_no_hp").value = response.data.no_hp;
+                document.getElementById("id_judul").value = response.data.judul;
+                document.getElementById("id_pesan").value = response.data.pesan;
+                document.getElementById("id_pesan_balasan").value = response.data.id;
+
+                document.getElementById("id_nama").disabled = true;
+                document.getElementById("id_email").disabled = true;
+                document.getElementById("id_no_hp").disabled = true;
+                document.getElementById("id_judul").disabled = true;
+                document.getElementById("id_pesan").disabled = true;
+
+                var html_balasan = '';
+                var data_balasan = response.data_balasan;
+                for (var i = 0; i < data_balasan.length; i++) {
+                    console.log(data_balasan);
+                    html_balasan += '<div class="card-comment"><img class="img-circle img-sm" src="https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png" alt="User Image"><div class="comment-text"><span class="username">Admin<span class="text-muted float-right">' + formatDate(new Date(data_balasan[i][2])) + '</span></span>' + data_balasan[i][1] + '</div></div>';
+                }
+
+                document.getElementById("data_balasan").innerHTML = html_balasan;
+
+                document.getElementById("createButton").style.visibility = "visible";
+                document.getElementById("title_modal").innerHTML = "Balas Pesan";
+
+                $('#modal_pesan').modal('show');
+            }
+        })
+
+    });
+
+
+    //BAGIAN DELETE
+    $('body').on('click', '.deletePesan', function() {
+        var id_Pesan = $(this).data("id");
+        var nama_Pesan = $(this).data("nama");
+        Swal.fire({
+            title: 'Anda yakin?',
+            text: "Yakin menghapus " + nama_Pesan + "!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!',
+        }).then((result) => {
+            if (result.value) {
+                $.ajax({
+                    url: id_Pesan + '/delete/',
+                    data: {
+                        csrfmiddlewaretoken: getCookie('csrftoken'),
+                        id: id_Pesan
+                    },
+                    type: 'post',
+                    dataType: 'json',
+                    success: function(response) {
+                        tampilkan_pesan(response.msg, response.type);
+                        table.ajax.reload();
+                    },
+                    error: function(xhr, status, error) {
+                        var error_response = xhr.responseJSON;
+                        tampilkan_pesan(error_response.msg, error_response.type);
+                    }
+                });
+
+            }
+        })
+    });
+
+
+    // Update action
+    $("#createButton").click(function(e) {
+        e.preventDefault();
+        $("#createButton").prop("disabled", true);
+        var balasan_tinymce = tinymce.activeEditor.getContent();
+        document.getElementById("id_balasan").value = balasan_tinymce;
+        var serializeData = $("#createBalasanPesanForm").serialize();
+
+        $.ajax({
+            url: $("#createBalasanPesanForm").data('url'),
+            data: serializeData,
+            type: 'post',
+            cache: false,
+            success: function(response) {
+                table.ajax.reload();
+                $('#modal_pesan').modal('hide');
+                tampilkan_pesan(response.msg, response.type);
+                $("#createPesanForm")[0].reset();
+                $("#createBalasanPesanForm")[0].reset();
+                $("#createButton").prop("disabled", false);
+            },
+            error: function(xhr, status, error) {
+                var error_response = xhr.responseJSON;
+                tampilkan_pesan(error_response.msg, error_response.type);
+                $("#createButton").prop("disabled", false);
+            },
+        })
+
+
+    });
+
+
+
+
+    $('#modal_pesan').on('hide.bs.modal', function() {
+        setTimeout(function() {
+            var validator = $("#createPesanForm").validate();
+            validator.resetForm();
+
+        })
+    });
+
+
+});
+</script>
+{% endblock %}

@@ -1,0 +1,1009 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title_name %}
+<title>Pelanggan | BaliGo Ekspedisi</title>
+{% endblock %}
+{% block file_css %}
+<!-- DataTables -->
+<link rel="stylesheet" href="{% static 'assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+<link rel="stylesheet" href="{% static 'assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+<!-- SweetAlert2 -->
+<link rel="stylesheet" href="{% static 'assets/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css' %}">
+<!-- Select2 -->
+<link rel="stylesheet" href="{% static 'assets/plugins/select2/css/select2.min.css' %}">
+<link rel="stylesheet" href="{% static 'assets/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
+<style type="text/css">
+@media (max-width: 768px) {
+    .buttontext {
+        width: 95px;
+        overflow: hidden;
+        white-space: nowrap;
+        display: block;
+        text-overflow: ellipsis;
+    }
+}
+</style>
+{% endblock %}
+{% block content_header %}
+<div class="container-fluid">
+    <div class="row mb-2">
+        <div class="col-sm-6">
+            <h1 class="m-0 text-dark">Pelanggan</h1>
+        </div><!-- /.col -->
+        <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                <li class="breadcrumb-item active">Pelanggan</li>
+            </ol>
+        </div><!-- /.col -->
+    </div><!-- /.row -->
+</div><!-- /.container-fluid -->
+{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Data Pelanggan</h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-block bg-gradient-primary" id="createPelanggan" title="Tambah Pelanggan">
+                <span class="buttontext"><i class="fa fa-plus"></i>&nbsp; Tambah Pelanggan</span>
+            </button>
+        </div>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+        <table id="pelanggan" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>ID</th>
+                    <th>Nama</th>
+                    <th>No. Tlp</th>
+                    <th>Status Akun</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th>No</th>
+                    <th>ID</th>
+                    <th>Nama</th>
+                    <th>No. Tlp</th>
+                    <th>Status Akun</th>
+                    <th>Action</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <!-- /.card-body -->
+</div>
+<!-- /.modal -->
+<div class="modal fade" id="modal_pelanggan">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="title_modal">Detail Data Pelanggan</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="createPelangganForm" method="post" data-url_provinsi="{% url 'list_provinsi' %}" data-url="{% url 'pelanggan' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="id" id="id">
+                    {% for field in form %}
+                    <div class="form-group row" id="input_group_{{field.name}}">
+                        <label for="{{ field.name }}" class="col-sm-2 col-form-label">{{ field.label }}</label>
+                        <div class="col-sm-10">
+                            {{ field }}
+                            {% if field.name == 'alamat' %}
+                            <div class="form-group mt-3">
+                                <select name="provinsi" id="id-provinsi" required class="form-control">
+                                    <option value="" selected disabled>Pilih Provinsi</option>
+                                </select>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-6">
+                                    <select name="kota" id="id-kota" class="form-control">
+                                        <option value="">Pilih Kota</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-6">
+                                    <select name="kecamatan" id="id-kecamatan" class="form-control">
+                                        <option value="">Pilih Kecamatan</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-6">
+                                    <select name="desa" id="id-desa" class="form-control">
+                                        <option value="">Pilih Desa</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-6">
+                                    <select name="kode_pos" id="id-kode_pos" class="form-control">
+                                        <option value="">Pilih Kode POS</option>
+                                    </select>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                    </div>
+                    {% endfor %}
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
+                <button type="button" class="btn btn-primary" id="updateButton">Update</button>
+                <button type="button" class="btn btn-success" id="createButton">Save</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+{% endblock %}
+{% block file_js %}
+<!-- Bootstrap 4 -->
+<script src="{% static 'assets/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<!-- DataTables -->
+<script src="{% static 'assets/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+<!-- SweetAlert2 -->
+<script src="{% static 'assets/plugins/sweetalert2/sweetalert2.min.js' %}"></script>
+<!-- Select2 -->
+<script src="{% static 'assets/plugins/select2/js/select2.full.min.js' %}"></script>
+<script>
+$(document).ready(function() {
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+
+
+    function generate_token() {
+        var now = new Date();
+        timestamp = now.getFullYear().toString(); // 2011
+        timestamp += (now.getMonth < 12 ? '0' : '') + now.getMonth().toString();
+        timestamp += ((now.getDate < 30) ? '0' : '') + now.getDate().toString();
+        timestamp += ((now.getHours < 12) ? '0' : '') + now.getHours().toString();
+        timestamp += ((now.getMinutes < 60) ? '0' : '') + now.getMinutes().toString();
+        timestamp += ((now.getSeconds < 60) ? '0' : '') + now.getSeconds().toString();
+        return timestamp;
+    }
+
+    function tampilkan_pesan(pesan, type) {
+        Toast.fire({
+            icon: type,
+            title: pesan
+        });
+    }
+
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000
+    });
+
+    var table = $('#pelanggan').DataTable({
+        "columns": [
+            { "width": "6%" },
+            null,
+            null,
+            null,
+            null,
+            { "width": "18%" },
+        ],
+        "paging": true,
+        "lengthChange": false,
+        "searching": true,
+        "ordering": true,
+        "info": true,
+        "autoWidth": false,
+        "responsive": true,
+        "processing": true,
+        "serverside": true,
+        "ajax": {
+            "url": $("#createPelangganForm").data('url'),
+            "type": "get"
+        },
+        initComplete: function() {
+            // Apply the search
+            this.api().columns().every(function() {
+                var that = this;
+
+                $('input', this.footer()).on('keyup change clear', function() {
+                    if (that.search() !== this.value) {
+                        that
+                            .search(this.value)
+                            .draw();
+                    }
+                });
+
+                $('select', this.footer()).on('keyup change clear', function() {
+                    if (that.search() !== this.value) {
+                        that
+                            .search(this.value)
+                            .draw();
+                    }
+                });
+            });
+        }
+    });
+
+    $('#pelanggan tfoot th').each(function() {
+        var title = $(this).text();
+        if (title != 'Action' && title != 'No') {
+            if (title == 'Status Akun') {
+                $(this).html('<select class="form-control" placeholder="Filter Status"><option value="">All</option><option value="personal">Personal</option><option value="company">Company</option><option value="goverment">Goverment</option><option value="Active">Active</option><option value="Tidak Aktif">Tidak Aktif</option></select>');
+            } else {
+                $(this).html('<input type="text" class="form-control" placeholder="Search ' + title + '" />');
+            }
+
+        }
+
+    });
+
+    // FORM VALIDATION
+    function process_str(msg) {
+        var out = msg.replace("_", " ");
+        var splitStr = out.toLowerCase().split(' ');
+        for (var i = 0; i < splitStr.length; i++) {
+            // You do not need to check if i is larger than splitStr length, as your for does that for you
+            // Assign it back to the array
+            splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);
+        }
+        // Directly return the joined string
+        return splitStr.join(' ');
+    }
+
+    function validation(id_input_field) {
+        var inpObj = document.getElementById(id_input_field);
+        if (!inpObj.checkValidity()) {
+            tampilkan_pesan(process_str(inpObj.name) + ' <= ' + inpObj.validationMessage, 'error');
+            return false;
+        } else {
+            return true;
+        }
+        $("#updateButton").prop("disabled", false);
+    }
+
+    function validatePhoneNumber(input_str) {
+        var re = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im;
+
+        if ((re.test(input_str)) == false) {
+            tampilkan_pesan('No Hp tidak valid, mohon di koreksi ya!', 'error');
+        }
+        return re.test(input_str);
+
+    }
+
+    $(function() {
+        $("input[name='no_telp']").on('input', function(e) {
+            $(this).val($(this).val().replace(/[^0-9]/g, ''));
+        });
+    });
+
+    //DETAIL DATA
+    $('body').on('click', '.detailPelanggan', function(event) {
+        event.preventDefault();
+        var id_pelanggan = $(this).data("id");
+
+        $.ajax({
+            url: $("#createPelangganForm").data('url') + 'detail/',
+            data: {
+                csrfmiddlewaretoken: getCookie('csrftoken'),
+                id: id_pelanggan
+            },
+            type: 'get',
+            success: function(response) {
+                // console.log(response);
+                document.getElementById("title_modal").innerHTML = "Detail Pelanggan";
+
+                document.getElementById("id").value = response.data.id;
+                document.getElementById("id_first_name").value = response.data.first_name;
+                document.getElementById("id_no_personil").value = response.data.no_personil;
+                document.getElementById("id_email").value = response.data.email;
+                document.getElementById("id_alamat").value = response.data.alamat;
+                document.getElementById("id_register_sebagai").value = response.data.register_sebagai;
+                document.getElementById("id_no_telp").value = response.data.no_telp;
+                document.getElementById("id_username").value = response.data.username;
+
+                document.getElementById("id_first_name").disabled = true;
+                document.getElementById("id_no_personil").disabled = true;
+                document.getElementById("id_email").disabled = true;
+                document.getElementById("id_username").disabled = true;
+                document.getElementById("id_alamat").disabled = true;
+                document.getElementById("id_register_sebagai").disabled = true;
+                document.getElementById("id_no_telp").disabled = true;
+                document.getElementById("input_group_password").style.display = "none";
+                document.getElementById("input_group_re_password").style.display = "none";
+                document.getElementById("input_group_no_personil").style.display = "";
+
+
+                document.getElementById("updateButton").style.display = "none";
+                document.getElementById("createButton").style.display = "none";
+                document.getElementById("title_modal").innerHTML = "Detail Data Pelanggan";
+                // $_provinsi = null;
+                // try {
+                //     $('#id-provinsi').val(null).trigger('change');
+                //     $('#id-kota').val(null).trigger('change');
+                //     $('#id-kecamatan').val(null).trigger('change');
+                //     $('#id-desa').val(null).trigger('change');
+                //     $('#id-kode_pos').val(null).trigger('change');
+                    
+                //     $_provinsi = response.data.hasOwnProperty('detail_pelanggan') ? response.data.detail_pelanggan.provinsi : 0;
+                //     if($_provinsi){
+                //         setTimeout(function(){
+                //             $('#id-provinsi').val($_provinsi).trigger('change');
+                //         },200)
+                //         setTimeout(function(){
+                //             $('#id-kota').val('').trigger('change');
+                //             $('#id-kecamatan').val('').trigger('change');
+                //             $('#id-desa').val('').trigger('change');
+                //             $('#id-kode_pos').val('').trigger('change');
+                //         },400);
+                //     }
+
+                //     try {
+                //         $_kota = response.data.hasOwnProperty('detail_pelanggan') ? response.data.detail_pelanggan.kota : 0;
+                //         if($_kota){
+                //             setTimeout(function(){
+                //                 $('#id-kota').val($_kota).trigger('change');
+                //             },450);
+                //         }
+                //         setTimeout(function(){
+                //             $('#id-kecamatan').val('').trigger('change');
+                //             $('#id-desa').val('').trigger('change');
+                //             $('#id-kode_pos').val('').trigger('change');
+                //         },650)
+                //     } catch(error){}
+
+                //     try {
+                //         $_kecamatan = response.data.hasOwnProperty('detail_pelanggan') ? response.data.detail_pelanggan.kecamatan : 0;
+                //         if($_kecamatan){
+                //             setTimeout(function(){
+                //                 $('#id-kecamatan').val($_kecamatan).trigger('change');
+                //             },700);
+                //         }
+                //         setTimeout(function(){
+                //             $('#id-desa').val('').trigger('change');
+                //             $('#id-kode_pos').val('').trigger('change');
+                //         },900)
+                //     } catch(error){}
+
+                //     try {
+                //         $_desa = response.data.hasOwnProperty('detail_pelanggan') ? response.data.detail_pelanggan.desa : 0;
+                //         if($_desa){
+                //             setTimeout(function(){
+                //                 $('#id-desa').val($_desa).trigger('change');
+                //             },950);
+                //         }
+                //         setTimeout(function(){
+                //             $('#id-kode_pos').val('').trigger('change');
+                //         },1150)
+                //     } catch(error){}
+
+                //     try {
+                //         $_kodepos = response.data.hasOwnProperty('detail_pelanggan') ? response.data.detail_pelanggan.kode_pos : 0;
+                //         if($_kodepos){
+                //             setTimeout(function(){
+                //                 $('#id-kode_pos').val($_kodepos).trigger('change');
+                //             },1200);
+                //         }
+                //     } catch(error){}
+                // } catch(error){}
+                try {
+                    $('#id-provinsi').val(response.data.detail_pelanggan.provinsi_id);
+                    document.getElementById("select2-id-provinsi-container").innerHTML = response.data.detail_pelanggan.provinsi__nama_provinsi;
+                    show_kota_list(response.data.detail_pelanggan.provinsi_id, response.data.detail_pelanggan.kota_id, response.data.detail_pelanggan.kota__nama_kota);
+                    show_kecamatan_list(response.data.detail_pelanggan.kota_id, response.data.detail_pelanggan.kecamatan_id, response.data.detail_pelanggan.kecamatan__nama_kecamatan);
+                    show_desa_list(response.data.detail_pelanggan.kecamatan_id, response.data.detail_pelanggan.desa_id, response.data.detail_pelanggan.desa__nama_desa);
+                    show_kode_pos_list(response.data.detail_pelanggan.provinsi_id, response.data.detail_pelanggan.kota_id, response.data.detail_pelanggan.kecamatan_id, response.data.detail_pelanggan.desa_id, response.data.detail_pelanggan.kode_pos_id, response.data.detail_pelanggan.kode_pos__kode_pos);
+
+                } catch(error){
+                    $('#select2-id-provinsi-container').html('Pilih Provinsi');
+                    $('#id-provinsi').val('');
+                    $('#select2-id-kota-container').html('Pilih Kota');
+                    $('#id-kota').val('');
+                    $('#select2-id-kecamatan-container').html('Pilih Kecamatan');
+                    $('#id-kecamatan').val('');
+                    $('#select2-id-desa-container').html('Pilih desa');
+                    $('#id-desa').val('');
+                    $('#select2-id-kode_pos-container').html('Pilih Kode Pos');
+                    $('#id-kode_pos').val('');
+                    console.log('DATA DETAIL PELANGGAN TIDAK DITEMUKAN (PROV, KOTA, KEC, dsb)');
+                }
+                
+
+                $('#id-provinsi').prop('disabled', true)
+                $('#id-kota').prop('disabled', true)
+                $('#id-kecamatan').prop('disabled', true)
+                $('#id-desa').prop('disabled', true)
+                $('#id-kode_pos').prop('disabled', true)
+                $('#modal_pelanggan').modal('show');
+            }
+        })
+
+    });
+
+    //CREATE DATA SHOW FORM
+    $("#createPelanggan").click(function(event) {
+        event.preventDefault();
+        $("#createPelangganForm")[0].reset();
+        $("#createButton").prop("disabled", false);
+        document.getElementById("title_modal").innerHTML = "Tambah Pelanggan";
+        document.getElementById("input_group_password").style.display = "";
+        document.getElementById("input_group_re_password").style.display = "";
+        document.getElementById("input_group_no_personil").style.display = "none";
+        $("#createPelangganForm :input").prop("disabled", false);
+        document.getElementById("updateButton").style.display = "none";
+        document.getElementById("createButton").style.display = "block";
+        $("#id_password").attr('required', '');
+        $("#id_re_password").attr('required', '');
+
+        $('#id-provinsi').val(null).trigger('change');
+        $('#id-kota').val(null).trigger('change');
+        $('#id-kecamatan').val(null).trigger('change');
+        $('#id-desa').val(null).trigger('change');
+        $('#id-kode_pos').val(null).trigger('change');
+        $('#modal_pelanggan').modal('show');
+    });
+
+    // CREATE DATA ACTION
+    $("#createButton").click(function(e) {
+        $("#createButton").prop("disabled", true);
+        if (!$("#createPelangganForm").valid()) { $("#createButton").prop("disabled", false); return };
+
+        e.preventDefault();
+        var serializeData = $("#createPelangganForm")[0];
+        serializeData = new FormData(serializeData);
+
+        $.ajax({
+            url: $("#createPelangganForm").data('url'),
+            data: serializeData,
+            type: 'post',
+            cache: false,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                $('#modal_pelanggan').modal('hide');
+                setTimeout(function() {
+                    table.ajax.reload();
+                    tampilkan_pesan(response.msg, response.type);
+                }, 1000);
+                $("#createPelangganForm")[0].reset();
+            },
+            error: function(xhr, status, error) {
+                // $('#modal_pengemasan').modal('hide');
+                setTimeout(function() {
+                    var error_response = xhr.responseJSON;
+                    tampilkan_pesan(error_response.msg, error_response.type);
+                }, 1000)
+                $("#createButton").prop("disabled", false);
+
+            },
+        })
+    });
+
+
+    //EDIT DATA SHOW
+    $('body').on('click', '.editPelanggan', function(event) {
+        event.preventDefault();
+        var id_pelanggan = $(this).data("id");
+        $("#updateButton").prop("disabled", false);
+        $.ajax({
+            url: $("#createPelangganForm").data('url') + 'detail/',
+            data: {
+                csrfmiddlewaretoken: getCookie('csrftoken'),
+                id: id_pelanggan
+            },
+            type: 'get',
+            success: function(response) {
+                document.getElementById("title_modal").innerHTML = "Edit Pelanggan";
+                document.getElementById("id").value = response.data.id;
+
+                document.getElementById("id_first_name").value = response.data.first_name;
+                document.getElementById("id_no_personil").value = response.data.no_personil;
+                document.getElementById("id_email").value = response.data.email;
+                document.getElementById("id_alamat").value = response.data.alamat;
+                document.getElementById("id_register_sebagai").value = response.data.register_sebagai;
+                document.getElementById("id_no_telp").value = response.data.no_telp;
+                document.getElementById("id_username").value = response.data.username;
+
+                document.getElementById("id_first_name").disabled = false;
+                document.getElementById("id_no_personil").disabled = true;
+                document.getElementById("id_email").disabled = false;
+                document.getElementById("id_username").disabled = false;
+                document.getElementById("id_alamat").disabled = false;
+                document.getElementById("id_register_sebagai").disabled = false;
+                document.getElementById("id_no_telp").disabled = false;
+
+                document.getElementById("input_group_password").style.display = "";
+                document.getElementById("input_group_re_password").style.display = "";
+                document.getElementById("input_group_no_personil").style.display = "";
+
+                document.getElementById("updateButton").style.display = "block";
+                document.getElementById("createButton").style.display = "none";
+
+                // $_provinsi = null;
+                // try {
+                //     $('#id-provinsi').val(null).trigger('change');
+                //     $('#id-kota').val(null).trigger('change');
+                //     $('#id-kecamatan').val(null).trigger('change');
+                //     $('#id-desa').val(null).trigger('change');
+                //     $('#id-kode_pos').val(null).trigger('change');
+
+                //     $_provinsi = response.data.hasOwnProperty('detail_pelanggan') ? response.data.detail_pelanggan.provinsi : 0;
+                //     if($_provinsi){
+                //         setTimeout(function(){
+                //             $('#id-provinsi').val($_provinsi).trigger('change');
+                //         },200)
+                //         setTimeout(function(){
+                //             $('#id-kota').val('').trigger('change');
+                //             $('#id-kecamatan').val('').trigger('change');
+                //             $('#id-desa').val('').trigger('change');
+                //             $('#id-kode_pos').val('').trigger('change');
+                //         },400);
+                //     }
+
+                //     try {
+                //         $_kota = response.data.hasOwnProperty('detail_pelanggan') ? response.data.detail_pelanggan.kota : 0;
+                //         if($_kota){
+                //             setTimeout(function(){
+                //                 $('#id-kota').val($_kota).trigger('change');
+                //             },450);
+                //         }
+                //         setTimeout(function(){
+                //             $('#id-kecamatan').val('').trigger('change');
+                //             $('#id-desa').val('').trigger('change');
+                //             $('#id-kode_pos').val('').trigger('change');
+                //         },650)
+                //     } catch(error){}
+
+                //     try {
+                //         $_kecamatan = response.data.hasOwnProperty('detail_pelanggan') ? response.data.detail_pelanggan.kecamatan : 0;
+                //         if($_kecamatan){
+                //             setTimeout(function(){
+                //                 $('#id-kecamatan').val($_kecamatan).trigger('change');
+                //             },700);
+                //         }
+                //         setTimeout(function(){
+                //             $('#id-desa').val('').trigger('change');
+                //             $('#id-kode_pos').val('').trigger('change');
+                //         },900)
+                //     } catch(error){}
+
+                //     try {
+                //         $_desa = response.data.hasOwnProperty('detail_pelanggan') ? response.data.detail_pelanggan.desa : 0;
+                //         if($_desa){
+                //             setTimeout(function(){
+                //                 $('#id-desa').val($_desa).trigger('change');
+                //             },950);
+                //         }
+                //         setTimeout(function(){
+                //             $('#id-kode_pos').val('').trigger('change');
+                //         },1150)
+                //     } catch(error){}
+
+                //     try {
+                //         $_kodepos = response.data.hasOwnProperty('detail_pelanggan') ? response.data.detail_pelanggan.kode_pos : 0;
+                //         if($_kodepos){
+                //             setTimeout(function(){
+                //                 $('#id-kode_pos').val($_kodepos).trigger('change');
+                //             },1200);
+                //         }
+                //     } catch(error){}
+                // } catch(error){}
+                try {
+                    $('#id-provinsi').val(response.data.detail_pelanggan.provinsi_id);
+                    document.getElementById("select2-id-provinsi-container").innerHTML = response.data.detail_pelanggan.provinsi__nama_provinsi;
+                    show_kota_list(response.data.detail_pelanggan.provinsi_id, response.data.detail_pelanggan.kota_id, response.data.detail_pelanggan.kota__nama_kota);
+                    show_kecamatan_list(response.data.detail_pelanggan.kota_id, response.data.detail_pelanggan.kecamatan_id, response.data.detail_pelanggan.kecamatan__nama_kecamatan);
+                    show_desa_list(response.data.detail_pelanggan.kecamatan_id, response.data.detail_pelanggan.desa_id, response.data.detail_pelanggan.desa__nama_desa);
+                    show_kode_pos_list(response.data.detail_pelanggan.provinsi_id, response.data.detail_pelanggan.kota_id, response.data.detail_pelanggan.kecamatan_id, response.data.detail_pelanggan.desa_id, response.data.detail_pelanggan.kode_pos_id, response.data.detail_pelanggan.kode_pos__kode_pos);
+
+                } catch(error){
+                    $('#select2-id-provinsi-container').html('Pilih Provinsi');
+                    $('#id-provinsi').val('');
+                    $('#select2-id-kota-container').html('Pilih Kota');
+                    $('#id-kota').val('');
+                    $('#select2-id-kecamatan-container').html('Pilih Kecamatan');
+                    $('#id-kecamatan').val('');
+                    $('#select2-id-desa-container').html('Pilih desa');
+                    $('#id-desa').val('');
+                    $('#select2-id-kode_pos-container').html('Pilih Kode Pos');
+                    $('#id-kode_pos').val('');
+                    console.log('DATA DETAIL PELANGGAN TIDAK DITEMUKAN (PROV, KOTA, KEC, dsb)');
+                } 
+                
+                $('#id-provinsi').prop('disabled', false)
+                $('#id-kota').prop('disabled', false)
+                $('#id-kecamatan').prop('disabled', false)
+                $('#id-desa').prop('disabled', false)
+                $('#id-kode_pos').prop('disabled', false)
+
+                $("#id_password").removeAttr('required');
+                $("#id_re_password").removeAttr('required');
+
+                document.getElementById("title_modal").innerHTML = "Edit Data Pelanggan";
+
+                $('#modal_pelanggan').modal('show');
+            }
+        })
+
+    });
+
+    // Update action
+    $("#updateButton").click(function(e) {
+        e.preventDefault();
+        $("#updateButton").prop("disabled", true);
+        var serializeData = $("#createPelangganForm").serialize();
+        if (validation('id_first_name') && validation('id_email') && validation('id_alamat') && validation('id_register_sebagai') && validation('id_no_telp')) {
+            $.ajax({
+                url: $("#createPelangganForm").data('url') + 'update/',
+                data: serializeData,
+                type: 'post',
+                cache: false,
+                success: function(response) {
+                    table.ajax.reload();
+                    $('#modal_pelanggan').modal('hide');
+                    tampilkan_pesan(response.msg, response.type);
+                    $("#createPelangganForm")[0].reset();
+                    $("#updateButton").prop("disabled", false);
+                },
+                error: function(xhr, status, error) {
+                    var error_response = xhr.responseJSON;
+
+                    tampilkan_pesan(error_response.msg, error_response.type);
+                    $("#updateButton").prop("disabled", false);
+                },
+            })
+        }
+
+    });
+
+    //BAGIAN DELETE
+    $('body').on('click', '.deletePelanggan', function() {
+        var id_pelanggan = $(this).data("id");
+        var first_name = $(this).data("nama");
+        Swal.fire({
+            title: 'Anda yakin?',
+            text: "Yakin menghapus " + first_name + "!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Tidak, Batalkan',
+        }).then((result) => {
+            if (result.value) {
+                $.ajax({
+                    url: $("#createPelangganForm").data('url') + 'delete/',
+                    data: {
+                        csrfmiddlewaretoken: getCookie('csrftoken'),
+                        id: id_pelanggan
+                    },
+                    type: 'post',
+                    dataType: 'json',
+                    success: function(response) {
+                        tampilkan_pesan(response.msg, response.type);
+                        table.ajax.reload();
+                    },
+                    error: function(xhr, status, error) {
+                        var error_response = xhr.responseJSON;
+                        tampilkan_pesan(error_response.msg, error_response.type);
+                    }
+                });
+
+            }
+        })
+    });
+
+
+    //BAGIAN ARSIP
+    $('body').on('click', '.arsipPelanggan', function() {
+        var id_pelanggan = $(this).data("id");
+        var first_name = $(this).data("nama");
+        Swal.fire({
+            title: 'Anda yakin?',
+            text: "Ingin mengarsipkan " + first_name + "!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, Arsipkan!',
+            cancelButtonText: 'Tidak, Batalkan',
+        }).then((result) => {
+            if (result.value) {
+                $.ajax({
+                    url: $("#createPelangganForm").data('url') + 'arsip/',
+                    data: {
+                        csrfmiddlewaretoken: getCookie('csrftoken'),
+                        id: id_pelanggan
+                    },
+                    type: 'post',
+                    dataType: 'json',
+                    success: function(response) {
+                        tampilkan_pesan(response.msg, response.type);
+                        table.ajax.reload();
+                    },
+                    error: function(xhr, status, error) {
+                        var error_response = xhr.responseJSON;
+                        tampilkan_pesan(error_response.msg, error_response.type);
+                    }
+                });
+
+            }
+        })
+    });
+
+
+    //BAGIAN UNARSIP
+    $('body').on('click', '.unarsipPelanggan', function() {
+        var id_pelanggan = $(this).data("id");
+        var first_name = $(this).data("nama");
+        Swal.fire({
+            title: 'Anda yakin?',
+            text: "Ingin mengaktifkan " + first_name + "!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, Aktifkan!',
+            cancelButtonText: 'Tidak, Batalkan',
+        }).then((result) => {
+            if (result.value) {
+                $.ajax({
+                    url: $("#createPelangganForm").data('url') + 'unarsip/',
+                    data: {
+                        csrfmiddlewaretoken: getCookie('csrftoken'),
+                        id: id_pelanggan
+                    },
+                    type: 'post',
+                    dataType: 'json',
+                    success: function(response) {
+                        tampilkan_pesan(response.msg, response.type);
+                        table.ajax.reload();
+                    },
+                    error: function(xhr, status, error) {
+                        var error_response = xhr.responseJSON;
+                        tampilkan_pesan(error_response.msg, error_response.type);
+                    }
+                });
+
+            }
+        })
+    });
+
+    $(document).on('hide.bs.modal', '.modal', function() {
+        setTimeout(function() {
+            var validator = $("#createPelangganForm").validate();
+            validator.resetForm();
+
+        }, 1000)
+    })
+
+    function show_provinsi_list() {
+        $.ajax({
+            type: "POST",
+            url: $("#createPelangganForm").data('url_provinsi'),
+            success: function(response) {
+                $("select#id-provinsi").append(response.data);
+            }
+        });
+    }
+    show_provinsi_list();
+
+    function show_kota_list(id_provinsi, id_kota_select, nama_kota) {
+        $.ajax({
+            type: "POST",
+            dataType: 'json',
+            contentType: "application/json",
+            url: $("#createPelangganForm").data('url_provinsi') + id_provinsi + '/kota/',
+            data: {
+                csrfmiddlewaretoken: getCookie('csrftoken'),
+                provinsi_id: id_provinsi
+            },
+
+            success: function(response) {
+                // console.log(response.data);
+                $("select#id-kota").html(response.data);
+                document.getElementById("id-kota").value = id_kota_select;
+                document.getElementById("select2-id-kota-container").innerHTML = nama_kota;
+            }
+        });
+    }
+
+    function show_kecamatan_list(id_kota, id_kecamatan_select, nama_kecamatan) {
+        $.ajax({
+            type: "POST",
+            dataType: 'json',
+            contentType: "application/json",
+            url: $("#createPelangganForm").data('url_provinsi') + id_kota + '/kecamatan/',
+            data: {
+                csrfmiddlewaretoken: getCookie('csrftoken'),
+                kota_id: id_kota
+            },
+
+            success: function(response) {
+                // console.log(response.data);
+                $("select#id-kecamatan").html(response.data);
+                document.getElementById("id-kecamatan").value = id_kecamatan_select;
+                document.getElementById("select2-id-kecamatan-container").innerHTML = nama_kecamatan;
+            }
+        });
+    }
+
+    function show_desa_list(id_kecamatan, id_desa_select, nama_desa) {
+        $.ajax({
+            type: "POST",
+            dataType: 'json',
+            contentType: "application/json",
+            url: $("#createPelangganForm").data('url_provinsi') + id_kecamatan + '/desa/',
+            data: {
+                csrfmiddlewaretoken: getCookie('csrftoken'),
+                kecamatan_id: id_kecamatan
+            },
+
+            success: function(response) {
+                // console.log(response.data);
+                $("select#id-desa").html(response.data);
+                document.getElementById("id-desa").value = id_desa_select;
+                document.getElementById("select2-id-desa-container").innerHTML = nama_desa;
+            }
+        });
+    }
+
+    function show_kode_pos_list(id_provinces, id_kota, id_kecamatan, id_desa, id_kode_pos_select, kode_pos) {
+        $.ajax({
+            type: "POST",
+            dataType: 'json',
+            contentType: "application/json",
+            url: $("#createPelangganForm").data('url_provinsi') + id_provinces + '/' + id_kota + '/' + id_kecamatan + '/' + id_desa + '/kode/',
+            data: {
+                csrfmiddlewaretoken: getCookie('csrftoken'),
+                provinsi_id: id_provinces,
+                kota_id: id_kota,
+                kecamatan_id: id_kecamatan,
+                desa_id: id_desa
+            },
+
+            success: function(response) {
+                // console.log(response.data);
+                $("select#id-kode_pos").html(response.data);
+                document.getElementById("id-kode_pos").value = id_kode_pos_select;
+                document.getElementById("select2-id-kode_pos-container").innerHTML = kode_pos;
+            }
+        });
+    }
+
+
+    $(document).on('change', '#id-provinsi', function(e){
+        var id_provinces = $(this).val();
+        $.ajax({
+            type: "POST",
+            dataType: 'json',
+            contentType: "application/json",
+            url: $("#createPelangganForm").data('url_provinsi') + id_provinces + '/kota/',
+            data: {
+                csrfmiddlewaretoken: getCookie('csrftoken'),
+                provinsi_id: id_provinces
+            },
+
+            success: function(response) {
+                // console.log(response.data);
+                $("select#id-kota").html(response.data);
+                getAjaxKota();
+            }
+        });
+    });
+
+
+    $("#id-kota").change(getAjaxKota);
+    function getAjaxKota() {
+        var id_kota = $("#id-kota").val();
+        $.ajax({
+            type: "POST",
+            dataType: 'json',
+            contentType: "application/json",
+            url: $("#createPelangganForm").data('url_provinsi') + id_kota + '/kecamatan/',
+            data: {
+                csrfmiddlewaretoken: getCookie('csrftoken'),
+                kota_id: id_kota
+            },
+            success: function(response) {
+                $("select#id-kecamatan").html(response.data);
+                getAjaxKecamatan();
+            }
+        });
+    }
+
+    $("#id-kecamatan").change(getAjaxKecamatan);
+    function getAjaxKecamatan() {
+        var id_kecamatan = $("#id-kecamatan").val();
+        $.ajax({
+            type: "POST",
+            dataType: 'json',
+            contentType: "application/json",
+            url: $("#createPelangganForm").data('url_provinsi') + id_kecamatan + '/desa/',
+            data: {
+                csrfmiddlewaretoken: getCookie('csrftoken'),
+                kecamatan_id: id_kecamatan
+            },
+            success: function(response) {
+                $("select#id-desa").html(response.data);
+                getAjaxDesa();
+            }
+        });
+    }
+
+    $("#id-desa").change(getAjaxDesa);
+    function getAjaxDesa() {
+            var id_provinces = $("#id-provinsi").val();
+            var id_kota = $("#id-kota").val();
+            var id_kecamatan = $("#id-kecamatan").val();
+            var id_desa = $("#id-desa").val();
+            $.ajax({
+                type: "POST",
+                dataType: 'json',
+                contentType: "application/json",
+                url: $("#createPelangganForm").data('url_provinsi') + id_provinces + '/' + id_kota + '/' + id_kecamatan + '/' + id_desa + '/kode/',
+                data: {
+                    csrfmiddlewaretoken: getCookie('csrftoken'),
+                    provinsi_id: id_provinces,
+                    kota_id: id_kota,
+                    kecamatan_id: id_kecamatan,
+                    desa_id: id_desa
+                },
+                success: function(response) {
+                    $("select#id-kode_pos").html(response.data);
+                }
+            });
+    }
+
+    $('#id-provinsi').select2({
+        theme: 'bootstrap4',
+        placeholder: 'Pilih Provinsi',
+        language: "id"
+    });
+    $('#id-kota').select2({
+        theme: 'bootstrap4',
+        placeholder: 'Pilih Kota',
+        language: "id"
+    });
+    $('#id-kecamatan').select2({
+        theme: 'bootstrap4',
+        placeholder: 'Pilih Kecamatan',
+        language: "id"
+    });
+    $('#id-desa').select2({
+        theme: 'bootstrap4',
+        placeholder: 'Pilih Desa',
+        language: "id"
+    });
+    $('#id-kode_pos').select2({
+        theme: 'bootstrap4',
+        placeholder: 'Pilih Kode Pos',
+        language: "id"
+    });
+
+});
+</script>
+{% endblock %}

@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title_name %}
+ <title>Login | BaliGo Ekspedisi</title>
+{% endblock %}
+
+{% block file_css %}
+<!-- DataTables -->
+ <link rel="stylesheet" href="{% static 'assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+ <link rel="stylesheet" href="{% static 'assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+{% endblock %}
+
+<!-- Login needs this body -->
+{% block custom_body %}
+<body class="hold-transition login-page">
+{% endblock %}
+
+<!-- Login doesn't have sidebar or header, so we override wrapper on base -->
+{% block wrapper %}
+<div class="login-box">
+  <div class="login-logo">
+    {% comment %}
+    <a href="{% url 'login' %}"><span class="brand-text font-weight-light"><b><span style="color: #55cb39">SA</span><span style="color: #399df2">MITRA</span></b> Ekspedisi</span></a>
+    {% endcomment %}
+
+    <div class="d-block mb-4">
+      <a href="{% url 'login' %}">
+        <img style="max-width: 65%; max-height:100%" class="img" src="{% static 'frontend/img/baligo.png' %}">
+      </a>
+    </div>
+  </div>
+  <!-- /.login-logo -->
+  <div class="card">
+    <div class="card-body login-card-body">
+      <p class="login-box-msg">Masuk untuk memulai sesi anda</p>
+
+      <!-- ANY MESSAGE GOES HERE -->
+      {% if messages %}
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      {% endfor %}
+      {% endif %}
+      <!-- END MESSAGE -->
+      
+      <form method="POST" class="mb-4">
+        {% csrf_token %}
+        <div class="input-group mb-3">
+          <input type="text" name="username" required class="form-control" placeholder="Username / Email">
+          <div class="input-group-append">
+            <div class="input-group-text">
+              <span class="fas fa-user"></span>
+            </div>
+          </div>
+        </div>
+        <div class="input-group mb-3">
+          <input type="password" name="password" required class="form-control" placeholder="Password">
+          <div class="input-group-append">
+            <div class="input-group-text">
+              <span class="fas fa-lock"></span>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-8">
+           <!--  <div class="icheck-primary">
+              <input type="checkbox" id="remember">
+              <label for="remember">
+                Remember Me
+              </label>
+            </div> -->
+          </div>
+          <!-- /.col -->
+          <div class="col-4">
+            <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+          </div>
+          <!-- /.col -->
+        </div>
+      </form>
+
+      <div class="row">
+	    <div class="col-6 text-left">
+	      <p class="mb-0">
+	        <a href="{% url 'register' %}" class="text-center">Daftar Akun</a>
+	      </p>
+	    </div>
+	    <div class="col-6 text-right">
+	      <p class="mb-1">
+	        <a href="{% url 'customer_reset_v1' %}">Lupa Password ?</a>
+	      </p>
+	    </div>
+  	  </div>
+    </div>
+    <!-- /.login-card-body -->
+  </div>
+</div>
+<!-- /.login-box -->
+{% endblock wrapper %}
+

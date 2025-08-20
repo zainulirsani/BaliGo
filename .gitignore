@@ -1,0 +1,9 @@
+# exclude everything
+env/*
+/project/ekspedisi/migrations
+/project/ekspedisi/media
+__pycache__
+.DS_Store
+.idea
+/data
+/db

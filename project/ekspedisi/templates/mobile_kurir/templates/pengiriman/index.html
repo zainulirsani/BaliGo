@@ -1,0 +1,962 @@
+{% extends '../base.html' %}
+{% load static %}
+{% load custom_filter %}
+
+{% block title_name %}
+ <title>Pengiriman | BaliGo Ekspedisi</title>
+{% endblock %}
+
+
+{% block file_css %}
+<!-- Daterange picker -->
+<link rel="stylesheet" href="{% static 'assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+<link rel="stylesheet" href="{% static 'assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+<link rel="stylesheet" href="{% static 'assets/plugins/daterangepicker/daterangepicker.css' %}">
+<!-- summernote -->
+<link rel="stylesheet" href="{% static 'assets/plugins/summernote/summernote-bs4.css' %}">
+<link rel="stylesheet" href="{% static 'assets/plugins/sweetalert2/sweetalert2.min.css' %}">
+<style>
+  #preview,
+  #preview-sampai{
+     width:100%;
+     height: auto;
+     margin:0px auto;
+  }
+</style>
+{% endblock %}
+
+{% block breadcrumb_mobile %}
+  Pengiriman
+{% endblock breadcrumb_mobile %}
+
+
+{% block content %}
+<!-- /.modal -->
+<div class="modal fade" id="modal-scanner">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title" id="title_modal"><i class="fas fa-qrcode"></i>&nbsp;&nbsp;Scan Resi TTD</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body" id="scanner-body">
+				<video id="preview" style="height: 170px;overflow: hidden;object-fit: cover;"></video>
+			</div>
+      {% comment %}
+      <div class="play-pause-btn-mobile" style="top:15px; right:15px">
+        <button type="button" class="btn btn-default btn-switch-terima" data-camera="0">
+          <i class="fas fa-history"></i>
+        </button>
+      </div>
+      {% endcomment %}
+			<div class="modal-footer justify-content-between">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
+				
+			</div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+{% comment %}
+<div class="modal fade" id="modal-scanner">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="title_modal"><i class="fas fa-qrcode"></i>&nbsp;&nbsp;Scan Kirim</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="scanner-body-kirim">
+        <video id="preview"></video>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
+        
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<div class="modal fade" id="modal-scanner-sampai">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="title_modal"><i class="fas fa-qrcode"></i>&nbsp;&nbsp;Scan Sampai</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="scanner-body-sampai">
+        <video id="preview-sampai"></video>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
+        
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+{% endcomment %}
+
+<div class="card mb-4 card-title-sticky">
+  {% csrf_token %}
+  <div class="card-header">
+    <div class="card-tools">
+      <ul class="nav nav-pills ml-auto p-2">
+        <li class="nav-item"><a style="padding:.5rem 0.5rem" class="nav-link" href="#tab_menunggu" data-toggle="tab"><i class="nav-icon fas fa-plane"></i>&nbsp;&nbsp;Kirim</a></li>
+        <li class="nav-item"><a style="padding:.5rem 0.5rem;" class="nav-link" href="#tab_berhasil" data-toggle="tab"><i class="nav-icon fas fa-check-square"></i>&nbsp;&nbsp;Sampai</a></li>
+        <li class="nav-item"><a style="padding:.5rem 0.5rem;" class="nav-link" href="#tab_terima" data-toggle="tab"><i class="nav-icon fas fa-signature"></i>&nbsp;&nbsp;Terima</a></li>
+        <li class="nav-item"><a style="padding:.5rem 0.5rem;" class="nav-link active" href="#tab_history" data-toggle="tab"><i class="nav-icon fas fa-history"></i>&nbsp;&nbsp;History</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <!-- /.card-header -->
+  <div class="card-body">
+    <!-- ANY MESSAGE GOES HERE -->
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    <!-- END MESSAGE -->
+    <div class="tab-content">
+      <div class="tab-pane" id="tab_menunggu">
+        <div class="mb-2 text-center">
+          <h5 class="mb-0 text-center text-muted"><strong>SCAN KIRIM</strong></h5>
+          <small class="text-muted">* Upload data dapat dilakukan sekaligus</small>
+        </div>
+        <div class="mb-2 scanner-wrapper">
+          <div id="scanner-wrapper-kirim">
+            <video id="scanner-kirim" class="scanner-show shadow"></video>
+          </div>
+          {% comment %}
+          <div class="play-pause-btn-mobile">
+            <button type="button" class="btn btn-default btn-switch-kirim" data-camera="0">
+              <i class="fas fa-history"></i>
+            </button>
+          </div>
+          {% endcomment %}
+        </div>
+        <form method="POST" id="form-upload-scan-kirim">
+          {% csrf_token %}
+          <input type="hidden" name="id_kurir" value="{{ request.user.id }}">
+          <div id="table-scan-sampai">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>No Resi</th>
+                  <th>Waktu Scan</th>
+                </tr>
+              </thead>
+              <tbody id="scan-data-kirim">
+                <tr>
+                  <td colspan="4" class="text-center">Tidak ada data</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="mb-2">
+            <button type="submit" disabled class="btn btn-primary btn-block text-white btn-upload-all-scan"><i class="fas fa-paper-plane"></i>&nbsp;&nbsp;Upload Data</button>
+          </div>
+        </form>
+      </div>
+      <!-- /.tab-pane -->
+      <div class="tab-pane" id="tab_berhasil">
+        <!-- ISI DATA TABLE LIST GUDANG -->
+          <div class="mb-2 text-center">
+            <h5 class="mb-0 text-center text-muted"><strong>SCAN SAMPAI</strong></h5>
+            <small class="text-muted">* Upload data dapat dilakukan sekaligus</small>
+          </div>
+          <div class="mb-2 scanner-wrapper">
+            <div id="scanner-wrapper-sampai">
+              <video id="scanner-sampai" class="scanner-show shadow"></video>
+            </div>
+            {% comment %}
+            <div class="play-pause-btn-mobile">
+              <button type="button" class="btn btn-default btn-switch-sampai" data-camera="0">
+                <i class="fas fa-history"></i>
+              </button>
+            </div>
+            {% endcomment %}
+          </div>
+          <form method="POST" id="form-upload-scan">
+            {% csrf_token %}
+            <input type="hidden" name="id_kurir" value="{{ request.user.id }}">
+            <div id="table-scan-sampai">
+              <table class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th>No Resi</th>
+                    <th>Waktu Scan</th>
+                  </tr>
+                </thead>
+                <tbody id="scan-data">
+                  <tr>
+                    <td colspan="4" class="text-center">Tidak ada data</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="mb-2">
+              <button type="submit" disabled class="btn btn-primary btn-block text-white btn-upload-all-scan"><i class="fas fa-paper-plane"></i>&nbsp;&nbsp;Upload Data</button>
+            </div>
+          </form>
+      </div>
+      <div class="tab-pane active" id="tab_history">
+        <!-- ISI DATA TABLE LIST GUDANG -->
+        {% if log_pengiriman|length %}
+          <div class="text-center mb-3">
+            <h5 class="text-muted"><strong>History Scan Anda</strong></h5>
+          </div>
+          <table id="table-history" class="table table-bordered table-stripped">
+            <thead>
+              <tr>
+                <th>Resi</th>
+                <th>Tanggal</th>
+                <th>Jenis Scan</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for data in log_pengiriman %}
+                <tr class="text-center">
+                  <td>{{ data.id_pengiriman.id_pengiriman }}</td>
+                  <td>{{ data.created_at|date:'d-m-Y H:i:s' }}</td>
+                  <td>{{ data.status_pengiriman|upper }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+        <div class="text-center">
+          TIDAK ADA DATA
+        </div>
+        {% endif %}
+      </div>
+      <div class="tab-pane" id="tab_terima">
+        <div class="text-center mb-3">
+          <h5 class="text-muted"><strong>Scan Terima Barang</strong></h5>
+          <form class="form-ttd" enctype="multipart/form-data" id="form-ttd">
+            {% csrf_token %}
+            <div class="form-group text-left">
+              <div class="input-group">
+                <input type="text" class="form-control" id="resi-textfield" required placeholder="Masukkan / Scan Nomor Resi" name="resi" aria-describedby="btnGroupAddon">
+                <div class="input-group-prepend">
+                  <button tabindex="-1" type="button" class="btn btn-primary" id="btn-scan-resi-ttd"><i class="fas fa-qrcode"></i></button>
+                </div>
+              </div>
+            </div>
+            <div class="form-group text-left">
+              <input type="text" required placeholder="Masukkan Nama Penerima" class="form-control" name="nama_penerima">
+            </div>
+            <div class="form-group text-left">
+              <input required type="file" multiple accept="image/x-png, image/jpeg, image/jpg" name="foto" class="form-control">
+              <small class="text-muted">* Upload bukti foto penerimaan (wajib)</small>
+            </div>
+            <div class="form-group">
+              <button type="submit" class="btn btn-primary btn-block btn-ttd"><i class="fas fa-paper-plane"></i>&nbsp;&nbsp;Upload Data</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /.card-body -->
+</div>
+{% endblock %}
+
+{% block file_js %}
+<!-- DataTables -->
+<script src="{% static 'assets/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+<!-- ChartJS -->
+<script src="{% static 'custom_js/instascan.min.js' %}"></script>
+<script src="{% static 'assets/plugins/sweetalert2/sweetalert2.min.js' %}"></script>
+<script type="text/javascript">
+  $(function(){
+
+    $('#table-history thead th').each( function () {
+          var title = $(this).text();
+          $(this).html(`<p style="margin:5px">${title}</p><input type="text" placeholder="Cari Data.."/>` );
+    });
+
+    $('#table-history').DataTable({
+        "paging":   true,
+        "ordering": false,
+        "info":     false,
+        'lengthChange': false,
+        initComplete: function () {
+          // Apply the search
+          this.api().columns().every( function () {
+              var that = this;
+              $( 'input', this.header() ).on( 'keyup change clear', function () {
+                  if ( that.search() !== this.value ) {
+                      that
+                          .search( this.value )
+                          .draw();
+                  }
+              } );
+          });
+        }
+    });
+
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000
+    });
+
+    function tampilkan_pesan(pesan, type) {
+        Toast.fire({
+            icon: type,
+            title: pesan
+        });
+    }
+
+    Number.prototype.padLeft = function(base,chr){
+      var  len = (String(base || 10).length - String(this).length)+1;
+      return len > 0? new Array(len).join(chr || '0')+this : this;
+    }
+
+    var scanner = {};
+    $('.barcode-group').on('click', function(){
+      scanner = new Instascan.Scanner({ video: document.getElementById('preview'), scanPeriod: 5, mirror: false });
+      scanner.addListener('scan',function(content){
+        var token = $('input[name="csrfmiddlewaretoken"]').val();
+        $('#modal-scanner').modal('hide');
+        setTimeout(function(){
+          Swal.fire({
+            title: 'Konfirmasi Pengiriman ?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: `Ya`,
+            confirmButtonColor: '#3085d6',
+            html:`<form id='form-scan-resi' method='POST'><input type='hidden' name='csrfmiddlewaretoken' value='${token}'><input type='hidden' value='${content}' name='resi'><input type='hidden' value='sent_by' name='status_pengiriman'><input type='hidden' value='{{ request.user.id }}' name='id_kurir'><div>Apakah anda yakin akan mengkonfirmasi pengiriman tanpa melihat detail data ?</div></form>`,
+            cancelButtonColor: '#d33',
+            allowOutsideClick: false
+          }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.value) {
+              var form = $('#form-scan-resi')[0];
+              var formData = new FormData(form);
+              $.ajax({
+                url: '/mobile_kurir/kurir_update_status_qr',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(result){
+                  setTimeout(function(){
+                    Swal.fire({
+                      title : 'Sukses',
+                      text : result.msg,
+                      icon : result.type,
+                      allowOutsideClick: false
+                    }).then((result)=> {
+                      if(result.value) {
+                        location.reload()
+                      }
+                    });
+                  },500)
+                },
+                error: function(xhr){
+                  setTimeout(function(){
+                    try {
+                      console.log(xhr.statusText)
+                      if(xhr.statusText=='Forbidden'){
+                        Swal.fire('Error','Forbidden Request, silahkan ulangi', 'error');
+                        return
+                      }
+
+                      var json = JSON.parse(xhr.responseText);
+                      Swal.fire({
+                        title : 'Error',
+                        text : json.msg,
+                        icon : json.type,
+                        allowOutsideClick: false
+                      })
+                    }catch(message) {
+                      console.log(message)
+                      Swal.fire('Terjadi kesalahan', message,'error');
+                    }
+                  }, 500)
+                }
+              });
+            }
+          })
+        },500)
+        //window.location.href=content;
+      });
+      Instascan.Camera.getCameras().then(function (cameras){
+        if(cameras.length>0){
+          scanner.start(cameras[0]);
+          $('.btn-switch-terima').on('click',function(){
+              console.log(cameras,$(this).data('camera'))
+              if($(this).data('camera')==1){
+                  if(Object.keys(cameras).includes("0")){
+                      $(this).data('camera', 0);
+                      scanner.start(cameras[0]);
+                  }else{
+                      alert('No Front camera found!');
+                  }
+              }else if($(this).data('camera')==0){
+                  if(Object.keys(cameras).includes("1")){
+                      $(this).data('camera', 1);
+                      scanner.start(cameras[1]);
+                  }else{
+                      alert('No Back camera found!');
+                  }
+              }
+          });
+        }else{
+          console.error('No cameras found.');
+          alert('No cameras found.');
+        }
+      }).catch(function(e){
+        console.error(e);
+      });
+    });
+
+    $('#modal-scanner').on('hide.bs.modal', function(){
+      try {
+        scanner.stop()
+        .then(function(){
+          document.getElementById('#scanner-body-kirim').innerHTML = "<video id='preview'></video>";
+        })
+      } catch(message) {
+        console.log(message)
+      }
+    });
+
+    var scan_data = [];
+    var scan_data_kirim = [];
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+
+      try {
+      scanner.stop()
+      .then(function(){
+          document.getElementById('#scanner-wrapper-sampai').innerHTML = '<video id="scanner-sampai" class="scanner-show shadow"></video>';
+      }).catch(error => function(){
+        console.log(error);
+      });
+      } catch(message) { console.log(message) }
+
+      var target = $(e.target).attr("href") // activated tab
+      if(target=='#tab_berhasil') {
+        scanner = new Instascan.Scanner({ video: document.getElementById('scanner-sampai'), mirror: false });
+        scanner.addListener('scan',function(content){
+          if(!scan_data.includes(content)){
+            // Mendapatkan Resi dari link
+            var query_string = '';
+            try {
+              query_string = new URL(content).search;
+            } catch(error) {}
+            const params = new URLSearchParams(query_string);
+            var cek_type = (params.get('type') == 'qrcode');
+            if(cek_type){
+                $id_pengiriman = params.get('resi', false);
+                if($id_pengiriman)
+                  content = $id_pengiriman;
+            }
+            // End mendapatkan resi dari link
+            
+            var patt = /^ER-[0-9]+/;
+            if(!patt.test(content)){
+              console.log(content);
+              tampilkan_pesan("Resi tidak valid, silahkan dicoba kembali", 'error');
+              return
+            }
+            scan_data.push(content)
+            var to_add = "";
+            var d = new Date,
+            dformat = [(d.getMonth()+1).padLeft(),
+                       d.getDate().padLeft(),
+                       d.getFullYear()].join('-') +' ' +
+                      [d.getHours().padLeft(),
+                       d.getMinutes().padLeft(),
+                       d.getSeconds().padLeft()].join(':');
+            to_add += `<tr><td><input type="hidden" name="id_pengiriman[]" value="${content}"><a href='kurir_pengiriman_detail/${content}'>${content}</a></td><td>${dformat}</td></tr>`;
+            $('#scan-data').html('');
+            $('#scan-data').append(to_add);
+            $('.btn-upload-all-scan').prop('disabled', false);
+          }
+          else {
+            tampilkan_pesan("Resi sudah ada", 'info');
+            return
+          }
+        });
+        Instascan.Camera.getCameras().then(function (cameras){
+          if(cameras.length>0){
+            scanner.start(cameras[0]);
+            $('.btn-switch-sampai').on('click',function(){
+                console.log(cameras,$(this).data('camera'))
+                if($(this).data('camera')==1){
+                    if(Object.keys(cameras).includes("0")){
+                        $(this).data('camera', 0);
+                        scanner.start(cameras[0]);
+                    }else{
+                        alert('No Front camera found!');
+                    }
+                }else if($(this).data('camera')==0){
+                    if(Object.keys(cameras).includes("1")){
+                        $(this).data('camera', 1);
+                        scanner.start(cameras[1]);
+                    }else{
+                        alert('No Back camera found!');
+                    }
+                }
+            });
+          }else{
+            console.error('No cameras found.');
+            alert('No cameras found.');
+          }
+        }).catch(function(e){
+          console.error(e);
+        });
+      }
+      else if(target=='#tab_menunggu') {
+        scanner = new Instascan.Scanner({ video: document.getElementById('scanner-kirim'), mirror: false });
+        scanner.addListener('scan',function(content){
+          if(!scan_data_kirim.includes(content)){
+            // Mendapatkan Resi dari link
+            var query_string = '';
+            try {
+              query_string = new URL(content).search;
+            } catch(error) {}
+            const params = new URLSearchParams(query_string);
+            var cek_type = (params.get('type') == 'qrcode');
+            if(cek_type){
+                $id_pengiriman = params.get('resi', false);
+                if($id_pengiriman)
+                  content = $id_pengiriman;
+            }
+            // End mendapatkan resi dari link
+            
+            var patt = /^ER-[0-9]+/;
+            if(!patt.test(content)){
+              console.log(content);
+              tampilkan_pesan("Resi tidak valid, silahkan dicoba kembali", 'error');
+              return
+            }
+            // console.log(content)
+            scan_data_kirim.push(content)
+            var to_add = "";
+            var d = new Date(),
+            dformat = [(d.getMonth()+1).padLeft(),
+                       d.getDate().padLeft(),
+                       d.getFullYear()].join('-') +' ' +
+                      [d.getHours().padLeft(),
+                       d.getMinutes().padLeft(),
+                       d.getSeconds().padLeft()].join(':');
+            for(var i=0;i<scan_data_kirim.length;i++){
+              to_add += `<tr><td><input type="hidden" name="id_pengiriman[]" value="${scan_data_kirim[i]}"><a href='kurir_pengiriman_detail/${scan_data_kirim[i]}'>${scan_data_kirim[i]}</a></td><td>${dformat}</td></tr>`;
+            }
+            $('#scan-data-kirim').html('');
+            $('#scan-data-kirim').append(to_add);
+            $('.btn-upload-all-scan').prop('disabled', false);
+          }
+          else {
+            tampilkan_pesan("Resi sudah ada", 'info');
+            return
+          }
+        });
+        Instascan.Camera.getCameras().then(function (cameras){
+          if(cameras.length>0){
+            scanner.start(cameras[0]);
+            $('.btn-switch-kirim').on('click',function(){
+                console.log(cameras,$(this).data('camera'))
+                if($(this).data('camera')==1){
+                    if(Object.keys(cameras).includes("0")){
+                        $(this).data('camera', 0);
+                        scanner.start(cameras[0]);
+                    }else{
+                        alert('No Front camera found!');
+                    }
+                }else if($(this).data('camera')==0){
+                    if(Object.keys(cameras).includes("1")){
+                        $(this).data('camera', 1);
+                        scanner.start(cameras[1]);
+                    }else{
+                        alert('No Back camera found!');
+                    }
+                }
+            });
+          }else{
+              console.error('No cameras found.');
+              alert('No cameras found.');
+          }
+        }).catch(function(e){
+          console.error(e);
+        });
+      }
+    });
+
+    $('#form-ttd').submit(function(e){
+      e.preventDefault();
+      var upload_scan = $('.btn-ttd').html()
+      $('.btn-ttd').html('<i class="fas fa-spin fa-spinner"></i>&nbsp;&nbsp;Mengupload Data');
+      $('.btn-ttd').prop('disabled', true);
+      $('#btn-scan-resi-ttd').prop('disabled', true);
+      $(this).find('input').not(':hidden').prop('readonly', true);
+
+      var form = $('#form-ttd')[0];
+      var formData = new FormData(form);
+      $.ajax({
+        url: '/mobile_kurir/kurir_update_status_paket/ttd',
+        type: 'POST',
+        contentType : false,
+        processData : false,
+        data : formData,
+        success : function(response){
+          if(Object.keys(response).includes('type') && response.type == 'success'){
+            Swal.fire({
+              title : 'Sukses',
+              text : response.msg,
+              icon : response.type,
+              allowOutsideClick: false
+            }).then((result)=> {
+              if(result.value){
+                location.reload();
+              }
+            })
+          } else {
+            Swal.fire({
+              title : 'Opps..',
+              text : response.msg,
+              icon : response.type,
+              allowOutsideClick: false
+            })
+          }
+        },
+        error : function(xhr){
+          setTimeout(function(){
+            try {
+              console.log(xhr.statusText)
+              if(xhr.statusText=='Forbidden'){
+                Swal.fire('Error','Forbidden Request, silahkan ulangi', 'error');
+                return
+              }
+
+              try {
+                var json = JSON.parse(xhr.responseText);
+              } catch(error) {
+                var json = {'msg':'Terjadi kesalahan saat mengupload, pastikan size kurang dari 5 Mb per foto dan coba kembali', 'type':'error'};
+              }
+              Swal.fire({
+                title : 'Error',
+                text : json.msg,
+                icon : json.type,
+                allowOutsideClick: false
+              })
+            }catch(message) {
+              console.log(message)
+              Swal.fire('Terjadi kesalahan', 'Coba ulangi beberapa saat lagi', 'error');
+            }
+          }, 500)
+        },
+        complete : function(){
+          $('#form-ttd').find('input').not(':hidden').prop('readonly', false);
+          $('#btn-scan-resi-ttd').prop('disabled', false);  
+          $('.btn-ttd').html(upload_scan);
+          $('.btn-ttd').prop('disabled', false);
+        }
+      });
+      return false;
+    });
+
+    $('#form-upload-scan').submit(function(e){
+      e.preventDefault();
+      var upload_scan = $('.btn-upload-all-scan').html()
+      $('.btn-upload-all-scan').html('<i class="fas fa-spin fa-spinner"></i>&nbsp;&nbsp;Mengupload Data');
+      $('.btn-upload-all-scan').prop('disabled', true);
+
+      var form = $('#form-upload-scan')[0];
+      var formData = new FormData(form);
+      $.ajax({
+        url: '/mobile_kurir/kurir_update_status_sampai',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success : function(result){
+          // Stop the scanner
+          try {
+            scanner.stop()
+            .then(function(){
+                document.getElementById('#scanner-wrapper-sampai').innerHTML = '';
+            }).catch(error => function(){
+              console.log(error);
+            });
+          } catch(message) {
+            console.log(message)
+          }
+
+          Swal.fire({
+            title : 'Sukses',
+            text : result.msg,
+            icon : result.type,
+            allowOutsideClick: false
+          }).then((result)=> {
+            if(result.value) {
+              location.reload()
+            }
+          });
+        },
+        error : function(xhr){
+          try {
+            console.log(xhr.statusText)
+            if(xhr.statusText=='Forbidden'){
+              Swal.fire('Error','Forbidden Request, silahkan ulangi', 'error')
+              .then((result) => {
+                location.reload();
+              });
+              return
+            }
+
+            var json = JSON.parse(xhr.responseText);
+            Swal.fire({
+              title : 'Error',
+              text : json.msg,
+              icon : json.type,
+              allowOutsideClick: false
+            })
+            .then((result) => {
+              location.reload();
+            })
+          }catch(message) {
+            console.log(message)
+            Swal.fire('Terjadi kesalahan', message,'error')
+            .then((result) => {
+              location.reload();
+            });
+          }
+        },
+        complete : function(){
+          $('.btn-upload-all-scan').html(upload_scan);
+          $('.btn-upload-all-scan').prop('disabled', false);
+        }
+      })
+      return false
+    });
+
+
+    $('#form-upload-scan-kirim').submit(function(e){
+      e.preventDefault();
+      var upload_scan = $('.btn-upload-all-scan').html()
+      $('.btn-upload-all-scan').html('<i class="fas fa-spin fa-spinner"></i>&nbsp;&nbsp;Mengupload Data');
+      $('.btn-upload-all-scan').prop('disabled', true);
+
+      var form = $('#form-upload-scan-kirim')[0];
+      var formData = new FormData(form);
+      $.ajax({
+        url: '/mobile_kurir/kurir_update_status_kirim',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success : function(result){
+          // Stop the scanner
+          try {
+            scanner.stop()
+            .then(function(){
+                document.getElementById('#scanner-wrapper-sampai').innerHTML = '';
+            }).catch(error => function(){
+              console.log(error);
+            });
+          } catch(message) {
+            console.log(message)
+          }
+
+          Swal.fire({
+            title : 'Sukses',
+            text : result.msg,
+            icon : result.type,
+            allowOutsideClick: false
+          }).then((result)=> {
+            if(result.value) {
+              location.reload()
+            }
+          });
+        },
+        error : function(xhr){
+          try {
+            console.log(xhr.statusText)
+            if(xhr.statusText=='Forbidden'){
+              Swal.fire('Error','Forbidden Request, silahkan ulangi', 'error')
+              .then((result) => {
+                location.reload();
+              });
+              return
+            }
+
+            var json = JSON.parse(xhr.responseText);
+            Swal.fire({
+              title : 'Error',
+              text : json.msg,
+              icon : json.type,
+              allowOutsideClick: false
+            }).then((result) => {
+              location.reload();
+            })
+          }catch(message) {
+            console.log(message)
+            Swal.fire('Terjadi kesalahan', message,'error')
+            .then((result) => {
+              location.reload();
+            });
+          }
+        },
+        complete : function(){
+          $('.btn-upload-all-scan').html(upload_scan);
+          $('.btn-upload-all-scan').prop('disabled', false);
+        }
+      })
+      return false
+    });
+
+    // On Ready Prepare Scanner Default
+    // scanner = new Instascan.Scanner({ video: document.getElementById('scanner-sampai'), mirror: false });
+    //   scanner.addListener('scan',function(content){
+    //     if(!scan_data.includes(content)){
+    //       var patt = /^ER-[0-9]+/;
+    //       if(!patt.test(content)){
+    //         console.log(content);
+    //         tampilkan_pesan("Resi tidak valid", 'error');
+    //         return
+    //       }
+    //       scan_data.push(content)
+    //       var to_add = "";
+    //       var d = new Date,
+    //       dformat = [(d.getMonth()+1).padLeft(),
+    //                  d.getDate().padLeft(),
+    //                  d.getFullYear()].join('-') +' ' +
+    //                 [d.getHours().padLeft(),
+    //                  d.getMinutes().padLeft(),
+    //                  d.getSeconds().padLeft()].join(':');
+    //       to_add += `<tr><td><input type="hidden" name="id_pengiriman[]" value="${content}"><a href='kurir_pengiriman_detail/${content}'>${content}</a></td><td>${dformat}</td></tr>`;
+    //       $('#scan-data').html('');
+    //       $('#scan-data').append(to_add);
+    //       $('.btn-upload-all-scan').prop('disabled', false);
+    //     }
+    //     else {
+    //       tampilkan_pesan("Resi sudah ada", 'info');
+    //       return
+    //     }
+    //   });
+    //   Instascan.Camera.getCameras().then(function (cameras){
+    //     if(cameras.length>0){
+    //       if(Object.keys(cameras).includes("1")){
+    //         scanner.start(cameras[1]);
+    //         return;
+    //       }
+    //       scanner.start(cameras[0]);
+    //     }else{
+    //       console.error('No cameras found.');
+    //       alert('No cameras found.');
+    //     }
+    //   }).catch(function(e){
+    //     console.error(e);
+    //   });
+
+    var scanner = {};
+		$('#btn-scan-resi-ttd').on('click', function(){
+			$('#modal-scanner').modal('show');
+      setTimeout(function(){
+        scanner = new Instascan.Scanner({ video: document.getElementById('preview'), scanPeriod: 5, mirror: false });
+        scanner.addListener('scan',function(content){
+    			$('#modal-scanner').modal('hide');
+          setTimeout(function(){
+            // Mendapatkan Resi dari link
+            var query_string = '';
+            try {
+              query_string = new URL(content).search;
+            } catch(error) {}
+            const params = new URLSearchParams(query_string);
+            var cek_type = (params.get('type') == 'qrcode');
+            if(cek_type){
+                $id_pengiriman = params.get('resi', false);
+                if($id_pengiriman)
+                  content = $id_pengiriman;
+            }
+            // End mendapatkan resi dari link
+
+            var patt = /^ER-[0-9]+/;
+            if(!patt.test(content)){
+              console.log(content);
+              tampilkan_pesan("Resi tidak valid, silahkan dicoba kembali", 'error');
+              return
+            }
+            $('#resi-textfield').val(content);
+          },500)
+          //window.location.href=content;
+        });
+        Instascan.Camera.getCameras().then(function (cameras){
+          if(cameras.length>0){
+            scanner.start(cameras[0]);
+            $('.btn-switch-terima').on('click',function(){
+                console.log(cameras,$(this).data('camera'))
+                if($(this).data('camera')==1){
+                    if(Object.keys(cameras).includes("0")){
+                        $(this).data('camera', 0);
+                        scanner.start(cameras[0]);
+                    }else{
+                        alert('No Front camera found!');
+                    }
+                }else if($(this).data('camera')==0){
+                    if(Object.keys(cameras).includes("1")){
+                        $(this).data('camera', 1);
+                        scanner.start(cameras[1]);
+                    }else{
+                        alert('No Back camera found!');
+                    }
+                }
+            });
+          }else{
+            console.error('No cameras found.');
+            alert('No cameras found.');
+          }
+        }).catch(function(e){
+          // console.error(e);
+          console.log(e);
+          // alert(e);
+        });
+      },500)
+		});
+
+    $('#modal-scanner').on('hide.bs.modal', function(){
+			try {
+				scanner.stop()
+				.then(function(){
+					$('#modal-scanner #scanner-body').innerHTML = "<video id='preview' style='height: 170px;overflow: hidden;object-fit: cover;'></video>";
+				})
+			} catch(message) {
+				console.log(message)
+			};
+		});
+
+  // END READY FUNCTION
+  });
+</script>
+{% endblock file_js %}

@@ -1,0 +1,324 @@
+{% extends '../base.html' %}
+{% load static %}
+{% load custom_filter %}
+
+{% block title_name %}
+ <title>Pengiriman | BaliGo Ekspedisi</title>
+{% endblock %}
+
+{% block file_css %}
+<!-- Daterange picker -->
+<link rel="stylesheet" href="{% static 'assets/plugins/daterangepicker/daterangepicker.css' %}">
+<!-- summernote -->
+<link rel="stylesheet" href="{% static 'assets/plugins/summernote/summernote-bs4.css' %}">
+<link rel="stylesheet" href="{% static 'assets/plugins/sweetalert2/sweetalert2.min.css' %}">
+
+<style>
+  #preview,
+  #preview-sampai{
+     width:100%;
+     height: auto;
+     margin:0px auto;
+  }
+</style>
+{% endblock %}
+
+{% block nav_link %}
+  <a class="nav-link breadcrumb_mobile" href="{% url 'kurir_pengiriman' %}">
+    <i class="fas fa-chevron-left"></i>&nbsp;&nbsp;Detail Pengiriman
+  </a>
+{% endblock nav_link %}
+
+{% block content %}
+  <div class="callout callout-info">
+    <h5 class="mb-0">{{ data.id_pengiriman }}</h5>
+    <small class="text-muted">*Pastikan data pengiriman sudah benar</small>
+  </div>
+  <hr>
+  <div class="card">
+    <div class="card-header">
+      <div class="row">
+        <div class="form-group col-6">
+          <div class="callout callout-info">
+            <h5 class="text-center mb-0">PENGIRIM</h5>
+            <div class="text-center">
+              <small class="text-center">*Info Detail Pengirim</small>
+            </div>
+          </div>
+          <div>
+            <h6><strong><i class="fas fa-user"></i>&nbsp;&nbsp;Nama :</strong></h6>
+            <h6>{{ data.nama_pengirim }}</h6>
+          </div>
+          <div>
+            <h6><strong><i class="fas fa-phone-alt"></i>&nbsp;&nbsp;No Telp :</strong></h6>
+            <h6>{{ data.no_telp_pengirim }}</h6>
+          </div>
+          <div>
+            <h6><strong><i class="fas fa-envelope"></i>&nbsp;&nbsp;Email :</strong></h6>
+            <h6>{{ data.email_pengirim }}</h6>
+          </div>
+          <div>
+            <h6><strong><i class="fas fa-map-marker-alt"></i>&nbsp;&nbsp;Alamat :</strong></h6>
+            <h6>{{ data.alamat_pengirim }}</h6>
+          </div>
+          <div class="callout callout-info">
+            <h5 class="text-center mb-0">Lokasi</h5>
+            <div class="text-center">
+              <small class="text-center">*Lokasi Pengirim</small>
+            </div>
+          </div>
+          <div>
+            <h6><strong>Provinsi :</strong></h6>
+            <h6>{{ data.provinsi_pengirim }}</h6>
+          </div>
+          <div>
+            <h6><strong>Kabupaten :</strong></h6>
+            <h6>{{ data.kota_pengirim }}</h6>
+          </div>
+          <div>
+            <h6><strong>Kecamatan :</strong></h6>
+            <h6>{{ data.kecamatan_pengirim }}</h6>
+          </div>
+          <div>
+            <h6><strong>Kode POS :</strong></h6>
+            <h6>{{ data.kode_pos_pengirim }}</h6>
+          </div>
+        </div>
+        <div class="form-group col-6">
+          <div class="callout callout-info">
+            <h5 class="text-center mb-0">PENERIMA</h5>
+            <div class="text-center">
+              <small class="text-center">*Info Detail Penerima</small>
+            </div>
+          </div>
+          <div>
+            <h6><strong><i class="fas fa-user"></i>&nbsp;&nbsp;Nama :</strong></h6>
+            <h6>{{ data.nama_penerima }}</h6>
+          </div>
+          <div>
+            <h6><strong><i class="fas fa-phone-alt"></i>&nbsp;&nbsp;No Telp :</strong></h6>
+            <h6>{{ data.no_telp_penerima }}</h6>
+          </div>
+          <div>
+            <h6><strong><i class="fas fa-envelope"></i>&nbsp;&nbsp;Email :</strong></h6>
+            <h6>{{ data.email_penerima }}</h6>
+          </div>
+          <div>
+            <h6><strong><i class="fas fa-map-marker-alt"></i>&nbsp;&nbsp;Alamat :</strong></h6>
+            <h6>{{ data.alamat_penerima }}</h6>
+          </div>
+          <div>
+            <div class="callout callout-info">
+            <h5 class="text-center mb-0">Lokasi</h5>
+            <div class="text-center">
+              <small class="text-center">*Lokasi Penerima</small>
+            </div>
+          </div>
+            <h6><strong>Provinsi :</strong></h6>
+            <h6>{{ data.provinsi_penerima }}</h6>
+          </div>
+          <div>
+            <h6><strong>Kabupaten :</strong></h6>
+            <h6>{{ data.kota_penerima }}</h6>
+          </div>
+          <div>
+            <h6><strong>Kecamatan :</strong></h6>
+            <h6>{{ data.kecamatan_penerima }}</h6>
+          </div>
+          <div>
+            <h6><strong>Kode POS :</strong></h6>
+            <h6>{{ data.kode_pos_penerima }}</h6>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <div class="callout callout-info">
+            <h5 class="text-center mb-0">RUTE PENGIRIMAN</h5>
+            <div class="text-center">
+              <small class="text-center">*Informasi Detail Rute</small>
+            </div>
+          </div>
+          <div>
+            <div id="rute_gudang">
+              <div class="timeline-item">
+                <span class="time"><i class="fas fa-map-marker-alt"></i> ({{rute.outlet_1.titik_lokasi}})</span>
+                <p class="timeline-header no-border">
+                  <small>
+                    <span class="badge badge-warning">Outlet #1</span> {{rute.outlet_1.nama}} | Alamat: {{rute.outlet_1.alamat}}
+                  </small>
+                </p>
+              </div>
+              <div class="timeline-item">
+                <span class="time"><i class="fas fa-map-marker-alt"></i> ({{rute.gudang_1.titik_lokasi}})</span>
+                <p class="timeline-header no-border">
+                  <small>
+                    <span class="badge badge-success">Gudang #1</span> ({{rute.gudang_1.nama}} | Alamat: ({{rute.gudang_1.alamat}}
+                  </small>
+                </p>
+              </div>
+              <div class="timeline-item">
+                <span class="time"><i class="fas fa-map-marker-alt"></i> ({{rute.gudang_2.titik_lokasi}})</span>
+                <p class="timeline-header no-border">
+                  <small>
+                    <span class="badge badge-success">Gudang #2</span> ({{rute.gudang_2.nama}} | Alamat: ({{rute.gudang_2.alamat}}
+                  </small>
+                </p>
+              </div>
+              <div class="timeline-item">
+                <span class="time"><i class="fas fa-map-marker-alt"></i> ({{rute.outlet_2.titik_lokasi}})</span>
+                <p class="timeline-header no-border">
+                  <small>
+                    <span class="badge badge-warning">Outlet #2</span> {{rute.outlet_2.nama}} | Alamat: {{rute.outlet_2.alamat}}
+                  </small>
+                </p>
+              </div>
+            </div>
+            <div id="log"></div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <div class="form-group">
+            {% if rute.status_pengiriman == 'sent_by' and rute.kurir %}
+            <a class="btn btn-block btn-primary text-white"><i class="fas fa-plane"></i>&nbsp;&nbsp;Sedang Dikirim</a>
+            {% else %}
+            <form id="form-ubah-status" class="form" method="post" action="{% url 'kurir_update_status' %}">
+              {% csrf_token %}
+              <input type="hidden" name="id_pengiriman" value="{{ data.id }}">
+              <input type="hidden" name="status" value="">
+              <input type="hidden" name="titik_lokasi" value="">
+              <input type="hidden" name="id_kurir" value="{{ request.user.id }}">
+              <input type="submit" onclick="setVal(this.value)" value="Kirim" class="btn btn-success btn-block mb-0 text-white">
+              <input type="submit" onclick="setVal(this.value)" value="Sampai" class="btn btn-danger btn-block mb-0 text-white">
+            </form>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
+
+{% block file_js %}
+<!-- ChartJS -->
+<script src="{% static 'custom_js/qr_scan.js' %}"></script>
+<script src="{% static 'assets/plugins/sweetalert2/sweetalert2.min.js' %}"></script>
+<script src="https://js.pusher.com/7.0/pusher.min.js"></script>
+<script type="text/javascript">
+  function setVal(value) {
+    try{
+      $('input[name="status"]').val(value)
+    }catch(message){}
+  }
+
+  $(function(){
+
+    var scanner = {};
+    $('.barcode-group').on('click', function(){
+      scanner = new Instascan.Scanner({ video: document.getElementById('preview'), scanPeriod: 5, mirror: false });
+      scanner.addListener('scan',function(content){
+        $('#modal-scanner').modal('hide');
+        setTimeout(function(){
+          alert(content);
+        },500)
+        //window.location.href=content;
+      });
+      Instascan.Camera.getCameras().then(function (cameras){
+        if(cameras.length>0){
+          $('#modal-scanner').modal('show');
+          if(Object.keys(cameras).includes("1")){
+            scanner.start(cameras[1]);
+            return;
+          }
+          scanner.start(cameras[0]);
+        }else{
+          console.error('No cameras found.');
+          alert('No cameras found.');
+        }
+      }).catch(function(e){
+        console.error(e);
+        // alert(e);
+      });
+    });
+
+    $('#modal-scanner').on('hide.bs.modal', function(){
+      try {
+        scanner.stop()
+        .then(function(){
+          document.getElementById('#scanner-body').innerHTML = "<video id='preview'></video>";
+        })
+      } catch(message) {
+        console.log(message)
+      };
+    });
+
+    $('#form-ubah-status').submit(function(e){
+      // var form = this;
+      e.preventDefault();
+      Swal.fire({
+        title: 'Konfirmasi Perubahan ?',
+        text: "Mengkonfirmasi data akan mengubah status pengiriman.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: `Ya`,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        allowOutsideClick: false
+      }).then((result) => {
+        /* Read more about isConfirmed, isDenied below */
+        if (result.value) {
+          var form = $('#form-ubah-status')[0];
+          var formData = new FormData(form);
+          $.ajax({
+            url: '/mobile_kurir/kurir_update_status',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(result){
+              Swal.fire({
+                title : 'Sukses',
+                text : result.msg,
+                icon : result.type,
+                allowOutsideClick: false
+              }).then((result)=> {
+                if(result.value) {
+                  location.reload()
+                }
+              })
+            },
+            error: function(xhr){
+              try {
+                var json = JSON.parse(xhr.responseText)
+                Swal.fire({
+                  title : 'Error',
+                  text : json.msg,
+                  icon : json.type,
+                  allowOutsideClick: false
+                })
+              }catch(message) {
+                Swal.fire(message)
+              }
+            }
+          });
+        }
+      });
+      return false;
+    });
+
+    var pusher = new Pusher('89e810361b5ea26c0dfb', {
+        cluster: 'ap1'
+    });
+
+    var channel = pusher.subscribe('my-channel');
+    if(Object.keys(channel).includes('subscribed') && channel.subscribed){
+      channel.bind('my-event', function(data) {
+        console.log(JSON.stringify(data));
+      });
+    }
+  });
+</script>
+{% endblock file_js %}

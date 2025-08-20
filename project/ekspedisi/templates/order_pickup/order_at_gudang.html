@@ -1,0 +1,986 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title_name %}
+<title>Order Pickup | BaliGo Ekspedisi</title>
+{% endblock %}
+{% block file_css %}
+<!-- DataTables -->
+<link rel="stylesheet" href="{% static 'assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+<link rel="stylesheet" href="{% static 'assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+<!-- SweetAlert2 -->
+<link rel="stylesheet" href="{% static 'assets/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css' %}">
+<style type="text/css">
+@media (max-width: 768px) {
+
+    #no_th {
+        font-size: small;
+        width: 6%;
+    }
+
+    #id_th {
+        font-size: small;
+        width: 28%;
+    }
+
+    #nama_th {
+        width: 30%;
+        font-size: small;
+    }
+
+    #alamat_th {
+        font-size: small;
+        width: 20%;
+    }
+
+    #status_th {
+        font-size: small;
+        width: 36%;
+    }
+
+
+    .detail_text {
+        display: none;
+    }
+}
+</style>
+{% endblock %}
+{% block content_header %}
+<div class="container-fluid">
+    <div class="row mb-2">
+        <div class="col-sm-6">
+            <h1 class="m-0 text-dark">Order Pick Up</h1>
+        </div><!-- /.col -->
+        <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                <li class="breadcrumb-item active">Order Pick Up</li>
+            </ol>
+        </div><!-- /.col -->
+    </div><!-- /.row -->
+</div><!-- /.container-fluid -->
+{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Data Order Pick Up</h3>
+        <div class="card-tools">
+            <a href="{% url 'order_pickup' %}" class="btn btn-block bg-gradient-primary">Kembali</a>
+        </div>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+        <table id="order_pickup" class="table table-bordered table-striped" data-url="{{ url_order }}">
+            <thead>
+                <tr>
+                    <th id="no_th">No</th>
+                    <th id="id_th">Id Order</th>
+                    <th id="nama_th">Nama Pelanggan</th>
+                    <th id="alamat_th">Alamat Pengirim</th>
+                    <th id="status_th">Status</th>
+                    <th>Billing</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th>No</th>
+                    <th>Id Order</th>
+                    <th>Nama Pelanggan</th>
+                    <th>Alamat Pengirim</th>
+                    <th>Status</th>
+                    <th>Billing</th>
+                    <th>Action</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <!-- /.card-body -->
+</div>
+<!-- /.modal -->
+<div class="modal fade" id="modal_order">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="title_modal">Detail Data Order Pickup</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="orderPickupForm" data-url_provinsi="{% url 'list_provinsi' %}" method="post" data-url="{% url 'order_pickup' %}">
+                    {% csrf_token %}
+                    <div class="form-group row">
+                        <label for="inputId" class="col-sm-2 col-form-label">Id Order</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="inputId">
+                        </div>
+                    </div>
+                    <!-- <div class="form-group row">
+	                    <label for="inputIdCustomer" class="col-sm-2 col-form-label">Id Customer</label>
+		                <div class="col-sm-10">
+		                   	<input type="text" class="form-control" id="inputIdCustomer">
+		                </div>
+	                </div> -->
+                    <div class="form-group row">
+                        <label for="inputNamaCustomer" class="col-sm-2 col-form-label">Nama Customer</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="inputNamaCustomer">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="inputNoTlp" class="col-sm-2 col-form-label">No. Tlp</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="inputNoTlp">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="inputJenisBarang" class="col-sm-2 col-form-label">Jenis Barang</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="inputJenisBarang">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="inputDetailBarang" class="col-sm-2 col-form-label">Detail Barang</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="inputDetailBarang">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="inputJenisPengiriman" class="col-sm-2 col-form-label">Jenis Pengiriman</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="inputJenisPengiriman">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="inputIdPengemasan" class="col-sm-2 col-form-label">Jenis Pengemasan</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="inputIdPengemasan">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="inputAlamatPengirim" class="col-sm-2 col-form-label">Alamat Pengiriman</label>
+                        <div class="col-sm-10">
+                            <textarea class="form-control" rows="3" id="inputAlamatPengirim"></textarea>
+                            <div class="form-group mt-3">
+                                <select name="provinsi" id="id-provinsi-pengirim" required class="form-control">
+                                    <option value="" selected disabled>Provinsi Pengirim</option>
+                                </select>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-6">
+                                    <select name="kota" id="id-kota-pengirim" class="form-control">
+                                        <option value="">Kota Pengirim</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-6">
+                                    <select name="kecamatan" id="id-kecamatan-pengirim" class="form-control">
+                                        <option value="">Kecamatan Pengirim</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-6">
+                                    <select name="desa" id="id-desa-pengirim" class="form-control">
+                                        <option value="">Desa Pengirim</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-6">
+                                    <select name="kode_pos" id="id-kode_pos-pengirim" class="form-control">
+                                        <option value="">Kode POS Pengirim</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="inputNamaPenerima" class="col-sm-2 col-form-label">Nama Penerima</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="inputNamaPenerima">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="inputNoTlpPenerima" class="col-sm-2 col-form-label">No.Tlp Penerima</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="inputNoTlpPenerima">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="inputEmailPenerima" class="col-sm-2 col-form-label">Email Penerima</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="inputEmailPenerima">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="inputAlamatPenerima" class="col-sm-2 col-form-label">Alamat Penerima</label>
+                        <div class="col-sm-10">
+                            <textarea class="form-control" rows="3" id="inputAlamatPenerima"></textarea>
+                            <div class="form-group mt-3">
+                                <select name="provinsi" id="id-provinsi-penerima" required class="form-control">
+                                    <option value="" selected disabled>Provinsi Penerima</option>
+                                </select>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-6">
+                                    <select name="kota" id="id-kota-penerima" class="form-control">
+                                        <option value="">Kota Penerima</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-6">
+                                    <select name="kecamatan" id="id-kecamatan-penerima" class="form-control">
+                                        <option value="">Kecamatan Penerima</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-6">
+                                    <select name="desa" id="id-desa-penerima" class="form-control">
+                                        <option value="">Desa Penerima</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-6">
+                                    <select name="kode_pos" id="id-kode_pos-penerima" class="form-control">
+                                        <option value="">Kode POS Penerima</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="inputNamaGudang" class="col-sm-2 col-form-label">Gudang</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="inputNamaGudang">
+                        </div>
+                    </div>
+                    <!-- Status dari sisi admin hanya Pickup dan Waiting, karena yang akan done dan cancel adalah kurir -->
+                    <div class="form-group row">
+                        <label for="inputStatus" class="col-sm-2 col-form-label">Status</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" disabled id="inputStatus" name="status">
+                                <option value="waiting">Waiting To Pickup</option>
+                                <option value="pickup">Pick Up</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
+                <button type="button" class="btn btn-primary" id="updateButton" data-url="">Ubah Status Order</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+{% endblock %}
+{% block file_js %}
+<!-- Bootstrap 4 -->
+<script src="{% static 'assets/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<!-- DataTables -->
+<script src="{% static 'assets/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+<!-- SweetAlert2 -->
+<script src="{% static 'assets/plugins/sweetalert2/sweetalert2.min.js' %}"></script>
+<script>
+$(document).ready(function() {
+    function formatDate(date) {
+        var hours = date.getHours();
+        var minutes = date.getMinutes();
+        var seconds = date.getSeconds();
+        var ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12; // the hour '0' should be '12'
+        hours = hours < 10 ? '0'+hours : hours;
+        minutes = minutes < 10 ? '0'+minutes : minutes;
+        seconds = seconds < 10 ? '0'+seconds : seconds;
+        var strTime = hours + ':' + minutes + ':' + seconds + `-${ampm}`;
+        // return (date.getMonth()+1) + "/" + date.getDate() + "/" + date.getFullYear() + "  " + strTime;
+        return date.getFullYear() + "-" + ("0" + (date.getMonth()+1)).slice(-2) + "-" + date.getDate() + " " + strTime;
+    }
+
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    var csrfToken = $("input[name=csrfmiddlewaretoken]").val();
+    var url_edit = '';
+
+    function tampilkan_pesan(pesan, type) {
+        Toast.fire({
+            icon: type,
+            title: pesan
+        });
+    }
+
+
+    function get_current_url() {
+        return window.location.href;
+    }
+
+
+    function generate_token() {
+        var now = new Date();
+        timestamp = now.getFullYear().toString(); // 2011
+        timestamp += (now.getMonth < 12 ? '0' : '') + now.getMonth().toString();
+        timestamp += ((now.getDate < 30) ? '0' : '') + now.getDate().toString();
+        timestamp += ((now.getHours < 12) ? '0' : '') + now.getHours().toString();
+        timestamp += ((now.getMinutes < 60) ? '0' : '') + now.getMinutes().toString();
+        timestamp += ((now.getSeconds < 60) ? '0' : '') + now.getSeconds().toString();
+        return timestamp;
+    }
+
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000
+    });
+
+    var table = $('#order_pickup').DataTable({
+
+        "paging": true,
+        "lengthChange": false,
+        "searching": true,
+        "ordering": true,
+        "info": true,
+        "autoWidth": false,
+        "responsive": true,
+        "processing": true,
+        "serverside": true,
+        "ajax": {
+            "url": get_current_url(),
+            "type": "get"
+        }
+    });
+
+
+    //DETAIL DATA
+    $('body').on('click', '.detailOrderPickup', function(event) {
+        event.preventDefault();
+        var id_order = $(this).data("id");
+        var url_detail = "{% url 'pickup_list_gudang' %}" + "order/" + id_order + "/";
+        $.ajax({
+            url: url_detail,
+            type: 'get',
+            success: function(response) {
+                console.log(response)
+                document.getElementById("inputId").value = response.order_pickup.id_order;
+                // document.getElementById("inputIdCustomer").value = response.pelanggan.id_pelanggan;
+                document.getElementById("inputNamaCustomer").value = response.pelanggan.first_name;
+                document.getElementById("inputNoTlp").value = response.pelanggan.no_telp;
+                document.getElementById("inputJenisBarang").value = response.order_pickup.jenis_barang;
+                document.getElementById("inputDetailBarang").value = response.order_pickup.detail_barang;
+                document.getElementById("inputJenisPengiriman").value = response.order_pickup.jenis_pengiriman;
+                document.getElementById("inputIdPengemasan").value = response.pengemasan.nama_pengemasan;
+                document.getElementById("inputAlamatPengirim").value = response.pelanggan.alamat;
+                document.getElementById("inputNamaPenerima").value = response.order_pickup.nama_penerima;
+                document.getElementById("inputNoTlpPenerima").value = response.order_pickup.no_tlp_penerima;
+                document.getElementById("inputEmailPenerima").value = response.order_pickup.email_penerima;
+                document.getElementById("inputAlamatPenerima").value = response.order_pickup.alamat_penerima;
+
+                document.getElementById("inputNamaGudang").value = response.gudang.nama_gudang;
+                document.getElementById("inputStatus").value = response.order_pickup.status;
+                try {
+                    var option_Kurir = new Option(response.order_pickup.kurir_nama, response.order_pickup.kurir_id, true, true);
+                    $('#inputKurir').append(option_Kurir).trigger('change');
+                } catch(error){ console.log(error)}
+
+
+                document.getElementById("inputId").disabled = true;
+                // document.getElementById("inputIdCustomer").disabled = true;
+                document.getElementById("inputNamaCustomer").disabled = true;
+                document.getElementById("inputNoTlp").disabled = true;
+                document.getElementById("inputJenisBarang").disabled = true;
+                document.getElementById("inputDetailBarang").disabled = true;
+                document.getElementById("inputJenisPengiriman").disabled = true;
+                document.getElementById("inputIdPengemasan").disabled = true;
+                document.getElementById("inputAlamatPengirim").disabled = true;
+                document.getElementById("inputNamaPenerima").disabled = true;
+                document.getElementById("inputNoTlpPenerima").disabled = true;
+                document.getElementById("inputEmailPenerima").disabled = true;
+                document.getElementById("inputAlamatPenerima").disabled = true;
+                document.getElementById("inputNamaGudang").disabled = true;
+                document.getElementById("inputStatus").disabled = true;
+
+                if (response.order_pickup.status == 'waiting') {
+                    document.getElementById("inputStatus").selectedIndex = "0";
+                } else if (response.order_pickup.status == 'pickup') {
+                    document.getElementById("inputStatus").selectedIndex = "1";
+                } else if (response.order_pickup.status == 'done') {
+                    document.getElementById("inputStatus").selectedIndex = "2";
+                } else {
+                    document.getElementById("inputStatus").selectedIndex = "-1";
+                }
+
+                // $_provinsi_pengirim = null;
+                // try {
+                //     $('#id-provinsi-pengirim').val(null).trigger('change');
+                //     $('#id-kota-pengirim').val(null).trigger('change');
+                //     $('#id-kecamatan-pengirim').val(null).trigger('change');
+                //     $('#id-desa-pengirim').val(null).trigger('change');
+                //     $('#id-kode_pos-pengirim').val(null).trigger('change');
+                    
+                //     $_provinsi_pengirim = response.hasOwnProperty('order_pickup') ? response.order_pickup.provinsi_pengirim : 0;
+                //     if($_provinsi_pengirim){
+                //         setTimeout(function(){
+                //             $('#id-provinsi-pengirim').val($_provinsi_pengirim).trigger('change');
+                //         },200)
+                //         setTimeout(function(){
+                //             $('#id-kota-pengirim').val('').trigger('change');
+                //             $('#id-kecamatan-pengirim').val('').trigger('change');
+                //             $('#id-desa-pengirim').val('').trigger('change');
+                //             $('#id-kode_pos-pengirim').val('').trigger('change');
+                //         },400);
+                //     }
+
+                //     try {
+                //         $_kota_pengirim = response.hasOwnProperty('order_pickup') ? response.order_pickup.kota_pengirim : 0;
+                //         if($_kota_pengirim){
+                //             setTimeout(function(){
+                //                 $('#id-kota-pengirim').val($_kota_pengirim).trigger('change');
+                //             },450);
+                //         }
+                //         setTimeout(function(){
+                //             $('#id-kecamatan-pengirim').val('').trigger('change');
+                //             $('#id-desa-pengirim').val('').trigger('change');
+                //             $('#id-kode_pos-pengirim').val('').trigger('change');
+                //         },650)
+                //     } catch(error){}
+
+                //     try {
+                //         $_kecamatan_pengirim = response.hasOwnProperty('order_pickup') ? response.order_pickup.kecamatan_pengirim : 0;
+                //         if($_kecamatan_pengirim){
+                //             setTimeout(function(){
+                //                 $('#id-kecamatan-pengirim').val($_kecamatan_pengirim).trigger('change');
+                //             },700);
+                //         }
+                //         setTimeout(function(){
+                //             $('#id-desa-pengirim').val('').trigger('change');
+                //             $('#id-kode_pos-pengirim').val('').trigger('change');
+                //         },900)
+                //     } catch(error){}
+
+                //     try {
+                //         $_desa_pengirim = response.hasOwnProperty('order_pickup') ? response.order_pickup.desa_pengirim : 0;
+                //         if($_desa_pengirim){
+                //             setTimeout(function(){
+                //                 $('#id-desa-pengirim').val($_desa_pengirim).trigger('change');
+                //             },950);
+                //         }
+                //         setTimeout(function(){
+                //             $('#id-kode_pos-pengirim').val('').trigger('change');
+                //         },1150)
+                //     } catch(error){}
+
+                //     try {
+                //         $_kodepos_pengirim = response.hasOwnProperty('order_pickup') ? response.order_pickup.kode_pos_pengirim : 0;
+                //         if($_kodepos_pengirim){
+                //             setTimeout(function(){
+                //                 $('#id-kode_pos-pengirim').val($_kodepos_pengirim).trigger('change');
+                //             },1200);
+                //         }
+                //     } catch(error){}
+                // } catch(error){}
+                
+
+                // $_provinsi_penerima = null;
+                // try {
+                //     $('#id-provinsi-penerima').val(null).trigger('change');
+                //     $('#id-kota-penerima').val(null).trigger('change');
+                //     $('#id-kecamatan-penerima').val(null).trigger('change');
+                //     $('#id-desa-penerima').val(null).trigger('change');
+                //     $('#id-kode_pos-penerima').val(null).trigger('change');
+                    
+                //     $_provinsi_penerima = response.hasOwnProperty('order_pickup') ? response.order_pickup.provinsi_penerima : 0;
+                //     if($_provinsi_penerima){
+                //         setTimeout(function(){
+                //             $('#id-provinsi-penerima').val($_provinsi_penerima).trigger('change');
+                //         },200)
+                //         setTimeout(function(){
+                //             $('#id-kota-penerima').val('').trigger('change');
+                //             $('#id-kecamatan-penerima').val('').trigger('change');
+                //             $('#id-desa-penerima').val('').trigger('change');
+                //             $('#id-kode_pos-penerima').val('').trigger('change');
+                //         },400);
+                //     }
+
+                //     try {
+                //         $_kota_penerima = response.hasOwnProperty('order_pickup') ? response.order_pickup.kota_penerima : 0;
+                //         if($_kota_penerima){
+                //             setTimeout(function(){
+                //                 $('#id-kota-penerima').val($_kota_penerima).trigger('change');
+                //             },450);
+                //         }
+                //         setTimeout(function(){
+                //             $('#id-kecamatan-penerima').val('').trigger('change');
+                //             $('#id-desa-penerima').val('').trigger('change');
+                //             $('#id-kode_pos-penerima').val('').trigger('change');
+                //         },650)
+                //     } catch(error){}
+
+                //     try {
+                //         $_kecamatan_penerima = response.hasOwnProperty('order_pickup') ? response.order_pickup.kecamatan_penerima : 0;
+                //         if($_kecamatan_penerima){
+                //             setTimeout(function(){
+                //                 $('#id-kecamatan-penerima').val($_kecamatan_penerima).trigger('change');
+                //             },700);
+                //         }
+                //         setTimeout(function(){
+                //             $('#id-desa-penerima').val('').trigger('change');
+                //             $('#id-kode_pos-penerima').val('').trigger('change');
+                //         },900)
+                //     } catch(error){}
+
+                //     try {
+                //         $_desa_penerima = response.hasOwnProperty('order_pickup') ? response.order_pickup.desa_penerima : 0;
+                //         if($_desa_penerima){
+                //             setTimeout(function(){
+                //                 $('#id-desa-penerima').val($_desa_penerima).trigger('change');
+                //             },950);
+                //         }
+                //         setTimeout(function(){
+                //             $('#id-kode_pos-penerima').val('').trigger('change');
+                //         },1150)
+                //     } catch(error){}
+
+                //     try {
+                //         $_kodepos_penerima = response.hasOwnProperty('order_pickup') ? response.order_pickup.kode_pos_penerima : 0;
+                //         if($_kodepos_penerima){
+                //             setTimeout(function(){
+                //                 $('#id-kode_pos-penerima').val($_kodepos_penerima).trigger('change');
+                //             },1200);
+                //         }
+                //     } catch(error){}
+                // } catch(error){}
+                try {
+                    console.log(response);
+                    $('#id-provinsi-pengirim').val(response.order_pickup.provinsi_pengirim);
+                    $('#id-provinsi-penerima').val(response.order_pickup.provinsi_penerima);
+
+                    // document.getElementById("select2-id-provinsi-pengirim-container").innerHTML = response.order_pickup.provinsi_pengirim_nama;
+
+                    show_kota_list(response.order_pickup.provinsi_pengirim, 'pengirim', response.order_pickup.kota_pengirim, response.order_pickup.kota_pengirim_nama);
+                    show_kota_list(response.order_pickup.provinsi_penerima, 'penerima', response.order_pickup.kota_penerima, response.order_pickup.kota_penerima_nama);
+
+                    show_kecamatan_list(response.order_pickup.kota_pengirim, 'pengirim', response.order_pickup.kecamatan_pengirim, response.order_pickup.kecamatan_pengirim_nama);
+                    show_kecamatan_list(response.order_pickup.kota_penerima, 'penerima', response.order_pickup.kecamatan_penerima, response.order_pickup.kecamatan_penerima_nama);
+
+                    show_desa_list(response.order_pickup.kecamatan_pengirim, 'pengirim', response.order_pickup.desa_pengirim, response.order_pickup.desa_pengirim_nama);
+                    show_desa_list(response.order_pickup.kecamatan_penerima, 'penerima', response.order_pickup.desa_penerima, response.order_pickup.desa_penerima_nama);
+
+                    show_kode_pos_list(response.order_pickup.provinsi_pengirim, response.order_pickup.kota_pengirim, response.order_pickup.kecamatan_pengirim, response.order_pickup.desa_pengirim, 'pengirim', response.order_pickup.kode_pos_pengirim, response.order_pickup.kode_pos_pengirim_nama);
+                    show_kode_pos_list(response.order_pickup.provinsi_penerima, response.order_pickup.kota_penerima, response.order_pickup.kecamatan_penerima, response.order_pickup.desa_penerima, 'penerima', response.order_pickup.kode_pos_penerima, response.order_pickup.kode_pos_penerima_nama);
+                } catch(error){
+                    // $('#select2-id-provinsi-pengirim-container').html('Pilih Provinsi');
+                    $('#id-provinsi-pengirim').val('');
+                    // $('#select2-id-kota-pengirim-container').html('Pilih Kota');
+                    $('#id-kota-pengirim').val('');
+                    // $('#select2-id-kecamatan-pengirim-container').html('Pilih Kecamatan');
+                    $('#id-kecamatan-pengirim').val('');
+                    // $('#select2-id-desa-pengirim-container').html('Pilih desa');
+                    $('#id-desa-pengirim').val('');
+                    // $('#select2-id-kode_pos-pengirim-container').html('Pilih Kode Pos');
+                    $('#id-kode_pos-pengirim').val('');
+
+                    // $('#select2-id-provinsi-penerima-container').html('Pilih Provinsi');
+                    $('#id-provinsi-penerima').val('');
+                    // $('#select2-id-kota-penerima-container').html('Pilih Kota');
+                    $('#id-kota-penerima').val('');
+                    // $('#select2-id-kecamatan-penerima-container').html('Pilih Kecamatan');
+                    $('#id-kecamatan-penerima').val('');
+                    // $('#select2-id-desa-penerima-container').html('Pilih desa');
+                    $('#id-desa-penerima').val('');
+                    // $('#select2-id-kode_pos-penerima-container').html('Pilih Kode Pos');
+                    $('#id-kode_pos-penerima').val('');
+                    console.log('DATA DETAIL PELANGGAN TIDAK DITEMUKAN (PROV, KOTA, KEC, dsb)');
+                } 
+
+                $('#id-provinsi-pengirim').prop('disabled', true)
+                $('#id-kota-pengirim').prop('disabled', true)
+                $('#id-kecamatan-pengirim').prop('disabled', true)
+                $('#id-desa-pengirim').prop('disabled', true)
+                $('#id-kode_pos-pengirim').prop('disabled', true)
+
+                $('#id-provinsi-penerima').prop('disabled', true)
+                $('#id-kota-penerima').prop('disabled', true)
+                $('#id-kecamatan-penerima').prop('disabled', true)
+                $('#id-desa-penerima').prop('disabled', true)
+                $('#id-kode_pos-penerima').prop('disabled', true)
+
+                document.getElementById("title_modal").innerHTML = "Detail Data Order Pickup Gudang";
+                $('#updateButton').attr('data-url', url_detail);
+
+                $('#modal_order').modal('show');
+            },
+            error: function(xhr, status, error) {
+                var error_response = xhr.responseJSON;
+
+                tampilkan_pesan(error_response.msg, error_response.type);
+            },
+        })
+
+    });
+
+    $("#updateButton").click(function(e) {
+        e.preventDefault();
+         $("#updateButton").prop("disabled", true);
+        var url_update = $(this).data("url");
+        var serializeData = $("#orderPickupForm").serialize();
+
+        $.ajax({
+            url: url_update,
+            data: serializeData,
+            type: 'post',
+            cache: false,
+            success: function(response) {
+                $('#modal_order').modal('hide');
+                tampilkan_pesan(response.msg, response.type);
+                $("#orderPickupForm")[0].reset();
+                $("#updateButton").prop("disabled", true);
+            },
+            error: function(xhr, status, error) {
+                var error_response = xhr.responseJSON;
+
+                tampilkan_pesan(error_response.msg, error_response.type);
+                 $("#updateButton").prop("disabled", false);
+            },
+        })
+
+
+    });
+
+    $('body').on('click', '.downloadBilling', function(event) {
+        event.preventDefault();
+        var id_order = $(this).data("id");
+
+        var url_detail = "{% url 'pickup_list_gudang' %}" + "order/" + id_order + "/";
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+        var yyyy = today.getFullYear();
+
+        today = mm + '/' + dd + '/' + yyyy;
+        $.ajax({
+            url: url_detail,
+            type: 'get',
+            success: function(response) {
+                var tgl_order = formatDate(new Date(response.tgl_order)) || new Date();
+
+                var printWindow = window.open('', '', 'height=400,width=800');
+                printWindow.document.write('<html><head><title>Data Order PickUp - ' + response.order_pickup.id_order + '</title>');
+                printWindow.document.write('<style id="style_billing">.invoice-box {max-width: 800px;margin: auto;padding: 30px;border: 1px solid #eee;box-shadow: 0 0 10px rgba(0, 0, 0, .15);font-size: 16px;line-height: 24px;font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;color: #555;}.invoice-box table {width: 100%;line-height: inherit;text-align: left;}.invoice-box table td {padding: 5px;vertical-align: top;}.invoice-box table tr td:nth-child(2) {text-align: right;}.invoice-box table tr.top table td {padding-bottom: 20px;}.invoice-box table tr.top table td.title {font-size: 45px;line-height: 45px;color: #333;}.invoice-box table tr.information table td {padding-bottom: 40px;}.invoice-box table tr.heading td {background: #eee;border-bottom: 1px solid #ddd;font-weight: bold;}.invoice-box table tr.details td {padding-bottom: 20px;}.invoice-box table tr.item td{border-bottom: 1px solid #eee;}.invoice-box table tr.item.last td {border-bottom: none;}.invoice-box table tr.total td:nth-child(2) {border-top: 2px solid #eee;font-weight: bold;}@media only screen and (max-width: 600px) {.invoice-box table tr.top table td {width: 100%;display: block;text-align: center;}.invoice-box table tr.information table td {width: 100%;display: block;text-align: center;}}.rtl {direction: rtl;font-family: Tahoma, "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;}.rtl table {text-align: right;}.rtl table tr td:nth-child(2) {text-align: left;}</style>');
+                printWindow.document.write('</head><body >');
+                printWindow.document.write('<div class="invoice-box"><table cellpadding="0" cellspacing="0"><tr class="top"><td colspan="2"><table><tr><td class="title"><img src=\'{% static "frontend/img/baligo.png" %}\' style="width:100%; max-width:200px;"></td>');
+                printWindow.document.write('<td>Invoice #: ' + response.order_pickup.id_order + '<br>Created: ' + today + '<br>Tgl Order: ' + tgl_order + '</td></tr></table></td></tr>');
+                printWindow.document.write('<tr class="information"><td colspan="2"><table><tr><td>Nama Pengirim:' + response.pelanggan.first_name + '<br>No. Hp:' + response.pelanggan.no_telp + '<br>' + 
+                    (response.order_pickup.alamat_pengirim_alt ? response.order_pickup.alamat_pengirim_alt : response.pelanggan.alamat) + ', <br>' +
+                    response.order_pickup.desa_pengirim_nama + ', ' +
+                    response.order_pickup.kecamatan_pengirim_nama + ', ' + '<br>' +
+                    response.order_pickup.kota_pengirim_nama + ', ' + 
+                    response.order_pickup.provinsi_pengirim_nama + ', ' + response.order_pickup.kode_pos_pengirim_nama + '\n' +
+                    '</td>');
+                printWindow.document.write('<td>BALIGO EKSPEDISI<br>Bali<br>admin@baligo.id</td></tr></table></td></tr><tr class="heading"><td>Jenis Pengiriman</td><td>Jenis Pengemasan</td></tr><tr class="details"><td>' + response.order_pickup.jenis_pengiriman + '</td><td>' + response.pengemasan.nama_pengemasan + '</td></tr>');
+                printWindow.document.write('<tr class="heading"><td>DETAIL TUJUAN</td><td>DATA</td></tr>');
+                printWindow.document.write('<tr class="item"><td>Nama Penerima</td><td>' + response.order_pickup.nama_penerima + '</td></tr>');
+                printWindow.document.write('<tr class="item"><td>Alamat Penerima</td><td>' + 
+                    response.order_pickup.alamat_penerima + ', <br>' +
+                    response.order_pickup.desa_penerima_nama + ', ' +
+                    response.order_pickup.kecamatan_penerima_nama + ', ' + '<br>' +
+                    response.order_pickup.kota_penerima_nama + ', ' + 
+                    response.order_pickup.provinsi_penerima_nama + ', ' + response.order_pickup.kode_pos_penerima_nama + '\n' +
+                    '</td></tr>');
+                printWindow.document.write('<tr class="item"><td>No Tlp.</td><td>' + response.order_pickup.no_tlp_penerima + '</td></tr>');
+                printWindow.document.write('<tr class="item last"><td>Email</td><td>' + response.order_pickup.email_penerima + '</td></tr>');
+                printWindow.document.write('<tr class="total"><td></td><td>Status: ' + response.order_pickup.status + '</td></tr></table></div>');
+
+                printWindow.document.write('</body></html>');
+                printWindow.document.close();
+                // printWindow.print();
+            }
+        })
+    });
+
+    function show_provinsi_list() {
+        $.ajax({
+            type: "POST",
+            url: $("#orderPickupForm").data('url_provinsi'),
+            success: function(response) {
+                $("select#id-provinsi-pengirim").append(response.data);
+                $("select#id-provinsi-penerima").append(response.data);
+            }
+        });
+    }
+    show_provinsi_list();
+
+    function show_kota_list(id_provinsi, pengirim_penerima, id_kota_select, nama_kota) {
+        $.ajax({
+            type: "POST",
+            dataType: 'json',
+            contentType: "application/json",
+            url: $("#orderPickupForm").data('url_provinsi') + id_provinsi + '/kota/',
+            data: {
+                csrfmiddlewaretoken: getCookie('csrftoken'),
+                provinsi_id: id_provinsi
+            },
+
+            success: function(response) {
+                // console.log(response.data);
+                $("select#id-kota-" + pengirim_penerima).html(response.data);
+                document.getElementById("id-kota-" + pengirim_penerima).value = id_kota_select;
+                try {
+                    document.getElementById("select2-id-kota-" + pengirim_penerima + "-container").innerHTML = nama_kota;
+                } catch(error){}
+            }
+        });
+    }
+
+    function show_kecamatan_list(id_kota, pengirim_penerima, id_kecamatan_select, nama_kecamatan) {
+        $.ajax({
+            type: "POST",
+            dataType: 'json',
+            contentType: "application/json",
+            url: $("#orderPickupForm").data('url_provinsi') + id_kota + '/kecamatan/',
+            data: {
+                csrfmiddlewaretoken: getCookie('csrftoken'),
+                kota_id: id_kota
+            },
+
+            success: function(response) {
+                // console.log(response.data);
+                $("select#id-kecamatan-" + pengirim_penerima).html(response.data);
+                document.getElementById("id-kecamatan-" + pengirim_penerima).value = id_kecamatan_select;
+                try {
+                    document.getElementById("select2-id-kecamatan-" + pengirim_penerima + "-container").innerHTML = nama_kecamatan;
+                } catch(error){}
+            }
+        });
+    }
+
+    function show_desa_list(id_kecamatan, pengirim_penerima, id_desa_select, nama_desa) {
+        $.ajax({
+            type: "POST",
+            dataType: 'json',
+            contentType: "application/json",
+            url: $("#orderPickupForm").data('url_provinsi') + id_kecamatan + '/desa/',
+            data: {
+                csrfmiddlewaretoken: getCookie('csrftoken'),
+                kecamatan_id: id_kecamatan
+            },
+
+            success: function(response) {
+                // console.log(response.data);
+                $("select#id-desa-" + pengirim_penerima).html(response.data);
+                document.getElementById("id-desa-" + pengirim_penerima).value = id_desa_select;
+                try {
+                    document.getElementById("select2-id-desa-" + pengirim_penerima + "-container").innerHTML = nama_desa;
+                } catch(error){}
+            }
+        });
+    }
+
+    function show_kode_pos_list(id_provinces, id_kota, id_kecamatan, id_desa, pengirim_penerima, id_kode_pos_select, kode_pos) {
+        $.ajax({
+            type: "POST",
+            dataType: 'json',
+            contentType: "application/json",
+            url: $("#orderPickupForm").data('url_provinsi') + id_provinces + '/' + id_kota + '/' + id_kecamatan + '/' + id_desa + '/kode/',
+            data: {
+                csrfmiddlewaretoken: getCookie('csrftoken'),
+                provinsi_id: id_provinces,
+                kota_id: id_kota,
+                kecamatan_id: id_kecamatan,
+                desa_id: id_desa
+            },
+
+            success: function(response) {
+                // console.log(response.data);
+                $("select#id-kode_pos-" + pengirim_penerima).html(response.data);
+                document.getElementById("id-kode_pos-" + pengirim_penerima).value = id_kode_pos_select;
+                try {
+                    document.getElementById("select2-id-kode_pos-" + pengirim_penerima + "-container").innerHTML = kode_pos;
+                } catch(error){}
+            }
+        });
+    }
+
+    $(document).on('change', '#id-provinsi-pengirim', function(e){
+        var id_provinces = $(this).val();
+        $.ajax({
+            type: "POST",
+            dataType: 'json',
+            contentType: "application/json",
+            url: $("#orderPickupForm").data('url_provinsi') + id_provinces + '/kota/',
+            data: {
+                csrfmiddlewaretoken: getCookie('csrftoken'),
+                provinsi_id: id_provinces
+            },
+
+            success: function(response) {
+                // console.log(response.data);
+                $("select#id-kota-pengirim").html(response.data);
+                getAjaxKotaPengirim();
+            }
+        });
+    });
+
+    $(document).on('change', '#id-provinsi-penerima', function(e){
+        var id_provinces = $(this).val();
+        $.ajax({
+            type: "POST",
+            dataType: 'json',
+            contentType: "application/json",
+            url: $("#orderPickupForm").data('url_provinsi') + id_provinces + '/kota/',
+            data: {
+                csrfmiddlewaretoken: getCookie('csrftoken'),
+                provinsi_id: id_provinces
+            },
+
+            success: function(response) {
+                // console.log(response.data);
+                $("select#id-kota-penerima").html(response.data);
+                getAjaxKota();
+            }
+        });
+    });
+
+
+    $("#id-kota-penerima").change(getAjaxKota);
+    function getAjaxKota() {
+        var id_kota = $("#id-kota-penerima").val();
+        $.ajax({
+            type: "POST",
+            dataType: 'json',
+            contentType: "application/json",
+            url: $("#orderPickupForm").data('url_provinsi') + id_kota + '/kecamatan/',
+            data: {
+                csrfmiddlewaretoken: getCookie('csrftoken'),
+                kota_id: id_kota
+            },
+            success: function(response) {
+                $("select#id-kecamatan-penerima").html(response.data);
+                getAjaxKecamatan();
+            }
+        });
+    }
+
+    $("#id-kota-pengirim").change(getAjaxKotaPengirim);
+    function getAjaxKotaPengirim() {
+        var id_kota = $("#id-kota-pengirim").val();
+        $.ajax({
+            type: "POST",
+            dataType: 'json',
+            contentType: "application/json",
+            url: $("#orderPickupForm").data('url_provinsi') + id_kota + '/kecamatan/',
+            data: {
+                csrfmiddlewaretoken: getCookie('csrftoken'),
+                kota_id: id_kota
+            },
+            success: function(response) {
+                $("select#id-kecamatan-pengirim").html(response.data);
+                getAjaxKecamatanPengirim();
+            }
+        });
+    }
+
+    $("#id-kecamatan-penerima").change(getAjaxKecamatan);
+    function getAjaxKecamatan() {
+        var id_kecamatan = $("#id-kecamatan-penerima").val();
+        $.ajax({
+            type: "POST",
+            dataType: 'json',
+            contentType: "application/json",
+            url: $("#orderPickupForm").data('url_provinsi') + id_kecamatan + '/desa/',
+            data: {
+                csrfmiddlewaretoken: getCookie('csrftoken'),
+                kecamatan_id: id_kecamatan
+            },
+            success: function(response) {
+                $("select#id-desa-penerima").html(response.data);
+                getAjaxDesa();
+            }
+        });
+    }
+
+    $("#id-kecamatan-pengirim").change(getAjaxKecamatanPengirim);
+    function getAjaxKecamatanPengirim() {
+        var id_kecamatan = $("#id-kecamatan-pengirim").val();
+        $.ajax({
+            type: "POST",
+            dataType: 'json',
+            contentType: "application/json",
+            url: $("#orderPickupForm").data('url_provinsi') + id_kecamatan + '/desa/',
+            data: {
+                csrfmiddlewaretoken: getCookie('csrftoken'),
+                kecamatan_id: id_kecamatan
+            },
+            success: function(response) {
+                $("select#id-desa-pengirim").html(response.data);
+                getAjaxDesaPengirim();
+            }
+        });
+    }
+
+    $("#id-desa-penerima").change(getAjaxDesa);
+    function getAjaxDesa() {
+            var id_provinces = $("#id-provinsi-penerima").val();
+            var id_kota = $("#id-kota-penerima").val();
+            var id_kecamatan = $("#id-kecamatan-penerima").val();
+            var id_desa = $("#id-desa-penerima").val();
+            $.ajax({
+                type: "POST",
+                dataType: 'json',
+                contentType: "application/json",
+                url: $("#orderPickupForm").data('url_provinsi') + id_provinces + '/' + id_kota + '/' + id_kecamatan + '/' + id_desa + '/kode/',
+                data: {
+                    csrfmiddlewaretoken: getCookie('csrftoken'),
+                    provinsi_id: id_provinces,
+                    kota_id: id_kota,
+                    kecamatan_id: id_kecamatan,
+                    desa_id: id_desa
+                },
+                success: function(response) {
+                    $("select#id-kode_pos-penerima").html(response.data);
+                }
+            });
+    }
+
+    $("#id-desa-pengirim").change(getAjaxDesaPengirim);
+    function getAjaxDesaPengirim() {
+            var id_provinces = $("#id-provinsi-pengirim").val();
+            var id_kota = $("#id-kota-pengirim").val();
+            var id_kecamatan = $("#id-kecamatan-pengirim").val();
+            var id_desa = $("#id-desa-pengirim").val();
+            $.ajax({
+                type: "POST",
+                dataType: 'json',
+                contentType: "application/json",
+                url: $("#orderPickupForm").data('url_provinsi') + id_provinces + '/' + id_kota + '/' + id_kecamatan + '/' + id_desa + '/kode/',
+                data: {
+                    csrfmiddlewaretoken: getCookie('csrftoken'),
+                    provinsi_id: id_provinces,
+                    kota_id: id_kota,
+                    kecamatan_id: id_kecamatan,
+                    desa_id: id_desa
+                },
+                success: function(response) {
+                    $("select#id-kode_pos-pengirim").html(response.data);
+                }
+            });
+    }
+
+});
+</script>
+{% endblock %}

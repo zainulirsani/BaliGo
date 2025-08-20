@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title_name %}
+ <title>Tentang | BaliGo Ekspedisi</title>
+{% endblock %}
+
+{% block file_css %}
+<!-- DataTables -->
+<link rel="stylesheet" href="{% static 'assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+<link rel="stylesheet" href="{% static 'assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+<!-- SweetAlert2 -->
+<link rel="stylesheet" href="{% static 'assets/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css' %}">
+<!-- Summernote css -->
+<link href="{% static 'assets/plugins/summernote/summernote-bs4.min.css' %}" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+
+{% block content_header %}
+<div class="container-fluid">
+    <div class="row mb-2">
+    	<div class="col-sm-6">
+            <h1 class="m-0 text-dark">Tentang Ekspedisi</h1>
+        </div><!-- /.col -->
+	    <div class="col-sm-6">
+	    	<ol class="breadcrumb float-sm-right">
+	    		<li class="breadcrumb-item"><a href="#">Home</a></li>
+	    		<li class="breadcrumb-item active">Tentang</li>
+	    	</ol>
+	    </div><!-- /.col -->
+	</div><!-- /.row -->
+</div><!-- /.container-fluid -->
+{% endblock %}
+
+
+
+{% block content %}
+<div class="card">
+	<div class="card-header">
+		<h3 class="card-title">Data Tentang</h3>
+	</div>
+	<!-- /.card-header -->
+	<div class="card-body">
+		<form id="tentangForm" method="post" data-url="{% url 'tentang' %}">
+			{% csrf_token %}
+			{% for field in form %}
+		        {{ field }}
+			{% endfor %}
+		</form>
+	</div>
+	<div class="card-body">
+		<div class="float-md-right">
+    		<button type="button" class="btn btn-primary " id="updateButton">Update</button>
+    	</div>
+  	</div>
+	
+	<!-- /.card-body -->
+</div>
+
+{% endblock %}
+
+
+
+
+{% block file_js %}
+<!-- Bootstrap 4 -->
+<script src="{% static 'assets/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<!-- DataTables -->
+<script src="{% static 'assets/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+<!-- SweetAlert2 -->
+<script src="{% static 'assets/plugins/sweetalert2/sweetalert2.min.js' %}"></script>
+
+<!-- Summernote js -->
+<script src="{% static 'assets/plugins/summernote/summernote-bs4.min.js' %}"></script>
+
+<!--tinymce js-->
+<script src="{% static 'assets/plugins/tinymce/tinymce.min.js' %}"></script>
+
+<script>
+	$(document).ready(function() {
+	    var csrfToken = $("input[name=csrfmiddlewaretoken]").val();
+	    var url_edit = '';
+
+	    function getCookie(name) {
+		    var cookieValue = null;
+		    if (document.cookie && document.cookie != '') {
+		        var cookies = document.cookie.split(';');
+		        for (var i = 0; i < cookies.length; i++) {
+		            var cookie = jQuery.trim(cookies[i]);
+		            // Does this cookie string begin with the name we want?
+		            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+		                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+		                break;
+		            }
+		        }
+		    }
+		    return cookieValue;
+		}
+
+	    function get_data() {
+	        $.ajax({
+	            url: $("#tentangForm").data("url"),
+	            type: 'get',
+	            cache: false,
+	            success: function(response) {
+	                var data_ = response.data;
+	                if (data_) {
+	                    document.getElementById("inputDeskripsi").value = data_;
+	                } else {
+	                    document.getElementById("inputDeskripsi").value = "";
+	                }
+	            },
+	            error: function(xhr, status, error) {
+	                var error_response = xhr.responseJSON;
+
+	                tampilkan_pesan(error_response.msg, error_response.type);
+	            },
+	        })
+	    }
+
+	    get_data();
+
+
+
+	    function tampilkan_pesan(pesan, type) {
+	        Toast.fire({
+	            icon: type,
+	            title: pesan
+	        });
+	    }
+
+	    const Toast = Swal.mixin({
+	        toast: true,
+	        position: 'top-end',
+	        showConfirmButton: false,
+	        timer: 3000
+	    });
+
+	    0 < $("#inputDeskripsi").length && tinymce.init({
+	        selector: "textarea#inputDeskripsi",
+	        height: 300,
+	        plugins: ["advlist autolink link image lists charmap print preview hr anchor pagebreak spellchecker", "searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking", "save table contextmenu directionality emoticons template paste textcolor"],
+	        toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | l      ink image | print preview media fullpage | forecolor backcolor emoticons",
+	        style_formats: [{
+	            title: "Bold text",
+	            inline: "b"
+	        }, {
+	            title: "Red text",
+	            inline: "span",
+	            styles: {
+	                color: "#ff0000"
+	            }
+	        }, {
+	            title: "Red header",
+	            block: "h1",
+	            styles: {
+	                color: "#ff0000"
+	            }
+	        }, {
+	            title: "Example 1",
+	            inline: "span",
+	            classes: "example1"
+	        }, {
+	            title: "Example 2",
+	            inline: "span",
+	            classes: "example2"
+	        }, {
+	            title: "Table styles"
+	        }, {
+	            title: "Table row 1",
+	            selector: "tr",
+	            classes: "tablerow1"
+	        }]
+	    })
+
+	    // Update action
+	    $("#updateButton").click(function(e) {
+	        e.preventDefault();
+	        // var serializeData = $("#tentangForm").serialize();
+	        var deskripsi_tinymce = tinymce.activeEditor.getContent();
+	        console.log(deskripsi_tinymce);
+	        $.ajax({
+	            url: $("#tentangForm").data("url") + "1/update/",
+	            data: {
+	            	csrfmiddlewaretoken: getCookie('csrftoken'),
+	            	deskripsi: deskripsi_tinymce
+	            },
+	            type: 'post',
+	            cache: false,
+	            success: function(response) {
+	                get_data();
+	                tampilkan_pesan(response.msg, response.type);
+	            },
+	            error: function(xhr, status, error) {
+	                var error_response = xhr.responseJSON;
+
+	                tampilkan_pesan(error_response.msg, error_response.type);
+	            },
+	        })
+	    });
+
+
+	});
+</script>
+{% endblock %}

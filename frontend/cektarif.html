@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>Cek Tarif - Ekspedisi Samitra</title>
+  <meta content="" name="description">
+  <meta content="" name="keywords">
+
+  <!-- Favicons -->
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+    rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/icofont/icofont.min.css" rel="stylesheet">
+  <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="assets/vendor/animate.css/animate.min.css" rel="stylesheet">
+  <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+  <link href="assets/vendor/venobox/venobox.css" rel="stylesheet">
+  <link href="assets/vendor/owl.carousel/assets/owl.carousel.min.css" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="assets/css/style.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+
+  <!-- ======= Header ======= -->
+  <header id="header" class="fixed-top ">
+    <div class="container d-flex align-items-center">
+      <h1 class="logo"><a href="index.html">Ekspedisi Samitra</a></h1>
+      <!-- Uncomment below if you prefer to use an image logo -->
+      <!-- <a href="index.html" class="logo"><img src="assets/img/logo.png" alt="" class="img-fluid"></a>-->
+      <nav class="nav-menu d-none d-lg-block ml-auto">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="#">Order</a></li>
+          <li><a href="#">Tarif</a></li>
+          <li><a href="#">Trace & Tracking</a></li>
+          <li><a href="#">Tentang</a></li>
+          <li><a href="#">Kontak</a></li>
+          <li class="memberarea"><a>Halo, User Id</a></li>
+          <li class="logout"><a href="#">Logout</a></li>
+
+        </ul>
+
+      </nav>
+    </div>
+  </header>
+
+
+  <main id="main">
+    <section id="breadcrumbs" class="breadcrumbs">
+      <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+          <h2>Cek Tarif Pengiriman</h2>
+        </div>
+      </div>
+    </section>
+    <section id="contact" class="contact">
+      <form action="" method="post" class="registration-form">
+        <div class="container">
+          <div class="row mt-5">
+            <div class="container-add-order col-lg-10 mt-5 mt-lg-0">
+
+              <div class="bs-example">
+
+                <div class="form-group row">
+                  <label for="inputEmail" class="col-sm-4 col-form-label">ASAL</label>
+                  <div class="col-sm-8">
+                    <input type="text" class="form-control" id="InputAsal">
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label for="inputPassword" class="col-sm-4 col-form-label">TUJUAN</label>
+                  <div class="col-sm-8">
+                    <input type="text" class="form-control" id="InputTujuan" >
+                  </div>
+                </div>
+                
+                <div class="form-group row">
+                  <label for="Provinsi" class="col-sm-4 col-form-label">SATUAN</label>
+                  <div class="col-md-8">
+                    <select class="form-control" id="InputSatuan">
+                      <option>Select Option 1</option>
+                      <option>Select Option 2</option>
+                      <option>Select Option 3</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-group row">
+                  <label for="inputBerat" class="col-sm-4 col-form-label">BERAT</label>
+                  <div class="col-sm-8">
+                    <input type="text" class="form-control" id="inputBerat">
+                  </div>
+                </div>
+
+              </div>
+            </div>
+            <hr>
+            </hr>
+            <div class="col-lg-2 mt-5">
+              <div class="bs-example">
+
+                <div class="form-group row">
+                  <div class="col-sm-10 offset-sm-2">
+                    <div class="text-center"><button type="submit">CEK</button></div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+        
+
+      <div class="loader text-center">
+        <div class="loader-inner">
+              <div class="lds-roller mb-3">
+                  <div></div>
+                  <div></div>
+                  <div></div>
+                  <div></div>
+                  <div></div>
+                  <div></div>
+                  <div></div>
+                  <div></div>
+              </div>
+              <h4 class="text-uppercase font-weight-bold">Silakan tunggu</h4>
+              
+        </div>
+      </div>
+
+        <div class="container">
+          <div class="row mt-5">
+            <div class="container-add-order col-lg-12 mt-5 mt-lg-0">
+
+              <div class="bs-example">
+
+                <div class="form-group row">
+                  <h2>Hasil</h2>
+                </div>
+                
+                <div class="form-group row">
+                  <table class="table table-bordered">
+                    <thead>
+                      <tr>
+                        <th scope="col">No</th>
+                        <th scope="col">Nama Customer</th>
+                        <th scope="col">Jenis Pengiriman</th>
+                        <th scope="col">Harga</th>
+                        <th scope="col">Estimasi Waktu</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <th scope="row">1</th>
+                        <td>Lorem ipsum dolor sit, amet consectetur adipisicing elit.</td>
+                        <td>Lorem ipsum dolor sit, amet consectetur adipisicing elit.</td>
+                        <td>Lorem ipsum dolor sit, amet consectetur adipisicing elit.</td>
+                        <td>Lorem ipsum dolor sit, amet consectetur adipisicing elit.</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">2</th>
+                        <td>Lorem ipsum dolor sit, amet consectetur adipisicing elit.</td>
+                        <td>Lorem ipsum dolor sit, amet consectetur adipisicing elit.</td>
+                        <td>Lorem ipsum dolor sit, amet consectetur adipisicing elit.</td>
+                        <td>Lorem ipsum dolor sit, amet consectetur adipisicing elit.</td>
+                        
+                      </tr>
+                      <tr>
+                        <th scope="row">3</th>
+                        <td>Lorem ipsum dolor sit, amet consectetur adipisicing elit.</td>
+                        <td>Lorem ipsum dolor sit, amet consectetur adipisicing elit.</td>
+                        <td>Lorem ipsum dolor sit, amet consectetur adipisicing elit.</td>
+                        <td>Lorem ipsum dolor sit, amet consectetur adipisicing elit.</td>
+                        
+                      </tr>
+                    </tbody>
+                  </table>
+                  
+                </div>
+                
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </form>
+    </section>
+
+  </main>
+  
+  <a href="#" class="back-to-top"><i class="icofont-simple-up"></i></a>
+
+  <!-- Vendor JS Files -->
+  <script src="assets/vendor/jquery/jquery.min.js"></script>
+  
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/jquery.easing/jquery.easing.min.js"></script>
+  <script src="assets/vendor/php-email-form/validate.js"></script>
+  <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="assets/vendor/venobox/venobox.min.js"></script>
+  <script src="assets/vendor/waypoints/jquery.waypoints.min.js"></script>
+  <script src="assets/vendor/owl.carousel/owl.carousel.min.js"></script>
+
+  
+  <!-- Template Main JS File -->
+  <script src="assets/js/main.js"></script>
+
+
+</body>
+
+</html>
